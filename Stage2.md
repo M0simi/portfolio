@@ -8,9 +8,11 @@
 The purpose of this project is to develop a chatbot that helps university students get instant and accurate answers to common questions related to university services, deadlines, campus activities, and facilities. This chatbot aims to improve the student experience by providing 24/7 access to university-related information, making it easier and quicker to find the answers students need.
 
 **Objectives (SMART):**  
-1. Deliver a user-friendly chatbot that answers at least 80% of FAQs accurately within the first release.  
-2. Integrate with university service databases (e.g., library, cafeteria, events) by the end of the MVP phase.  
-3. Achieve at least 70% active adoption among target student testers within the pilot stage.  
+1- **Improve Student Access to Information**: Provide instant answers to frequently asked questions about campus facilities, academic services, and important deadlines.
+
+Enhance the Student Experience: Facilitate easy access to a variety of university information without the need for students to navigate multiple sources or wait for staff responses.
+
+Reduce Support Overhead for University Staff: Minimize repetitive inquiries handled by university staff regarding general and common topics, allowing them to focus on more complex tasks.
 
 ---
 
