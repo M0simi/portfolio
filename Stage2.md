@@ -9,9 +9,7 @@ The purpose of this project is to develop a chatbot that helps university studen
 
 **Objectives (SMART):**  
 1- **Improve Student Access to Information**: Provide instant answers to frequently asked questions about campus facilities, academic services, and important deadlines.
-
 2- **Enhance the Student Experience**: Facilitate easy access to a variety of university information without the need for students to navigate multiple sources or wait for staff responses.
-
 3- **Reduce Support Overhead for University Staff**: Minimize repetitive inquiries handled by university staff regarding general and common topics, allowing them to focus on more complex tasks.
 
 ---
@@ -43,15 +41,19 @@ The purpose of this project is to develop a chatbot that helps university studen
 ## 3. Scope
 
 **In-Scope:**  
-- AI chatbot capable of answering FAQs.  
-- Basic integration with university service databases (library, cafeteria, events).  
-- Web or mobile-friendly interface for students.  
+- Providing answers to common university-related questions (e.g., campus facilities, deadlines, events). 
+- Real-time data regarding university services, facilities (e.g., library, cafeteria), and key events. 
+- Web or mobile-friendly interface for students.
+- Development of an intuitive user interface that allows students to interact with the chatbot.
 - 24/7 availability.  
 
 **Out-of-Scope:**  
-- Handling sensitive student data (grades, financial records).  
-- Advanced features like predictive analytics or voice assistants (future phases).  
-- Full-scale integration with every university system.  
+- The MVP will not integrate with university systems for personalized student data like grades, course registrations, etc.  
+- Advanced features like predictive analytics or voice assistants (future phases).
+- No advanced NLP capabilities (e.g., understanding complex questions or casual conversations).  
+- Full-scale integration with every university system.
+- The chatbot will be available primarily through a web interface, not as a mobile app in this MVP version.
+- Multi-Language Support: The MVP will not include multi-language support for international students (will be added later if needed).  
 
 ---
 
