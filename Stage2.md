@@ -1,0 +1,82 @@
+# 📄 Stage 2 – Project Charter: University Chatbot for Students
+
+---
+
+## 1. Project Objectives
+
+**Purpose:**  
+To create an AI-powered chatbot that provides university students with instant, reliable, and personalized assistance. The chatbot will serve as a single point of contact for common questions and university-related services.
+
+**Objectives (SMART):**  
+1. Deliver a user-friendly chatbot that answers at least 80% of FAQs accurately within the first release.  
+2. Integrate with university service databases (e.g., library, cafeteria, events) by the end of the MVP phase.  
+3. Achieve at least 70% active adoption among target student testers within the pilot stage.  
+
+---
+
+## 2. Stakeholders and Team Roles
+
+**Internal Stakeholders:**  
+- **Team Members:**  
+  - Saleh Alharbi – Project Manager (PM)  
+  - Meshari Alosimi – Developer & Documentation
+  - Abdulaziz Almutairi – Backend Developer  
+  - Abdulaziz Alzahrani – Frontend Developer  
+
+- **Tutors/Instructors:** Provide feedback and evaluation.  
+
+**External Stakeholders:**  
+- University students (end-users)  
+- University administration (support and potential integration partner)  
+
+**Roles & Responsibilities:**  
+- **Project Manager (PM):** Oversees planning, ensures progress, manages risks.  
+- **Frontend Developer:** Builds chatbot interface and user experience.  
+- **Backend Developer:** Develops server-side logic, database integration, and APIs.  
+- **Developer & Documentation:** Supports development tasks and maintains clear documentation.  
+
+---
+
+## 3. Scope
+
+**In-Scope:**  
+- AI chatbot capable of answering FAQs.  
+- Basic integration with university service databases (library, cafeteria, events).  
+- Web or mobile-friendly interface for students.  
+- 24/7 availability.  
+
+**Out-of-Scope:**  
+- Handling sensitive student data (grades, financial records).  
+- Advanced features like predictive analytics or voice assistants (future phases).  
+- Full-scale integration with every university system.  
+
+---
+
+## 4. Risks
+
+| Risk | Impact | Mitigation Strategy |
+|------|--------|---------------------|
+| Limited access to university databases | Medium | Collaborate early with university IT to identify accessible data sources. |
+| Student privacy concerns | High | Avoid handling sensitive personal data; comply with data privacy policies. |
+| Lack of technical experience in NLP | Medium | Use existing AI frameworks and allocate time for tutorials. |
+| Low adoption by students | High | Conduct awareness campaigns and focus on user-friendly design. |
+
+---
+
+## 5. High-Level Plan
+
+**Project Stages & Timeline:**  
+
+- **Stage 1:** Idea Development & Team Formation ✅  
+- **Stage 2:** Project Charter Development (Current, Week 3–4)  
+- **Stage 3:** Technical Documentation (Week 5–6)  
+- **Stage 4:** MVP Development (Week 7–10)  
+- **Stage 5:** Project Closure & Final Presentation (Week 11–12)  
+
+**Key Milestones:**  
+- Week 4: Finalize Project Charter  
+- Week 6: Complete Technical Documentation  
+- Week 10: Deliver MVP for testing  
+- Week 12: Final Presentation & Closure  
+
+---
