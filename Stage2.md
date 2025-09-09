@@ -29,7 +29,8 @@ The purpose of this project is to develop a chatbot that helps university studen
 
 **External Stakeholders:**  
 - University students (end-users)  
-- University administration (support and potential integration partner)  
+- University administration (support and potential integration partner)
+- External AI Services Providers (if applicable): Might offer APIs or technologies used to power the chatbot’s AI functionality.
 
 **Roles & Responsibilities:**  
 - **Project Manager (PM):** Oversees planning, ensures progress, manages risks.  
