@@ -5,7 +5,7 @@
 ## 1. Project Objectives
 
 **Purpose:**  
-To create an AI-powered chatbot that provides university students with instant, reliable, and personalized assistance. The chatbot will serve as a single point of contact for common questions and university-related services.
+The purpose of this project is to develop a chatbot that helps university students get instant and accurate answers to common questions related to university services, deadlines, campus activities, and facilities. This chatbot aims to improve the student experience by providing 24/7 access to university-related information, making it easier and quicker to find the answers students need.
 
 **Objectives (SMART):**  
 1. Deliver a user-friendly chatbot that answers at least 80% of FAQs accurately within the first release.  
