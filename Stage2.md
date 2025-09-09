@@ -9,7 +9,9 @@ The purpose of this project is to develop a chatbot that helps university studen
 
 **Objectives (SMART):**  
 1- **Improve Student Access to Information**: Provide instant answers to frequently asked questions about campus facilities, academic services, and important deadlines.
+
 2- **Enhance the Student Experience**: Facilitate easy access to a variety of university information without the need for students to navigate multiple sources or wait for staff responses.
+
 3- **Reduce Support Overhead for University Staff**: Minimize repetitive inquiries handled by university staff regarding general and common topics, allowing them to focus on more complex tasks.
 
 ---
