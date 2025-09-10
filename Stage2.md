@@ -68,6 +68,21 @@ The purpose of this project is to develop a chatbot that helps university studen
 | Lack of technical experience in NLP | Medium | Use existing AI frameworks and allocate time for tutorials. |
 | Low adoption by students | High | Conduct awareness campaigns and focus on user-friendly design. |
 
+## 🚨 3. Identify Risks
+
+| **Risk**                                                                 | **Category**       | **Description**                                                                                       | **Mitigation Strategy**                                                                                   |
+|--------------------------------------------------------------------------|--------------------|--------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| Lack of experience with chatbot development tools or NLP libraries       | Technical          | Team members may be unfamiliar with platforms like Dialogflow, Rasa, or NLP models like GPT.           | Allocate time for team training sessions and tutorials during the initial sprint. Assign learning tasks.   |
+| Integration difficulty with university systems or databases              | Technical          | Challenges in connecting with external systems to retrieve real-time data.                             | Focus the MVP on public data; plan integration for later stages. Build a mock API to simulate real data.   |
+| Delay in meeting deadlines                                               | Timeline           | Potential delays due to scope creep, unforeseen technical issues, or team availability.                | Use agile methodology with short sprints, set realistic timelines, and conduct weekly progress reviews.    |
+| Poor team communication or collaboration                                 | Team Dynamics      | Miscommunication may lead to duplicated efforts or incomplete tasks.                                   | Set clear communication guidelines, hold weekly sync meetings, and use Slack + Notion for task tracking.   |
+| Insufficient or unclear data for chatbot training                        | Technical          | Limited or low-quality FAQ data may affect chatbot accuracy and performance.                           | Start with scraped/available FAQ data, and validate it with students or university sources when possible.  |
+| Low student adoption or interest in using the chatbot                    | User Adoption      | Students may not be aware of the chatbot or may not find it useful.                                    | Create an onboarding strategy (e.g., demo videos, posters), and gather user feedback for continuous improvement. |
+| Difficulty in maintaining chatbot accuracy as information changes        | Maintenance        | University services and deadlines often change, requiring regular content updates.                     | Design a simple content management backend or allow admin users to update key information manually.        |
+| Privacy and data protection concerns                                     | Legal / Technical  | Risk of violating privacy policies when handling student-related queries.                              | Ensure the chatbot doesn’t process sensitive personal data. Follow local laws (e.g., GDPR/FERPA) in design.|
+| Over-reliance on one or two key team members                             | Team Dynamics      | Bottlenecks if certain roles become unavailable or overwhelmed.                                        | Cross-train members, document progress thoroughly, and foster knowledge sharing within the team.          |
+
+
 ---
 
 ## 5. High-Level Plan
