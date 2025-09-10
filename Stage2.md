@@ -91,3 +91,6 @@ Below is the high-level plan outlining the major phases of the project and their
 | **Stage 5: Project Closure**   | Week 11–12    | Final presentation, documentation handover, and team reflection.                |  Final Report, Presentation Slides, Demo Video, Lessons Learned               |
 
 ---
+
+![Timeline](Timeline.png)
+
