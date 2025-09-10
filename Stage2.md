@@ -78,24 +78,6 @@ The purpose of this project is to develop a chatbot that helps university studen
 
 ## 5. High-Level Plan
 
-**Project Stages & Timeline:**  
-
-- **Stage 1:** Idea Development & Team Formation ✅  
-- **Stage 2:** Project Charter Development (Current, Week 3–4)  
-- **Stage 3:** Technical Documentation (Week 5–6)  
-- **Stage 4:** MVP Development (Week 7–10)  
-- **Stage 5:** Project Closure & Final Presentation (Week 11–12)  
-
-**Key Milestones:**  
-- Week 4: Finalize Project Charter  
-- Week 6: Complete Technical Documentation  
-- Week 10: Deliver MVP for testing  
-- Week 12: Final Presentation & Closure  
-
----
-
-## 🗂️ 4. Develop a High-Level Plan
-
 ### Project Timeline & Milestones
 
 Below is the high-level plan outlining the major phases of the project and their associated milestones.
