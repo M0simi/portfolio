@@ -92,5 +92,5 @@ Below is the high-level plan outlining the major phases of the project and their
 
 ---
 
-![Timeline](Timeline.png)
+![Timeline](Timeline.jpeg)
 
