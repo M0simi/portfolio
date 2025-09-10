@@ -61,15 +61,6 @@ The purpose of this project is to develop a chatbot that helps university studen
 
 ## 4. Risks
 
-| Risk | Impact | Mitigation Strategy |
-|------|--------|---------------------|
-| Limited access to university databases | Medium | Collaborate early with university IT to identify accessible data sources. |
-| Student privacy concerns | High | Avoid handling sensitive personal data; comply with data privacy policies. |
-| Lack of technical experience in NLP | Medium | Use existing AI frameworks and allocate time for tutorials. |
-| Low adoption by students | High | Conduct awareness campaigns and focus on user-friendly design. |
-
-## 🚨 3. Identify Risks
-
 | **Risk**                                                                 | **Category**       | **Description**                                                                                       | **Mitigation Strategy**                                                                                   |
 |--------------------------------------------------------------------------|--------------------|--------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
 | Lack of experience with chatbot development tools or NLP libraries       | Technical          | Team members may be unfamiliar with platforms like Dialogflow, Rasa, or NLP models like GPT.           | Allocate time for team training sessions and tutorials during the initial sprint. Assign learning tasks.   |
