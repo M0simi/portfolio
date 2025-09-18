@@ -5,7 +5,7 @@
 ## 1. Project Objectives
 
 **Purpose:**  
-The purpose of this project is to develop a chatbot that helps university students get instant and accurate answers to common questions related to university services, deadlines of activites or public services, campus activities, and facilities. This chatbot aims to improve the student experience by providing 24/7 access to university-related information, making it easier and quicker to find the answers students need.
+The purpose of this project is to develop an application that helps university students get instant and accurate answers to common questions related to university services, deadlines of activites or public services, campus activities, and facilities. This chatbot aims to improve the student experience by providing 24/7 access to university-related information, making it easier and quicker to find the answers students need.
 
 **Objectives (SMART):**  
 1- **Improve Student Access to Information**: Provide instant answers to frequently asked questions about campus facilities, academic services, and important deadlines.
