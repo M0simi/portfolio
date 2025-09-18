@@ -5,7 +5,7 @@
 ## 1. Project Objectives
 
 **Purpose:**  
-The purpose of this project is to develop a chatbot that helps university students get instant and accurate answers to common questions related to university services, deadlines, campus activities, and facilities. This chatbot aims to improve the student experience by providing 24/7 access to university-related information, making it easier and quicker to find the answers students need.
+The purpose of this project is to develop a chatbot that helps university students get instant and accurate answers to common questions related to university services, deadlines of activites or public services, campus activities, and facilities. This chatbot aims to improve the student experience by providing 24/7 access to university-related information, making it easier and quicker to find the answers students need.
 
 **Objectives (SMART):**  
 1- **Improve Student Access to Information**: Provide instant answers to frequently asked questions about campus facilities, academic services, and important deadlines.
@@ -26,11 +26,6 @@ The purpose of this project is to develop a chatbot that helps university studen
   - Abdulaziz Alzahrani – Frontend Developer  
 
 - **Tutors/Instructors:** Provide feedback and evaluation.  
-
-**External Stakeholders:**  
-- University students (end-users)  
-- University administration (support and potential integration partner)
-- External AI Services Providers (if applicable): Might offer APIs or technologies used to power the chatbot’s AI functionality.
 
 **Roles & Responsibilities:**  
 - **Project Manager (PM):** Oversees planning, ensures progress, manages risks.  
