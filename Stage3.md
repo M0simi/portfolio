@@ -39,10 +39,10 @@
 
 **High-Level Components**
 - **Frontend:** React web interface.  
-- **Backend:** Flask + Flask-RESTX API.  
-- **Database:** PostgreSQL.  
-- **Search Engine:** Retrieval-based (keywords + embeddings).  
-- **External API:** Optional (University Calendar in future).  
+- **Backend:** Python + Django Framework.  
+- **Database:** MongoDB.  
+- **Search Engine (if applicable):** Rasa.  
+- **External API (if applicable):** Optional (University Calendar in future, OpenAI).
 
 **Data Flow**
 Student → Frontend → Backend (API) → Database/Search → Response → Student  
@@ -50,10 +50,10 @@ Student → Frontend → Backend (API) → Database/Search → Response → Stud
 ```mermaid
 flowchart LR
     student[Student Web] --> frontend[Frontend - React]
-    frontend -->|REST calls| backend[Backend - Flask + RESTX]
-    backend -->|CRUD/Queries| db[(PostgreSQL)]
+    frontend -->|REST calls| backend[Backend - Python - Django]
+    backend -->|CRUD/Queries| db[(MongoDB)]
     backend -->|Search / Rank| vector[(Vector Store - optional)]
-    backend -->|Optional Events| external[External API - University Calendar]
+    backend -->|Optional Events| external[External API - University Calendar, OpenAI]
     backend --> frontend
     frontend --> student
 ```
