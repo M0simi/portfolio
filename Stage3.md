@@ -28,10 +28,12 @@
 ### Mockups
 
 - **Chatbot Interface:**  
-  ![Chatbot Mockup](mockup_chat.png)  
+  <img width="1600" height="1000" alt="image" src="https://github.com/user-attachments/assets/c0584a73-f01b-44b6-9266-f2f4011ee4dd" />
+ 
 
 - **Admin Dashboard:**  
-  ![Admin Dashboard Mockup](mockup_admin.png)  
+  <img width="1600" height="1126" alt="image" src="https://github.com/user-attachments/assets/e8e39f0e-4483-4685-8356-a15cf4ceeaaf" />
+  
 
 ---
 
