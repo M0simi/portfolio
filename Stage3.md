@@ -13,7 +13,7 @@
 - As an **admin**, I want to **add or update FAQs**, so that **the chatbot always has accurate information**.  
 
 **Should Have**
-- As a **student**, I want to **ask the chatbot general questions about university events and announcemtns**, so that **I stay informed and engaged.
+- As a **student**, I want to **ask the chatbot general questions about university events and announcemtns**, so that **I stay informed and engaged**.
 - As a **student**, I want to **access the chatbot from web**, so that **I can use it wherever I am**
 
 **Could Have**
