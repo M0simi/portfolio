@@ -13,14 +13,17 @@
 - As an **admin**, I want to **add or update FAQs**, so that **the chatbot always has accurate information**.  
 
 **Should Have**
-- As a **student**, I want to **receive reminders for important deadlines**, so that **I stay updated**.  
+- As a **student**, I want to **ask the chatbot general questions about university events and announcemtns**, so that **I stay informed and engaged.
+- As a **student**, I want to **access the chatbot from web**, so that **I can use it wherever I am**
 
 **Could Have**
-- As a **student**, I want to **rate chatbot answers**, so that **future responses can improve**.  
+- As a **student**, I want to **rate chatbot answers**, so that **future responses can improve**.
+- As a **student**, I want to **save frequently asked questions**, so that **I can access them quickly later**. 
 
 **Won’t Have (MVP)**
-- Voice assistant features.  
-- Integration with personalized student data (grades, enrollment).  
+- As a **student**, I want to **interact with the chatbot using voice commands**, so that **I can have a hands-free experience**.
+- As a **student**, I want the chatbot to **access my grades and personal academic data**, so that **I can get personalized academic insights**.
+- As a **student**, I want the chatbot to **speak in multiple languages**, so that **I can interact in my preferred language**.
 
 ### Mockups
 
