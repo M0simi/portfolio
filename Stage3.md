@@ -186,7 +186,8 @@ sequenceDiagram
 
 ### External APIs (Future)
 - University Calendar API.  
-- University Announcements API.  
+- University Announcements API.
+- OpenAI API  
 
 ---
 
