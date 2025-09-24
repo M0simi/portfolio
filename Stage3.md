@@ -214,46 +214,6 @@ Constraint: unique pair (user_id, faq_id)
 ## 📝 Task 3: Sequence Diagrams
 
 ```mermaid
-sequenceDiagram
-    autonumber
-    participant Student
-    participant Admin
-    participant Frontend as Frontend (Web/Admin UI)
-    participant Backend as Backend API (Flask)
-    participant DB as PostgreSQL
-
-    %% --- Use Case 1: Student asks FAQ ---
-    Student->>Frontend: Type question
-    Frontend->>Backend: GET /api/faqs?query=...
-    Backend->>DB: Search FAQs (text/embeddings)
-    DB-->>Backend: Matching rows
-    Backend-->>Frontend: 200 OK (JSON answer)
-    Frontend-->>Student: Render answer in chat
-
-    %% --- Divider ---
-    Note over Student,DB: --- Admin updates FAQ ---
-
-    %% --- Use Case 2: Admin updates FAQ ---
-    Admin->>Frontend: Edit FAQ (question/answer)
-    Frontend->>Backend: PUT /api/faqs/:id (JWT)
-    Backend->>DB: UPDATE faqs SET ...
-    DB-->>Backend: Update OK
-    Backend-->>Frontend: 200 OK (updated record)
-    Frontend-->>Admin: Show success + refreshed table
-
-    %% --- Divider ---
-    Note over Student,DB: --- Student views events ---
-
-    %% --- Use Case 3: Student views events ---
-    Student->>Frontend: Click "Deadlines" quick reply
-    Frontend->>Backend: GET /api/events?from=&to=
-    Backend->>DB: SELECT events WHERE date range
-    DB-->>Backend: Matching events
-    Backend-->>Frontend: 200 OK (JSON events)
-    Frontend-->>Student: Show list of deadlines
-```
-
-```mermaid
 %%{init: {'theme': 'dark', 'sequence': {'showSequenceNumbers': true}}}%%
 sequenceDiagram
   autonumber
