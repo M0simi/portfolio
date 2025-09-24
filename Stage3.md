@@ -254,52 +254,47 @@ sequenceDiagram
 ```
 
 ```
+%%{init: {'theme': 'dark', 'sequence': {'showSequenceNumbers': true}}}%%
 sequenceDiagram
   autonumber
   participant Student
-  participant Frontend as Frontend (React)
-  participant Backend as Backend (Django + DRF)
-  participant DB as MongoDB
-
-  Student->>Frontend: Open login & enter credentials
-  Frontend->>Backend: POST /api/auth/login {email, password}
-  Backend->>DB: findOne({ email })
-  DB-->>Backend: user doc
-  Backend-->>Frontend: 200 OK { token, role }
-  Frontend-->>Student: Store token & redirect
-```
-2) Student Searches FAQs
-```
-sequenceDiagram
-  autonumber
-  participant Student
-  participant Frontend as Frontend (React)
-  participant Backend as Backend (Django + DRF)
-  participant DB as MongoDB
-
-  Student->>Frontend: Type query "library hours"
-  Frontend->>Backend: GET /api/faqs?query=library%20hours
-  Backend->>DB: find({ $text: { $search: "library hours" } })
-  DB-->>Backend: matching FAQs
-  Backend-->>Frontend: 200 OK [ {id, question, answer}, ... ]
-  Frontend-->>Student: Render results in chat
-```
-3) Admin Updates FAQ
-```
-sequenceDiagram
-  autonumber
   participant Admin
-  participant Frontend as Frontend (Admin UI)
-  participant Backend as Backend (Django + DRF)
+  participant Frontend as Frontend (React Web/Admin UI)
+  participant Backend as Backend API (Django + DRF)
   participant DB as MongoDB
 
-  Admin->>Frontend: Edit FAQ form (Q/A fields)
-  Frontend->>Backend: PUT /api/faqs/:id (JWT)
-  Backend->>DB: updateOne({ _id:id }, { $set: {...} })
-  DB-->>Backend: acknowledged: true
-  Backend-->>Frontend: 200 OK { updated record }
-  Frontend-->>Admin: Show success & refresh table
+  %% ===================== Use Case 1: Student asks FAQ =====================
+  rect rgba(180,180,180,0.15)
+    Note over Student,DB: --- Student asks FAQ ---
+    Student->>Frontend: Type question
+    Frontend->>Backend: GET /api/faqs?query=...
+    Backend->>DB: find({ $text: { $search: "<query>" } })
+    DB-->>Backend: matching FAQ documents
+    Backend-->>Frontend: 200 OK (JSON answers)
+    Frontend-->>Student: Render answer in chat
+  end
 
+  %% ===================== Use Case 2: Admin updates FAQ =====================
+  rect rgba(180,180,180,0.15)
+    Note over Student,DB: --- Admin updates FAQ ---
+    Admin->>Frontend: Edit FAQ (question/answer)
+    Frontend->>Backend: PUT /api/faqs/:id (Authorization: Bearer JWT)
+    Backend->>DB: updateOne({ _id: id }, { $set: { question, answer, updated_by, updated_at } })
+    DB-->>Backend: { acknowledged: true, modifiedCount: 1 }
+    Backend-->>Frontend: 200 OK { updated record }
+    Frontend-->>Admin: Show success + refreshed table
+  end
+
+  %% ===================== Use Case 3: Student views events ==================
+  rect rgba(180,180,180,0.15)
+    Note over Student,DB: --- Student views events ---
+    Student->>Frontend: Click "deadlines" quick reply
+    Frontend->>Backend: GET /api/events?from=&to=
+    Backend->>DB: find({ start_date: { $gte: from, $lte: to } })
+    DB-->>Backend: matching event documents
+    Backend-->>Frontend: 200 OK (JSON events)
+    Frontend-->>Student: Show list of deadlines
+  end
 ```
 
 ---
