@@ -64,69 +64,149 @@ flowchart LR
 
 ## 📝 Task 2: Components, Classes, and Database Design
 
-### 2.1 Component/Class Descriptions (Back-end)
+### 2.1 Back-End Components / Services
 
-- **FaqService**
-  - **Methods:** `list_faqs(query, category_id)`, `get_faq(id)`, `create_faq(data)`, `update_faq(id, data)`, `delete_faq(id)`
+AuthService
 
-- **SearchService**
-  - **Methods:** `search(query, top_k)`, `index_faq(faq)`
+login(email, password) → token
 
-- **EventService**
-  - **Methods:** `list_events(from, to)`, `create_event(data)`, `update_event(id, data)`, `delete_event(id)`
+generate_token(user)
 
-- **AuthService**
-  - **Methods:** `login(email, password)`, `generate_token(user)`, `verify_token(token)`
+verify_token(token)
 
----
+FaqService
 
-### 2.2 ER Diagram / Database Schema (Relational)
+list_faqs(query, category_id)
 
-#### ER Diagram (Mermaid)
-```mermaid
-erDiagram
-    USERS ||--o{ FAQS : updates
-    USERS {
-      int id PK
-      varchar name
-      varchar email
-      varchar role
-      varchar password_hash
-      datetime created_at
-    }
+get_faq(id)
 
-    CATEGORIES ||--o{ FAQS : categorizes
-    CATEGORIES {
-      int id PK
-      varchar name
-    }
+create_faq(data, user)
 
-    FAQS {
-      int id PK
-      text question
-      text answer
-      int category_id FK
-      int updated_by FK
-      datetime updated_at
-    }
+update_faq(id, data, user)
 
-    EVENTS {
-      int id PK
-      varchar title
-      datetime start_date
-      datetime end_date
-      varchar location
-    }
+delete_faq(id)
 
-    FAQS ||--o{ FEEDBACK : receives
-    FEEDBACK {
-      int id PK
-      int faq_id FK
-      boolean helpful
-      text comment
-      datetime created_at
-    }
+EventService
+
+list_events(from, to)
+
+create_event(data)
+
+update_event(id, data)
+
+delete_event(id)
+
+SearchService
+
+search(query, top_k)
+
+index_faq(faq) (تُستخدم إذا اعتمدنا vector store/Rasa لاحقًا)
+
+FeedbackService
+
+submit_feedback(faq_id, helpful, comment, user)
+
+list_feedback(faq_id)
+
+FavoriteService (Optional for “save FAQs”)
+
+toggle_favorite(user_id, faq_id)
+
+list_favorites(user_id)
+
+
+2.2 Database Design (Document-Oriented – MongoDB)
+Collection: users
 ```
+{
+  "_id": "UUID",
+  "name": "string",
+  "email": "string (unique)",
+  "password_hash": "string",
+  "role": "admin|student",
+  "created_at": "ISODate",
+  "updated_at": "ISODate"
+}
+```
+
+Mandatory: email, password_hash, role
+
+Optional: name
+
+Collection: categories
+```
+{
+  "_id": "UUID",
+  "name": "string"
+}
+```
+
+Mandatory: name
+
+Collection: faqs
+```
+{
+  "_id": "UUID",
+  "question": "text",
+  "answer": "text",
+  "category_id": "UUID -> categories._id",
+  "updated_by": "UUID -> users._id",
+  "updated_at": "ISODate",
+  "created_at": "ISODate"
+}
+```
+
+Mandatory: question, answer, category_id
+
+Optional: updated_by
+
+Collection: events
+```
+{
+  "_id": "UUID",
+  "title": "string",
+  "start_date": "ISODate",
+  "end_date": "ISODate",
+  "location": "string",
+  "description": "string",
+  "created_at": "ISODate",
+  "updated_at": "ISODate"
+}
+```
+
+Mandatory: title, start_date
+
+Optional: end_date, location, description
+
+Collection: feedback
+```
+{
+  "_id": "UUID",
+  "faq_id": "UUID -> faqs._id",
+  "user_id": "UUID -> users._id",
+  "helpful": true,
+  "comment": "string",
+  "created_at": "ISODate"
+}
+```
+
+Mandatory: faq_id, user_id, helpful
+
+Optional: comment
+
+Collection: favorites
+```
+{
+  "_id": "UUID",
+  "user_id": "UUID -> users._id",
+  "faq_id": "UUID -> faqs._id",
+  "created_at": "ISODate"
+}
+```
+
+Mandatory: user_id, faq_id
+
+Constraint: unique pair (user_id, faq_id)
 
 ---
 
