@@ -116,6 +116,7 @@ list_favorites(user_id)
 
 
 2.2 Database Design (Document-Oriented – MongoDB)
+
 Collection: users
 ```
 {
