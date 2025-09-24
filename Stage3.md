@@ -213,37 +213,7 @@ Constraint: unique pair (user_id, faq_id)
 
 ## 📝 Task 3: Sequence Diagrams
 
-```mermaid
-%%{init: {'theme': 'dark', 'sequence': {'showSequenceNumbers': true}}}%%
-sequenceDiagram
-  autonumber
-  participant Student
-  participant Admin
-  participant Frontend as Frontend (React Web/Admin UI)
-  participant Backend as Backend API (Django + DRF)
-  participant DB as MongoDB
 
-  %% ===================== Use Case 1: Student asks FAQ =====================
-  Note over Student,DB: --- Student asks FAQ ---
-  Student->>Frontend: Type question
-  Frontend->>Backend: GET /api/faqs?query=...
-  Backend->>DB: find({ $text: { $search: "<query>" } })
-  DB-->>Backend: matching FAQ documents
-  Backend-->>Frontend: 200 OK (JSON answers)
-  Frontend-->>Student: Render answer in chat
-
-  %% ===================== Use Case 2: Admin updates FAQ =====================
-  Note over Student,DB: --- Admin updates FAQ ---
-  Admin->>Frontend: Edit FAQ (question/answer)
-  Frontend->>Backend: PUT /api/faqs/:id (Authorization: Bearer JWT)
-  Backend->>DB: updateOne({ _id: id }, { $set: { question, answer, updated_by, updated_at } })
-  DB-->>Backend: { acknowledged: true, modifiedCount: 1 }
-  Backend-->>Frontend: 200 OK { updated record }
-  Frontend-->>Admin: Show success + refreshed table
-
-  %% ====
-
-```
 ```mermaid
 %%{init:{
   'theme':'dark',
@@ -273,6 +243,7 @@ sequenceDiagram
   Frontend-->>Student: Render answer in chat
 
 ```
+
 ```mermaid
 %%{init:{
   'theme':'dark',
@@ -302,6 +273,7 @@ sequenceDiagram
   Frontend-->>Admin: Show success + refreshed table
 
 ```
+
 ```mermaid
 %%{init:{
   'theme':'dark',
