@@ -252,6 +252,56 @@ sequenceDiagram
     Backend-->>Frontend: 200 OK (JSON events)
     Frontend-->>Student: Show list of deadlines
 ```
+
+```
+sequenceDiagram
+  autonumber
+  participant Student
+  participant Frontend as Frontend (React)
+  participant Backend as Backend (Django + DRF)
+  participant DB as MongoDB
+
+  Student->>Frontend: Open login & enter credentials
+  Frontend->>Backend: POST /api/auth/login {email, password}
+  Backend->>DB: findOne({ email })
+  DB-->>Backend: user doc
+  Backend-->>Frontend: 200 OK { token, role }
+  Frontend-->>Student: Store token & redirect
+```
+2) Student Searches FAQs
+```
+sequenceDiagram
+  autonumber
+  participant Student
+  participant Frontend as Frontend (React)
+  participant Backend as Backend (Django + DRF)
+  participant DB as MongoDB
+
+  Student->>Frontend: Type query "library hours"
+  Frontend->>Backend: GET /api/faqs?query=library%20hours
+  Backend->>DB: find({ $text: { $search: "library hours" } })
+  DB-->>Backend: matching FAQs
+  Backend-->>Frontend: 200 OK [ {id, question, answer}, ... ]
+  Frontend-->>Student: Render results in chat
+```
+3) Admin Updates FAQ
+```
+sequenceDiagram
+  autonumber
+  participant Admin
+  participant Frontend as Frontend (Admin UI)
+  participant Backend as Backend (Django + DRF)
+  participant DB as MongoDB
+
+  Admin->>Frontend: Edit FAQ form (Q/A fields)
+  Frontend->>Backend: PUT /api/faqs/:id (JWT)
+  Backend->>DB: updateOne({ _id:id }, { $set: {...} })
+  DB-->>Backend: acknowledged: true
+  Backend-->>Frontend: 200 OK { updated record }
+  Frontend-->>Admin: Show success & refresh table
+
+```
+
 ---
 
 ## 📝 Task 4: API Specifications
