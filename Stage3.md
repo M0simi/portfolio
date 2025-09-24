@@ -253,7 +253,7 @@ sequenceDiagram
     Frontend-->>Student: Show list of deadlines
 ```
 
-```
+```mermaid
 %%{init: {'theme': 'dark', 'sequence': {'showSequenceNumbers': true}}}%%
 sequenceDiagram
   autonumber
