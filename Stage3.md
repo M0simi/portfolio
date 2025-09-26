@@ -7,26 +7,26 @@
 ### User Stories (MoSCoW)
 
 **Must Have**
-- As a **student**, I want to **search for FAQs by keyword**, so that **I can quickly find answers**.  
-- As a **student**, I want to **know deadlines of activities/services**, so that **I don’t miss important dates**.  
-- As a **student**, I want to **get information about campus facilities (library, cafeteria, gym)**, so that **I can plan my visits**.  
-- As an **admin**, I want to **add or update FAQs**, so that **the chatbot always has accurate information**.  
+- As a **student**, I want to **search FAQs by keyword** to **find answers quickly**.  
+- As a **student**, I want **deadlines of activities/services** so I **don’t miss dates**.  
+- As a **student**, I want **info about facilities (library/cafeteria/gym)** to **plan visits**.  
+- As an **admin**, I want to **add/update FAQs** so **content stays accurate**.
 
 **Should Have**
-- As a **student**, I want to **ask the chatbot general questions about university events and announcements**, so that **I stay informed and engaged**.  
-- As a **student**, I want to **access the chatbot from web**, so that **I can use it wherever I am**.
+- As a **student**, I want to **ask about events/announcements** to **stay informed**.  
+- As a **student**, I want to **use the chatbot on the web** to **access it anywhere**.
 
 **Could Have**
-- As a **student**, I want to **rate chatbot answers**, so that **future responses can improve**.  
-- As a **student**, I want to **save frequently asked questions**, so that **I can access them quickly later**.  
+- As a **student**, I want to **rate answers** to **improve responses**.  
+- As a **student**, I want to **save favorite FAQs** to **open them quickly later**.
 
 **Won’t Have (MVP)**
 - Voice commands.  
-- Access to personalized academic data (grades).  
-- Multi-language support.  
+- Access to personal academic data (grades).  
+- Multi-language support.
 
 ### Mockups
-- **Chatbot Interface:**  
+- **Chatbot UI:**  
   <img width="1600" height="1000" alt="chat-mock" src="https://github.com/user-attachments/assets/c0584a73-f01b-44b6-9266-f2f4011ee4dd" />
 - **Admin Dashboard:**  
   <img width="1600" height="1126" alt="admin-mock" src="https://github.com/user-attachments/assets/e8e39f0e-4483-4685-8356-a15cf4ceeaaf" />
@@ -35,22 +35,29 @@
 
 ## 📝 Task 1: System Architecture
 
-**High-Level Components**
-- **Frontend:** React (Web).  
-- **Backend:** Python + Django REST Framework (DRF).  
-- **Database:** MongoDB.  
-- **Search (optional):** Rasa / Vector Store.  
-- **External APIs (future):** University Calendar, OpenAI.  
+**Stack**
+- **Frontend:** React (Web)  
+- **Backend:** Python + Django REST Framework (DRF)  
+- **Database:** MongoDB  
+- **Search (optional):** Rasa / Vector Store  
+- **External (future):** University Calendar, OpenAI  
 
 **Data Flow:** Student → Frontend → Backend(API) → DB/Search → Response → Student
 
 ```mermaid
 flowchart LR
-  student[Student (Web)] --> fe[Frontend - React]
-  fe -->|REST| be[Backend - Django (DRF)]
-  be -->|CRUD & Queries| db[(MongoDB)]
-  be -->|Search/Rank| vs[(Rasa / Vector Store - optional)]
-  be -->|Events/AI (optional)| ext[(External APIs)]
+  student[Student (Web)]
+  fe[Frontend - React]
+  be[Backend - Django (DRF)]
+  db[(MongoDB)]
+  vs[(Rasa / Vector Store - optional)]
+  ext[(External APIs - Calendar, OpenAI)]
+
+  student --> fe
+  fe --> be
+  be --> db
+  be --> vs
+  be --> ext
   be --> fe
   fe --> student
 ```
@@ -62,65 +69,65 @@ flowchart LR
 ### 2.1 Back-End Components / Services
 
 **AuthService**
-- `login(email, password) → token`  
-- `generate_token(user)`  
+- `login(email, password) -> token`
+- `generate_token(user)`
 - `verify_token(token)`
 
 **FaqService**
-- `list_faqs(query, category_id)`  
-- `get_faq(id)`  
-- `create_faq(data, user)`  
-- `update_faq(id, data, user)`  
+- `list_faqs(query, category_id)`
+- `get_faq(id)`
+- `create_faq(data, user)`
+- `update_faq(id, data, user)`
 - `delete_faq(id)`
 
 **EventService**
-- `list_events(from, to)`  
-- `create_event(data)`  
-- `update_event(id, data)`  
+- `list_events(from, to)`
+- `create_event(data)`
+- `update_event(id, data)`
 - `delete_event(id)`
 
 **SearchService**
-- `search(query, top_k)`  
-- `index_faq(faq)` *(optional with vector store/Rasa)*
+- `search(query, top_k)`
+- `index_faq(faq)` *(optional)*
 
 **FeedbackService**
-- `submit_feedback(faq_id, helpful, comment, user)`  
+- `submit_feedback(faq_id, helpful, comment, user)`
 - `list_feedback(faq_id)`
 
 **FavoriteService (optional)**
-- `toggle_favorite(user_id, faq_id)`  
+- `toggle_favorite(user_id, faq_id)`
 - `list_favorites(user_id)`
 
-### 2.2 Database Design (MongoDB – Document Oriented)
+### 2.2 Database Design (MongoDB – Documents)
 
 **users**
 ```json
-{ "_id":"UUID", "name":"string", "email":"string", "password_hash":"string", "role":"admin|student", "created_at":"ISODate", "updated_at":"ISODate" }
+{"_id":"UUID","name":"string","email":"string","password_hash":"string","role":"admin|student","created_at":"ISODate","updated_at":"ISODate"}
 ```
 
 **categories**
 ```json
-{ "_id":"UUID", "name":"string" }
+{"_id":"UUID","name":"string"}
 ```
 
 **faqs**
 ```json
-{ "_id":"UUID", "question":"text", "answer":"text", "category_id":"UUID", "updated_by":"UUID", "updated_at":"ISODate", "created_at":"ISODate" }
+{"_id":"UUID","question":"text","answer":"text","category_id":"UUID","updated_by":"UUID","updated_at":"ISODate","created_at":"ISODate"}
 ```
 
 **events**
 ```json
-{ "_id":"UUID", "title":"string", "start_date":"ISODate", "end_date":"ISODate", "location":"string", "description":"string", "created_at":"ISODate", "updated_at":"ISODate" }
+{"_id":"UUID","title":"string","start_date":"ISODate","end_date":"ISODate","location":"string","description":"string","created_at":"ISODate","updated_at":"ISODate"}
 ```
 
 **feedback**
 ```json
-{ "_id":"UUID", "faq_id":"UUID", "user_id":"UUID", "helpful":true, "comment":"string", "created_at":"ISODate" }
+{"_id":"UUID","faq_id":"UUID","user_id":"UUID","helpful":true,"comment":"string","created_at":"ISODate"}
 ```
 
 **favorites**
 ```json
-{ "_id":"UUID", "user_id":"UUID", "faq_id":"UUID", "created_at":"ISODate" }
+{"_id":"UUID","user_id":"UUID","faq_id":"UUID","created_at":"ISODate"}
 ```
 
 ---
@@ -138,9 +145,9 @@ sequenceDiagram
 
   Student->>FE: Type question
   FE->>BE: GET /api/faqs?query=...
-  BE->>DB: text search / embeddings
+  BE->>DB: text search
   DB-->>BE: matching docs
-  BE-->>FE: 200 OK (answers JSON)
+  BE-->>FE: 200 OK (answers)
   FE-->>Student: Render answer
 ```
 
@@ -154,11 +161,11 @@ sequenceDiagram
   participant DB as MongoDB
 
   Admin->>FE: Edit FAQ (question/answer)
-  FE->>BE: PUT /api/faqs/:id (Authorization: Bearer JWT)
+  FE->>BE: PUT /api/faqs/:id (JWT)
   BE->>DB: updateOne({_id:id}, {$set:{question,answer,updated_by,updated_at}})
-  DB-->>BE: {acknowledged:true, modifiedCount:1}
-  BE-->>FE: 200 OK (updated record)
-  FE-->>Admin: Show success & refresh table
+  DB-->>BE: ack
+  BE-->>FE: 200 OK (updated)
+  FE-->>Admin: Show success
 ```
 
 ### Use Case 3 — Student views events
@@ -174,8 +181,8 @@ sequenceDiagram
   FE->>BE: GET /api/events?from=&to=
   BE->>DB: find({start_date:{$gte:from,$lte:to}})
   DB-->>BE: events[]
-  BE-->>FE: 200 OK (events JSON)
-  FE-->>Student: Show deadlines list
+  BE-->>FE: 200 OK (events)
+  FE-->>Student: Show list
 ```
 
 ---
@@ -196,9 +203,9 @@ sequenceDiagram
 | `/api/favorites`    | GET    | `Authorization: JWT`                    | `[{_id, faq_id, created_at}]`              | Student  |
 
 ### External APIs (Future)
-- **University Calendar API** – official deadlines/events.  
+- **University Calendar API** – deadlines/events.  
 - **University Announcements API** – news/alerts.  
-- **OpenAI API** – better natural-language answers.  
+- **OpenAI API** – better answers/NLP.  
 - **Rasa NLU (optional)** – intent/entity extraction.
 
 ---
@@ -220,10 +227,4 @@ sequenceDiagram
 ---
 
 # 📌 Final Deliverable
-This single document includes:
-- **Task 0:** User Stories & Mockups  
-- **Task 1:** System Architecture (Mermaid)  
-- **Task 2:** Components & MongoDB Schema  
-- **Task 3:** Sequence Diagrams (Mermaid)  
-- **Task 4:** API Specs (Internal + Future External)  
-- **Task 5:** SCM & QA Strategies
+This single document includes Tasks 0→5 for **Unibot**.
