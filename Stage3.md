@@ -263,5 +263,13 @@ sequenceDiagram
 
 ---
 
-📌 **Final Deliverable: Stage 3 – Technical Documentation (Unibot)**  
-This document consolidates all the outputs of Stage 3 for the Unibot project, including all tasks (0–5).
+# 📌 Final Deliverable: Stage 3 – Technical Documentation (Unibot)
+
+This document consolidates all the outputs of Stage 3 for the **Unibot** project, including:
+
+- **Task 0:** User Stories and Mockups  
+- **Task 1:** System Architecture  
+- **Task 2:** Components, Classes, and Database Design  
+- **Task 3:** Sequence Diagrams  
+- **Task 4:** API Specifications  
+- **Task 5:** SCM and QA Strategies
