@@ -69,13 +69,17 @@
 
 ---
 
-## 5. Project Management by:
+## 5. User Persona:
+
+---
+
+## 6. Project Management by:
 - Github
 - Jira
 
 ---
 
-## 6. Roles
+## 7. Roles
 
 | Role              | Team Member(s)            |
 |-------------------|---------------------------|
