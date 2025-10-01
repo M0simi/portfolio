@@ -69,7 +69,13 @@
 
 ---
 
-## 5. Roles
+## 5. Project Management by:
+- Github
+- Jira
+
+---
+
+## 6. Roles
 
 | Role              | Team Member(s)            |
 |-------------------|---------------------------|
