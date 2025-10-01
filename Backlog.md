@@ -15,6 +15,75 @@
 
 ---
 
+## Functional Requirements
+
+1. **User Authentication & Roles**  
+   - Users (students and admins) must be able to log in.  
+   - Differentiate permissions between admins and students.
+
+2. **FAQ Search**  
+   - Students must be able to search FAQs using keywords.  
+   - Search results should display relevant questions with detailed answers.
+
+3. **Service Deadlines Display**  
+   - Show clear and updated deadlines for university services and activities.
+
+4. **University Facilities Information**  
+   - Provide detailed information about university facilities (library, cafeteria, gym, etc.).  
+   - Information should be searchable and easy to browse.
+
+5. **Event Information & Posting**  
+   - Display university events and announcements to students.  
+   - Allow students to post new events (with verification and approval depending on roles).
+
+6. **Admin FAQ Management**  
+   - Enable admins to add, update, or delete FAQs.
+
+7. **AI-powered Chat Interaction**  
+   - Integrate AI to enable interactive chatbot conversations with students.  
+   - Provide smart, relevant answers based on the database and previous questions.
+
+8. **Data Persistence**  
+   - Link the system to a database to store FAQs, events, users, and ratings.
+
+9. **Chatbot Accessibility**  
+   - The assistant should be accessible via a responsive web interface on different devices.
+
+10. **Answer Rating & Feedback** (Optional, based on phase)  
+    - Allow students to rate chatbot answers to improve future responses.
+
+11. **Saved FAQs** (Optional, based on phase)  
+    - Enable students to save frequently asked questions for quick access
+
+## Non-Functional Requirements
+
+1. **Performance**  
+   - Respond to user queries within 2 seconds under normal load.  
+   - Support multiple concurrent users without significant delay.
+
+2. **Security**  
+   - Protect and encrypt user data.  
+   - Restrict FAQ management features to admins only.
+
+3. **Usability**  
+   - Provide a simple and easy-to-use interface for all students.  
+   - Clear guidance and feedback on errors.
+
+4. **Compatibility**  
+   - Support desktop and mobile devices, and major browsers.
+
+5. **Scalability**  
+   - Designed to scale for increasing users and data.
+
+6. **Maintainability**  
+   - Organized and easy-to-update code.  
+   - Allow easy updates to FAQs and events.
+
+7. **Availability**  
+   - Ensure 99.5% uptime with minimal maintenance downtime.
+   
+---
+
 ## 2. Tasks
 
 1. Distribute roles to team members  
