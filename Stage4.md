@@ -57,3 +57,64 @@ _As a student, I want to easily find university event dates._
 | Conduct user testing              | Saleh Alharbi            | Could Have   | Oct 28, 2025     |
 
 ---
+# 🚀 Sprint Execution
+
+## 🎯 Purpose
+To implement features and deliverables according to the sprint plan, ensuring high code quality, collaboration, and efficient delivery.
+
+---
+
+## 🛠️ Instructions
+
+### 👨‍💻 Developers
+- Focus on assigned sprint tasks.
+- Follow agreed coding standards and best practices.
+- Write clear, maintainable, and well-documented code.
+- Collaborate using Git and implement feature branches (e.g., `feature/chat-ui`).
+- Submit Pull Requests (PRs) with proper descriptions and references to task IDs.
+
+### 🔁 SCM (Source Code Management)
+- Ensure all developers are using the version control system (e.g., Git).
+- Review and approve pull requests before merging into `dev` or `main` branches.
+- Enforce branching strategy:
+  - `main` – stable production-ready code.
+  - `dev` – integration branch for all features in development.
+  - `feature/*` – individual features under development.
+
+### 🧪 QA (Quality Assurance)
+- Test completed features and tasks as soon as they are marked "Ready for QA."
+- Use tools like **Postman** for API testing and **manual/automated testing** for UI components.
+- Log bugs and issues in the task tracking system (e.g., Trello, Jira).
+- Verify bug fixes before closing tasks.
+
+---
+
+## 🧾 Example: Sprint for API Development
+
+### 👨‍💻 Developers
+- Implement API endpoints for:
+  - Event information retrieval.
+  - User authentication.
+  - FAQ search.
+- Write unit tests for core API functions.
+
+### 🔁 SCM
+- Code is committed under `feature/api-endpoints`.
+- PRs are submitted and reviewed by another team member.
+- Once approved, merged into `dev` branch.
+
+### 🧪 QA
+- Use **Postman** to test:
+  - API response accuracy.
+  - Status codes.
+  - Error handling.
+- Report any bugs to developers and retest after fixes.
+
+---
+
+## ✅ Expected Outcomes
+- All sprint tasks are completed and tested.
+- Code is merged into the main development branch.
+- Bugs are identified and resolved early.
+- Deliverables are ready for review and potential deployment.
+
