@@ -13,7 +13,8 @@ import Chat from "./pages/Chat";
 import Profile from "./pages/Profile";
 
 // إعداد Axios
-axios.defaults.baseURL = "https://unibot-foo.onrender.com/api/";
+axios.defaults.baseURL = "https://api.unibot.foo/api/";
+
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
 // حارس المسارات المحمية: يرسل المستخدم إلى /login إن لم يكن مسجلاً الدخول
