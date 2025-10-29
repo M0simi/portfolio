@@ -20,6 +20,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "preinstall": "npm install typescript@4.9.5 --save-exact",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -51,9 +52,6 @@
   "engines": {
     "node": "20.x",
     "npm": "10.x"
-  },
-  "resolutions": {
-    "typescript": "4.9.5"
   },
   "overrides": {}
 }
