@@ -15,6 +15,7 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = [
     "api.unibot.foo",
     "unibot.foo",
+    "portfolio-1-ppb8.onrender.com",
     "www.unibot.foo",
     "localhost",
     "127.0.0.1"
@@ -173,3 +174,4 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar_fixed": True,
     "sidebar": "sidebar-dark-primary",
 }
+
