@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+
+# Environment
+.env
+*.env
+
+# Django stuff
+staticfiles/
+media/
+
+# VS Code settings
+.vscode/
+
+# OS files
+.DS_Store
+
+# Node (لو تستخدم React بالفرونت)
+node_modules/
+build/
