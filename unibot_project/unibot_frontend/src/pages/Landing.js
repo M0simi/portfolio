@@ -6,7 +6,7 @@ export default function Landing() {
     <section className="flex flex-col items-center justify-center min-h-screen font-cairo text-center px-6 bg-gradient-to-b from-blue-300 via-blue-100 to-white">
       {/* العنوان */}
       <h1 className="text-5xl sm:text-6xl font-extrabold text-blue-800 mb-4 animate-fadeInUp">
-        مرحباً بك في <span className="text-blue-600">Unibot 🤖</span>
+        مرحباً بك في <span className="text-blue-600">Unibot</span>
       </h1>
 
       {/* الوصف */}
@@ -35,15 +35,15 @@ export default function Landing() {
       <div className="flex flex-wrap justify-center gap-10 mt-16 text-gray-700 animate-fadeInUp delay-500">
         <div className="flex flex-col items-center">
           <Zap className="w-8 h-8 text-blue-600 mb-2" />
-          <p className="font-medium">⚡ سرعة في الإجابة</p>
+          <p className="font-medium">سرعة في الإجابة</p>
         </div>
         <div className="flex flex-col items-center">
           <Brain className="w-8 h-8 text-blue-600 mb-2" />
-          <p className="font-medium">🧠 ذكاء وسهولة استخدام</p>
+          <p className="font-medium">ذكاء وسهولة استخدام</p>
         </div>
         <div className="flex flex-col items-center">
           <GraduationCap className="w-8 h-8 text-blue-600 mb-2" />
-          <p className="font-medium">🎓 مصمم للطلاب الجامعيين</p>
+          <p className="font-medium">مصمم للطلاب الجامعيين</p>
         </div>
       </div>
 
