@@ -61,16 +61,13 @@ const Profile = () => {
             className="w-full bg-gray-100 border rounded-lg px-3 py-2 text-gray-500 cursor-not-allowed"
           />
         </div>
-        <div>
+               <div>
           <label className="block text-gray-700 mb-2">الدور</label>
-          <select
-            value={profile.role}
-            onChange={(e) => setProfile({ ...profile, role: e.target.value })}
-            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="student">طالب</option>
-            <option value="teacher">عضو هيئة تدريس</option>
-          </select>
+          <input
+            type="text"
+            value="طالب"
+            readOnly
+            className="w-full border rounded-lg px-3 py-2 bg-gray-100 cursor-not-allowed"/>
         </div>
       </div>
 
