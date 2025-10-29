@@ -8,7 +8,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECURITY_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
@@ -250,5 +250,6 @@ JAZZMIN_UI_TWEAKS = {
 # Media files (uploaded content like PDFs)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
+
 
 
