@@ -175,3 +175,14 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar": "sidebar-dark-primary",
 }
 
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "authorization",
+    "accept",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+
