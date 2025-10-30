@@ -18,7 +18,7 @@ export default function Chat() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/ai/general/",
+        "https://api.unibot.foo/api/ai/general/",
         { prompt },
         {
           headers: {
@@ -103,4 +103,5 @@ export default function Chat() {
     </section>
   );
 }
+
 
