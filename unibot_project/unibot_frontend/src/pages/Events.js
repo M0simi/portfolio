@@ -8,7 +8,7 @@ export default function Events() {
   // جلب الأحداث من API
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/events/")
+      .get("https://api.unibot.foo/api/events")
       .then((res) => {
         setEvents(res.data);
         setLoading(false);
