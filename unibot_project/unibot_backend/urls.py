@@ -5,10 +5,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('core.urls')),  # API endpoints
-    path('', include('core.urls')),      # Root fallback
+    path('api/', include('core.urls')),
 ]
 
-# Serve media files during development
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
