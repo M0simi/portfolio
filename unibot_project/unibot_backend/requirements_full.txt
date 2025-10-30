@@ -40,3 +40,5 @@ tzdata==2025.2
 urllib3==2.5.0
 uuid==1.30
 gunicorn>=21.2.0
+whitenoise==6.7.0
+
