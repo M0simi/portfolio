@@ -12,17 +12,36 @@ import Register from "./pages/Register";
 import Chat from "./pages/Chat";
 import Profile from "./pages/Profile";
 
-// إعداد Axios
-axios.defaults.baseURL = "https://api.unibot.foo/api/";
+/* ================================
+   🔧 إعداد Axios (اتصال الباك إند)
+================================ */
+axios.defaults.baseURL = "https://api.unibot.foo/api"; // ✅ بدون "/" في النهاية
+axios.defaults.headers.common["Content-Type"] = "application/json";
 
-axios.defaults.headers.post["Content-Type"] = "application/json";
+// 🎫 إضافة التوكن تلقائيًا مع كل طلب
+axios.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Token ${token}`;
+  }
+  return config;
+});
 
-// حارس المسارات المحمية: يرسل المستخدم إلى /login إن لم يكن مسجلاً الدخول
+/* ================================
+   🛡️ حارس المسارات المحمية
+================================ */
 function Protected({ children, token }) {
   const location = useLocation();
-  return token ? children : <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  return token ? (
+    children
+  ) : (
+    <Navigate to="/login" replace state={{ from: location.pathname }} />
+  );
 }
 
+/* ================================
+   🧠 المكون الرئيسي للتطبيق
+================================ */
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
   const [loading, setLoading] = useState(true);
@@ -62,7 +81,7 @@ export default function App() {
   return (
     <Router>
       <div className="min-h-screen flex flex-col bg-gray-50 font-cairo">
-        <Navbar />
+        <Navbar onLogout={handleLogout} />
         <main className="flex-1 w-full bg-gradient-to-b from-blue-100 to-blue-200">
           <Routes>
             {/* صفحات عامة */}
@@ -106,4 +125,3 @@ export default function App() {
     </Router>
   );
 }
-
