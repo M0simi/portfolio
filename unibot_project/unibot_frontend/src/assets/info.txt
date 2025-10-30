@@ -1,0 +1,14 @@
+
+Hope you enjoy your new logo, here are the people that
+made your beautiful logo happen :)
+font name: IBMPlexSerif-Light
+font link: https://fonts.google.com/specimen/IBM+Plex+Serif
+font author: Mike Abbink
+font author site: https://www.mikeabbink.com/
+
+
+icon designer: Rutmer Zijlstra
+icon designer link: /creator/rutmer/
+        
+{"bg":"#231B6E","icon":"#1DC7DA","font":"#ffffff","slogan":"#ffffff"}
+      
