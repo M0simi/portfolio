@@ -49,8 +49,8 @@ export default function Events() {
             >
                     {event.image_url && (
                     <img
-                        src={event.image_url}         // رابط الصورة من API
-                        alt={event.title}             // نص بديل للصورة
+                        src={event.image_url}         
+                        alt={event.title}             
                         className="w-full h-40 object-cover rounded-lg mb-3"
                         />
     )}
