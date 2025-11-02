@@ -47,6 +47,13 @@ export default function Events() {
               key={event.id}
               className="bg-white rounded-2xl shadow-md p-5 border hover:shadow-lg transition"
             >
+                    {event.image_url && (
+                    <img
+                        src={event.image_url}         // رابط الصورة من API
+                        alt={event.title}             // نص بديل للصورة
+                        className="w-full h-40 object-cover rounded-lg mb-3"
+                        />
+    )}
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 {event.title}
               </h3>
