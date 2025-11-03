@@ -1,3 +1,4 @@
+# ... نفس الاستيرادات اللي عندك
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -37,6 +38,19 @@ INSTALLED_APPS = [
     'corsheaders',
     'core',
 ]
+
+# ✅ Cloudinary (يُفعَّل تلقائياً إذا المفاتيح موجودة)
+CLOUDINARY_URL = os.getenv('CLOUDINARY_URL')  # الشكل المفضّل: cloudinary://<api_key>:<api_secret>@<cloud_name>
+CLOUDINARY_CLOUD_NAME = os.getenv('CLOUDINARY_CLOUD_NAME')
+CLOUDINARY_API_KEY = os.getenv('CLOUDINARY_API_KEY')
+CLOUDINARY_API_SECRET = os.getenv('CLOUDINARY_API_SECRET')
+
+USE_CLOUDINARY = bool(
+    CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET)
+)
+
+if USE_CLOUDINARY:
+    INSTALLED_APPS += ['cloudinary', 'cloudinary_storage']
 
 # ==========================
 # Middleware
@@ -114,6 +128,21 @@ STATICFILES_DIRS = [BASE_DIR / "core" / "static"]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
 
+# ✅ تفعيل Cloudinary لملفات الميديا (إن وُجدت المفاتيح)
+if USE_CLOUDINARY:
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+    # لو ما استخدمت CLOUDINARY_URL، نزود الكونفيقشن اليدوي
+    if not CLOUDINARY_URL:
+        CLOUDINARY_STORAGE = {
+            'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
+            'API_KEY': CLOUDINARY_API_KEY,
+            'API_SECRET': CLOUDINARY_API_SECRET,
+        }
+else:
+    # تخزين محلي كالمعتاد
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ==========================
@@ -143,13 +172,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
-
 CSRF_TRUSTED_ORIGINS = [
     "https://unibot.foo",
     "https://www.unibot.foo",
     "https://api.unibot.foo",
 ]
-
 CORS_ALLOW_CREDENTIALS = True
 
 # ==========================
@@ -169,7 +196,6 @@ JAZZMIN_SETTINGS = {
     "theme": "cosmo",
     "dark_mode_theme": "darkly",
 }
-
 JAZZMIN_UI_TWEAKS = {
     "navbar_fixed": True,
     "sidebar_fixed": True,
@@ -185,6 +211,3 @@ CORS_ALLOW_HEADERS = [
     "x-csrftoken",
     "x-requested-with",
 ]
-
-
-
