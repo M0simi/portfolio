@@ -1,5 +1,6 @@
 import os
 from django.core.wsgi import get_wsgi_application
+os.makedirs(settings.MEDIA_ROOT, exist_ok=True)
 
 # اضبط إعدادات المشروع
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'unibot_backend.settings')  # تأكد من المسار الصحيح
@@ -23,3 +24,4 @@ except Exception as e:
     # لا نطيّح السيرفر بسبب خطأ بالمايجريشن — نطبع تحذير فقط
     print(f"⚠️ Migration skipped: {e}")
 # -------------------------------------------------------------
+
