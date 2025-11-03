@@ -2,6 +2,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin  # للمستخدم المخصص (Custom user admin)
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm  # نماذج الإدارة (Admin forms)
+from django.utils.html import format_html
 from .models import CustomUser, Category, FAQ, Event, Feedback, Favorite
 from .models import KnowledgeBase
 
@@ -65,11 +66,33 @@ class FAQAdmin(admin.ModelAdmin):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_display = ['title', 'start_date', 'end_date', 'location']  # عرض العنوان، التواريخ، الموقع
-    list_filter = ['start_date', 'end_date']  # فلاتر زمنية
-    date_hierarchy = 'start_date'  # تصفح حسب التاريخ (Date hierarchy)
-    search_fields = ['title', 'description']  # بحث
+    # نعرض الـ slug والصورة المصغّرة
+    list_display = ['title', 'start_date', 'location', 'slug', 'image_preview']  # عرض العنوان، التاريخ، الموقع، السلاج، والصورة
+    list_filter = ['start_date']  # فلاتر زمنية (نكتفي ببداية الحدث)
+    date_hierarchy = 'start_date'  # تصفح حسب التاريخ
+    search_fields = ['title', 'location', 'description']  # بحث شامل
     ordering = ['start_date']  # ترتيب حسب التاريخ
+    prepopulated_fields = {"slug": ("title",)}  # تعبئة slug مبدئيًا من العنوان
+
+    # تنظيم الحقول داخل صفحة التعديل/الإضافة
+    fields = (
+        ('title', 'slug'),
+        ('start_date', 'end_date'),
+        'location',
+        'description',
+        'image',
+        'image_preview',
+    )
+    readonly_fields = ('image_preview',)
+
+    def image_preview(self, obj):
+        if getattr(obj, 'image', None):
+            try:
+                return format_html('<img src="{}" style="max-height:80px; border-radius:6px;" />', obj.image.url)
+            except Exception:
+                return '-'
+        return '-'
+    image_preview.short_description = 'معاينة الصورة'  # اسم العمود في لست ديسبلاي
 
 @admin.register(Feedback)
 class FeedbackAdmin(admin.ModelAdmin):
@@ -84,7 +107,6 @@ class FavoriteAdmin(admin.ModelAdmin):
     list_filter = ['created_at']  # فلاتر
     raw_id_fields = ['user', 'faq']  # روابط
     ordering = ['-created_at']  # ترتيب أحدث أولاً
-
 
 @admin.register(KnowledgeBase)
 class KnowledgeBaseAdmin(admin.ModelAdmin):
