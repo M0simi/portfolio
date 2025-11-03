@@ -7,6 +7,7 @@ import Footer from "./components/Footer";
 
 import Landing from "./pages/Landing";
 import Events from "./pages/Events";
+import EventDetail from "./pages/EventDetail"; // ✅ جديد
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Chat from "./pages/Chat";
@@ -87,6 +88,7 @@ export default function App() {
             {/* صفحات عامة */}
             <Route path="/" element={<Landing />} />
             <Route path="/events" element={<Events />} />
+            <Route path="/events/:slug" element={<EventDetail />} /> {/* ✅ جديد */}
 
             {/* مصادقة */}
             <Route
