@@ -3,7 +3,6 @@ from rest_framework import serializers
 from .models import CustomUser, Category, FAQ, Event, Feedback, Favorite
 from django.contrib.auth.hashers import make_password
 
-
 class UserSerializer(serializers.ModelSerializer):
     # محول المستخدم (User serializer)
     class Meta:
@@ -28,11 +27,26 @@ class FAQSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']  # ID وتواريخ غير قابلة للتعديل
 
 class EventSerializer(serializers.ModelSerializer):
-    # محول الحدث (Event serializer)
+    # محول الحدث مع رابط صورة كامل (Event serializer with absolute image URL)
+    image_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Event
-        fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        # إظهار الحقول المتفق عليها فقط (بدون image الخام)
+        fields = [
+            'id', 'title', 'slug',
+            'start_date', 'end_date',
+            'location', 'description',
+            'image_url'
+        ]
+        read_only_fields = ['id', 'slug', 'created_at', 'updated_at']
+
+    def get_image_url(self, obj):
+        request = self.context.get('request')
+        if getattr(obj, 'image', None):
+            url = obj.image.url
+            return request.build_absolute_uri(url) if request else url
+        return None
 
 class FeedbackSerializer(serializers.ModelSerializer):
     # محول التعليق (Feedback serializer)
