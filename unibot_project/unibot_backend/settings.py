@@ -1,4 +1,3 @@
-# ... نفس الاستيرادات اللي عندك
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -211,3 +210,4 @@ CORS_ALLOW_HEADERS = [
     "x-csrftoken",
     "x-requested-with",
 ]
+
