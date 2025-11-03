@@ -39,12 +39,24 @@ class CustomLoginView(ObtainAuthToken):
         })
 
 
-# ✅ عرض جميع الأحداث (مفتوح للجميع)
+# ✅ عرض جميع الأحداث (مفتوح للجميع) + تمرير request للـ serializer
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_events(request):
     events = Event.objects.all().order_by('start_date')
-    serializer = EventSerializer(events, many=True)
+    serializer = EventSerializer(events, many=True, context={'request': request})
+    return Response(serializer.data)
+
+
+# ✅ تفاصيل حدث بالـ slug (مفتوح للجميع)
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_event_detail(request, slug):
+    try:
+        event = Event.objects.get(slug=slug)
+    except Event.DoesNotExist:
+        return Response({'detail': 'الحدث غير موجود'}, status=status.HTTP_404_NOT_FOUND)
+    serializer = EventSerializer(event, context={'request': request})
     return Response(serializer.data)
 
 
@@ -68,6 +80,7 @@ def api_root(request):
             'register': 'POST /api/register/',
             'login': 'POST /api/login/',
             'events': 'GET /api/events/',
+            'event_detail': 'GET /api/events/<slug>/',  # تمت إضافة التفاصيل
             'search': 'POST /api/search/',
             'ai_general': 'POST /api/ai/general/',
         },
@@ -175,7 +188,6 @@ def ai_general(request):
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
 # ✅ الملف الشخصي
 @api_view(['GET', 'PUT'])
 @permission_classes([IsAuthenticated])
@@ -196,4 +208,3 @@ def get_profile(request):
             'message': '✅ تم تحديث الملف الشخصي بنجاح',
             'user': serializer.data
         })
-
