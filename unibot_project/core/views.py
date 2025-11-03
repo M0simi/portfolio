@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
@@ -39,12 +40,34 @@ class CustomLoginView(ObtainAuthToken):
         })
 
 
-# ✅ عرض جميع الأحداث (مفتوح للجميع) + تمرير request للـ serializer
+# ✅ عرض الأحداث (قائمة) مع فلاتر status و q
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_events(request):
-    events = Event.objects.all().order_by('start_date')
-    serializer = EventSerializer(events, many=True, context={'request': request})
+    """
+    - status=upcoming | past | all (افتراضي all)
+    - q=بحث بالعنوان أو الوصف
+    """
+    qs = Event.objects.all()
+    now = timezone.now()
+
+    # فلتر حسب الحالة
+    status_param = (request.GET.get('status') or '').lower()
+    if status_param == 'upcoming':
+        # يبدأ الآن أو لاحقًا
+        qs = qs.filter(start_date__gte=now)
+    elif status_param == 'past':
+        # انتهى: (له end_date وانتهى) أو (بدون end_date لكنه بدأ قبل الآن)
+        qs = qs.filter(Q(end_date__lt=now) | Q(end_date__isnull=True, start_date__lt=now))
+    # else: all
+
+    # فلتر البحث
+    q = request.GET.get('q')
+    if q:
+        qs = qs.filter(Q(title__icontains=q) | Q(description__icontains=q))
+
+    qs = qs.order_by('start_date')
+    serializer = EventSerializer(qs, many=True, context={'request': request})
     return Response(serializer.data)
 
 
