@@ -1,6 +1,7 @@
 # نماذج قاعدة البيانات الكاملة والمتكيفة مع SQLite (Full adapted models for SQLite from MongoDB - updated with fixed Manager)
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager  # استيراد BaseUserManager للمخصص (BaseUserManager for custom)
+from django.utils.text import slugify  # لتوليد slug من العنوان (Generate slug from title)
 import uuid  # مكتبة UUID للـ _id (UUID library for _id)
 
 # مدير المستخدم المخصص (Custom User Manager - FIXED with self.model)
@@ -89,12 +90,26 @@ class FAQ(models.Model):
 class Event(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # _id: UUID
     title = models.CharField(max_length=200)  # title: string
+    slug = models.SlugField(max_length=220, unique=True, db_index=True, blank=True)  # جديد: رابط نظيف (unique, indexed)
     start_date = models.DateTimeField()  # start_date: ISODate
     end_date = models.DateTimeField(null=True, blank=True)  # end_date: ISODate (optional)
     location = models.CharField(max_length=100, blank=True)  # location: string
     description = models.TextField(blank=True)  # description: string
+    image = models.ImageField(upload_to='events/', null=True, blank=True)  # جديد: صورة الحدث (optional)
     created_at = models.DateTimeField(auto_now_add=True)  # created_at
     updated_at = models.DateTimeField(auto_now=True)  # updated_at
+
+    def save(self, *args, **kwargs):
+        # توليد slug تلقائيًا من العنوان مع ضمان التفرد (Auto-generate unique slug from title)
+        if not self.slug:
+            base = slugify(self.title)[:200]
+            candidate = base
+            i = 1
+            while Event.objects.filter(slug=candidate).exclude(pk=self.pk).exists():
+                i += 1
+                candidate = f"{base}-{i}"
+            self.slug = candidate
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return self.title
@@ -133,7 +148,6 @@ class Favorite(models.Model):
     
     def __str__(self):
         return f"{self.user.email} - {self.faq.question[:20]}"
-
 
 class KnowledgeBase(models.Model):
     title = models.CharField(max_length=255, verbose_name="اسم الملف")
