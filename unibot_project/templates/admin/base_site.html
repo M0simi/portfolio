@@ -1,0 +1,22 @@
+{% load static %}
+{% extends "admin/base.html" %}
+
+{% block title %}إدارة UniBot{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <!-- خطوط اختيارية -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- ستايل مخصص للأدمن -->
+  <link rel="stylesheet" href="{% static 'admin/custom.css' %}">
+{% endblock %}
+
+{% block branding %}
+  <h1 id="site-name">
+    <a href="{% url 'admin:index' %}">لوحة إدارة UniBot</a>
+  </h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
