@@ -3,7 +3,6 @@ anyio==4.11.0
 asgiref==3.10.0
 Django==4.2.7
 django-cors-headers==4.3.1
-django-jazzmin==3.0.1
 djangorestframework==3.14.0
 djangorestframework_simplejwt==5.5.1
 groq==0.4.2
