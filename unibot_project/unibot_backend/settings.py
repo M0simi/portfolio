@@ -28,7 +28,6 @@ ALLOWED_HOSTS = [
 # Applications
 # ==========================
 INSTALLED_APPS = [
-    # "jazzmin",  # ❌ تمت الإزالة
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -196,3 +195,4 @@ CORS_ALLOW_HEADERS = [
     "x-csrftoken",
     "x-requested-with",
 ]
+
