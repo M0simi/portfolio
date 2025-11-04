@@ -1,0 +1,31 @@
+:root {
+  --primary: #1e40af;     
+  --bg: #f8fafc;
+}
+
+html, body {
+  direction: rtl;
+  font-family: "Cairo", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+#header {
+  background: var(--primary);
+}
+#header a, #site-name a {
+  color: #fff !important;
+  text-decoration: none;
+}
+
+#content {
+  background: var(--bg);
+  padding: 16px;
+  border-radius: 10px;
+}
+
+.module h2, .module caption {
+  color: var(--primary);
+}
+
+.breadcrumbs {
+  direction: rtl;
+}
