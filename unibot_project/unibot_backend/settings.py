@@ -178,28 +178,6 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
-# ==========================
-# Jazzmin Admin Settings
-# ==========================
-JAZZMIN_SETTINGS = {
-    "site_title": "إدارة UniBot",
-    "site_header": "UniBot - لوحة التحكم",
-    "site_brand": "إدارة UniBot",
-    "welcome_sign": "مرحباً بك في لوحة إدارة UniBot 👋",
-    "language_rtl": True,
-    "site_logo": "core/img/unibot_logo.png",
-    "login_logo": "core/img/unibot_logo.png",
-    "login_logo_dark": "core/img/unibot_logo.png",
-    "custom_css": "css/jazzmin_fix.css",
-    "copyright": "UniBot © 2025 - جميع الحقوق محفوظة",
-    "theme": "cosmo",
-    "dark_mode_theme": "darkly",
-}
-JAZZMIN_UI_TWEAKS = {
-    "navbar_fixed": True,
-    "sidebar_fixed": True,
-    "sidebar": "sidebar-dark-primary",
-}
 
 CORS_ALLOW_HEADERS = [
     "content-type",
@@ -210,4 +188,5 @@ CORS_ALLOW_HEADERS = [
     "x-csrftoken",
     "x-requested-with",
 ]
+
 
