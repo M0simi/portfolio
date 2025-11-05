@@ -1,20 +1,17 @@
 {% extends "custom_admin/generic_list.html" %}
-
 {% block list_title %}المستخدمون{% endblock %}
-
 {% block list_headers %}
   <th>البريد</th>
   <th>الاسم</th>
   <th>الدور</th>
-  <th>مسجل منذ</th>
+  <th>تاريخ الإنشاء</th>
 {% endblock %}
-
 {% block list_rows %}
   {% for u in items %}
     <tr>
       <td>{{ u.email }}</td>
       <td>{{ u.name|default:"-" }}</td>
-      <td>{{ u.role }}</td>
+      <td>{{ u.role|default:"-" }}</td>
       <td>{{ u.created_at|date:"Y-m-d H:i" }}</td>
     </tr>
   {% empty %}
