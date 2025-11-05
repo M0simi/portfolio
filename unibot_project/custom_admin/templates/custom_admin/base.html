@@ -2,48 +2,15 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>UniBot Console</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{ title|default:"UniBot Console" }}</title>
   <link rel="stylesheet" href="{% static 'custom_admin/css/admin.css' %}">
 </head>
 <body>
-
-  <!-- Topbar -->
-  <header class="topbar">
-    <div class="brand">UniBot Console</div>
-    <nav class="top-links">
-      <a href="{% url 'custom_admin:dashboard' %}">الرئيسية</a>
-      <a href="/admin/">Django Admin</a>
-      <a href="{% url 'custom_admin:events_list' %}">الأحداث</a>
-    </nav>
-  </header>
-
-  <!-- Layout -->
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="menu-title">التنقل</div>
-      <a class="menu-link" href="{% url 'custom_admin:dashboard' %}">لوحة التحكم</a>
-      <a class="menu-link" href="{% url 'custom_admin:events_list' %}">الأحداث</a>
-      <hr>
-      <div class="menu-title">روابط سريعة</div>
-      <a class="menu-link" href="/admin/core/faq/">الأسئلة الشائعة</a>
-      <a class="menu-link" href="/admin/core/category/">الفئات</a>
-      <a class="menu-link" href="/admin/core/knowledgebase/">Knowledge bases</a>
-      <a class="menu-link" href="/admin/auth/user/">المستخدمون</a>
-    </aside>
-
-    <main class="content">
-      {% block page_header %}{% endblock %}
-      <section class="card">
-        {% block content %}{% endblock %}
-      </section>
-    </main>
-  </div>
-
-  <footer class="footer">
-    <span>© {{ now|date:"Y" }} UniBot — لوحة إدارة مخصّصة</span>
-  </footer>
-
+  {% include "custom_admin/_nav.html" %}
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
 </body>
 </html>
