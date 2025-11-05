@@ -150,3 +150,11 @@ a:hover{color:var(--primary-700)}
   padding:14px 22px;border-top:1px solid var(--outline);
   color:var(--muted);text-align:center
 }
+
+/* logo */
+
+.brand img{
+  height:28px;
+  width:auto;
+}
+
