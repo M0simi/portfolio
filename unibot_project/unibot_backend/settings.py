@@ -22,7 +22,11 @@ ALLOWED_HOSTS = [
     "portfolio-1-ppb8.onrender.com",
     "localhost",
     "127.0.0.1",
+    ".onrender.com",           
 ]
+
+# لو شغّال خلف بروكسي (Render)
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # ==========================
 # Applications
@@ -76,7 +80,7 @@ ROOT_URLCONF = "unibot_backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],  # ✅ لتخصيص قوالب الأدمن لاحقًا
+        "DIRS": [BASE_DIR / "templates"],   
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -129,13 +133,13 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "core" / "static"]
 
-# WhiteNoise (لخدمة الستاتك على Render)
+# WhiteNoise
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# Cloudinary media storage (إذا تم توفير البيانات)
+# Cloudinary media storage 
 if USE_CLOUDINARY:
     DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
     if not CLOUDINARY_URL:
@@ -145,7 +149,6 @@ if USE_CLOUDINARY:
             "API_SECRET": CLOUDINARY_API_SECRET,
         }
 else:
-    # التخزين المحلي الافتراضي
     DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -196,3 +199,13 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
+# ==========================
+# Extra security for production
+# ==========================
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
