@@ -1,26 +1,19 @@
 {% extends "custom_admin/generic_list.html" %}
-{% block title %}الفئات{% endblock %}
-{% block subtitle %}إدارة الفئات{% endblock %}
 
-{% block toolbar %}
-<form method="get" class="toolbar">
-  <input class="input" type="text" name="q" value="{{ q }}" placeholder="ابحث بالاسم…" />
-  <button class="btn">بحث</button>
-</form>
-{% endblock %}
+{% block list_title %}الفئات{% endblock %}
 
-{% block table_head %}
-<tr>
+{% block list_headers %}
   <th>الاسم</th>
-</tr>
+  <th>آخر تحديث</th>
 {% endblock %}
 
-{% block table_rows %}
-{% for c in items %}
-<tr>
-  <td>{{ c.name }}</td>
-</tr>
-{% empty %}
-<tr><td>لا توجد بيانات</td></tr>
-{% endfor %}
+{% block list_rows %}
+  {% for c in items %}
+    <tr>
+      <td>{{ c.name }}</td>
+      <td>{{ c.updated_at|date:"Y-m-d H:i" }}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="2">لا توجد فئات</td></tr>
+  {% endfor %}
 {% endblock %}
