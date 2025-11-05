@@ -1,12 +1,30 @@
-{% extends "admin/index.html" %}
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'unibot_admin/custom.css' %}">
+    <style>
+        .dashboard-welcome {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .dashboard-welcome h2 {
+            margin: 0;
+            font-size: 28px;
+        }
+    </style>
+{% endblock %}
 
 {% block content %}
-  <div class="uni-grid" style="display:grid;grid-template-columns:1.2fr .8fr;gap:16px;">
-    <div>
-      {{ app_list|safe }}
-    </div>
-    <div>
-      {{ recent_actions|safe }}
-    </div>
-  </div>
+<div class="dashboard-welcome">
+    <h2>👋 مرحباً {{ user.username }}!</h2>
+    <p>أهلاً بك في لوحة إدارة UniBot</p>
+</div>
+
+{{ block.super }}
 {% endblock %}
