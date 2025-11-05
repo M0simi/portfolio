@@ -1,95 +1,92 @@
-:root{
-  --uni-primary:#1e40af;    /* الأزرق */
-  --uni-primary-600:#16348c;
-  --uni-bg:#0f1115;         /* خلفية داكنة أنيقة */
-  --uni-panel:#151923;
-  --uni-border:#2a2f3a;
-  --uni-text:#e6e9f0;
-  --uni-muted:#9aa3b2;
-  --uni-accent:#22c55e;     /* أخضر للتوكيد */
+/* ========== تخصيص الألوان الرئيسية ========== */
+:root {
+    --primary: #1e40af;
+    --secondary: #3b82f6;
+    --accent: #60a5fa;
+    --dark: #1e293b;
+    --light: #f1f5f9;
 }
 
-html,body{
-  direction:rtl;
-  font-family:"Cairo", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  color:var(--uni-text);
-  background:var(--uni-bg);
+/* ========== خلفية عامة ========== */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-/* الهيدر */
-#header{
-  background:var(--uni-primary);
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-#header #site-name a{ color:#fff !important; text-decoration:none; }
-.uni-brand{ display:flex; align-items:center; gap:.6rem; }
-.uni-logo{ height:22px; width:auto; filter:drop-shadow(0 1px 0 rgba(0,0,0,.2)); }
-
-/* الحاويات */
-#content{ background:transparent; }
-.dashboard .module,
-.module{
-  background:var(--uni-panel);
-  border:1px solid var(--uni-border);
-  border-radius:12px;
-  box-shadow:0 4px 20px rgba(0,0,0,.15);
-}
-.module h2, .module caption{
-  color:#fff;
-  background:transparent;
-  border-bottom:1px solid var(--uni-border);
-  padding:12px 14px;
+/* ========== الهيدر ========== */
+#header {
+    background: var(--dark) !important;
+    color: white;
+    border-bottom: 3px solid var(--secondary);
 }
 
-/* الروابط/الأزرار */
-a{ color:#8ab4ff; }
-.object-tools a, .submit-row input, .button, .btn{
-  background:var(--uni-primary);
-  border:0;
-  color:#fff;
-  padding:8px 12px;
-  border-radius:10px;
-  cursor:pointer;
-}
-.object-tools a:hover, .submit-row input:hover, .button:hover, .btn:hover{
-  background:var(--uni-primary-600);
+#branding h1 {
+    color: white !important;
+    font-weight: bold;
 }
 
-/* الجداول */
-#changelist-form table,
-.change-list table,
-.inline-group table{
-  border-color:var(--uni-border);
-}
-tr{ background:transparent !important; }
-tr:nth-child(even){ background:rgba(255,255,255,.02) !important; }
-th, td{
-  color:var(--uni-text);
-  border-color:var(--uni-border) !important;
+#branding h1 a:link,
+#branding h1 a:visited {
+    color: white !important;
 }
 
-/* الفلاتر الجانبية */
-#changelist-filter{ background:var(--uni-panel); border-color:var(--uni-border); }
-#changelist-filter h2{ color:#fff; }
-
-/* حقل البحث */
-#changelist-search input[type="text"]{
-  background:#0c0f14; border:1px solid var(--uni-border); color:#fff;
+/* ========== القائمة الجانبية ========== */
+.module h2, 
+.module caption {
+    background: var(--primary) !important;
+    color: white !important;
 }
 
-/* تنسيقات صغيرة */
-.breadcrumbs{ direction:rtl; border-bottom:1px solid var(--uni-border); }
-.help, .quiet, .small{ color:var(--uni-muted) !important; }
-.errornote, .errorlist li{ background:#ef4444; color:#fff; }
-
-/* فورم التعديل */
-fieldset{ border:1px solid var(--uni-border); border-radius:12px; }
-.submit-row{ background:transparent; border-top:1px solid var(--uni-border); }
-
-/* روابط الإضافة/التعديل الخضراء في الداشبورد */
-.dashboard .module .addlink, .dashboard .module .changelink{
-  color:var(--uni-accent) !important;
+/* ========== الجداول ========== */
+#content-main {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-/* تحسينات لمسافات الـ RTL */
-#content-main, #content-related{ float:none; }
+/* ========== الأزرار ========== */
+.button, 
+input[type=submit], 
+input[type=button],
+.submit-row input {
+    background: var(--secondary) !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+}
+
+.button:hover,
+input[type=submit]:hover,
+input[type=button]:hover {
+    background: var(--primary) !important;
+    transform: translateY(-2px);
+}
+
+/* ========== روابط ========== */
+a:link, a:visited {
+    color: var(--secondary);
+}
+
+a:hover {
+    color: var(--primary);
+}
+
+/* ========== صفحة تسجيل الدخول ========== */
+#login {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    padding: 40px;
+}
+
+#login .submit-row {
+    padding: 20px 0 0 0;
+}
+
+/* ========== تحسينات الـ RTL للعربي ========== */
+body[dir="rtl"] #content-main {
+    text-align: right;
+}
