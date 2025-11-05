@@ -1,17 +1,77 @@
 {% extends "admin/base_site.html" %}
 {% load i18n static %}
 
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'unibot_admin/custom.css' %}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        #content {
+            padding: 40px 20px;
+        }
+        #content-main {
+            max-width: 450px;
+            margin: 0 auto;
+        }
+    </style>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+
+{% block usertools %}{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
 {% block content %}
-  <div class="login-box" style="max-width:420px;margin:40px auto;background:var(--uni-panel);border:1px solid var(--uni-border);border-radius:12px;padding:24px;">
-    <h2 style="margin:0 0 16px;color:#fff;text-align:center;">تسجيل الدخول</h2>
-    {% if form.errors %}
-      <p class="errornote">بيانات غير صحيحة، حاول مرة أخرى.</p>
+<div id="content-main">
+    <h2 style="text-align: center; margin-bottom: 30px; color: #1e293b;">
+        🔐 تسجيل الدخول
+    </h2>
+    
+    {% if form.errors and not form.non_field_errors %}
+    <p class="errornote">
+        {% if form.errors.items|length == 1 %}
+            يرجى تصحيح الخطأ أدناه.
+        {% else %}
+            يرجى تصحيح الأخطاء أدناه.
+        {% endif %}
+    </p>
     {% endif %}
-    <form action="" method="post">{% csrf_token %}
-      <div class="form-row">{{ form.username.label_tag }} {{ form.username }}</div>
-      <div class="form-row">{{ form.password.label_tag }} {{ form.password }}</div>
-      <div class="submit-row"><input type="submit" value="{% trans 'Log in' %}" class="button"></div>
-      <input type="hidden" name="next" value="{{ next }}">
+
+    {% if form.non_field_errors %}
+    {% for error in form.non_field_errors %}
+    <p class="errornote">{{ error }}</p>
+    {% endfor %}
+    {% endif %}
+
+    <form action="{{ app_path }}" method="post" id="login-form">
+        {% csrf_token %}
+        <div class="form-row">
+            {{ form.username.errors }}
+            {{ form.username.label_tag }}
+            {{ form.username }}
+        </div>
+        <div class="form-row">
+            {{ form.password.errors }}
+            {{ form.password.label_tag }}
+            {{ form.password }}
+            <input type="hidden" name="next" value="{{ next }}">
+        </div>
+        {% url 'admin_password_reset' as password_reset_url %}
+        {% if password_reset_url %}
+        <div class="password-reset-link">
+            <a href="{{ password_reset_url }}">نسيت كلمة المرور؟</a>
+        </div>
+        {% endif %}
+        <div class="submit-row">
+            <input type="submit" value="دخول" class="default">
+        </div>
     </form>
-  </div>
+</div>
 {% endblock %}
