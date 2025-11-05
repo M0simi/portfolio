@@ -1,63 +1,16 @@
 {% extends "custom_admin/base.html" %}
-
-{% block page_header %}
-  <h1 class="title">مرحباً 👋</h1>
-  <p class="subtitle">هذه لوحة الإدارة المخصّصة لـ UniBot.</p>
-{% endblock %}
-
 {% block content %}
-  <!-- Cards -->
-  <div class="grid-3">
-    <div class="stat">
-      <div class="stat-label">المستخدمون</div>
-      <div class="stat-value">{{ stats.users }}</div>
-      <a class="stat-link" href="/admin/auth/user/">إدارة</a>
+  <div class="card">
+    <h1>مرحبًا 👋</h1>
+    <p>هذه لوحة الإدارة المخصّصة لـ UniBot.</p>
+    <div class="grid">
+      <a class="tile" href="{% url 'custom_admin:events_list' %}">إدارة الأحداث</a>
+      <a class="tile" href="{% url 'custom_admin:faqs_list' %}">إدارة الأسئلة الشائعة</a>
+      <a class="tile" href="{% url 'custom_admin:categories_list' %}">إدارة الفئات</a>
+      <a class="tile" href="{% url 'custom_admin:kb_list' %}">ملفات المعرفة (PDF)</a>
+      <a class="tile" href="{% url 'custom_admin:feedback_list' %}">تعليقات المستخدمين</a>
+      <a class="tile" href="{% url 'custom_admin:favorites_list' %}">المفضلات</a>
+      <a class="tile" href="{% url 'custom_admin:users_list' %}">المستخدمون</a>
     </div>
-    <div class="stat">
-      <div class="stat-label">الأسئلة الشائعة</div>
-      <div class="stat-value">{{ stats.faqs }}</div>
-      <a class="stat-link" href="/admin/core/faq/">إدارة</a>
-    </div>
-    <div class="stat">
-      <div class="stat-label">الأحداث القادمة</div>
-      <div class="stat-value">{{ stats.upcoming_events }}</div>
-      <a class="stat-link" href="{% url 'custom_admin:events_list' %}">استعراض</a>
-    </div>
-  </div>
-
-  <!-- Recent events -->
-  <h2 class="section-title">أحدث الأحداث</h2>
-  <div class="table-wrap">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>العنوان</th>
-          <th>البداية</th>
-          <th>النهاية</th>
-          <th>الموقع</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for e in recent_events %}
-        <tr>
-          <td>{{ e.title }}</td>
-          <td>{{ e.start_date|date:"Y-m-d H:i" }}</td>
-          <td>{% if e.end_date %}{{ e.end_date|date:"Y-m-d H:i" }}{% else %}-{% endif %}</td>
-          <td>{{ e.location|default:"-" }}</td>
-          <td class="actions">
-            <a class="btn sm" href="{% url 'custom_admin:events_list' %}">تفاصيل</a>
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="5" class="muted">لا يوجد أحداث بعد.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-
-  <div class="toolbar">
-    <a class="btn" href="{% url 'custom_admin:events_list' %}">كل الأحداث</a>
-    <a class="btn primary" href="{% url 'custom_admin:event_add' %}">+ إضافة حدث</a>
   </div>
 {% endblock %}
