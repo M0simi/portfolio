@@ -1,12 +1,9 @@
 {% extends "custom_admin/generic_list.html" %}
-
 {% block list_title %}الفئات{% endblock %}
-
 {% block list_headers %}
   <th>الاسم</th>
-  <th>آخر تحديث</th>
+  <th>تاريخ التحديث</th>
 {% endblock %}
-
 {% block list_rows %}
   {% for c in items %}
     <tr>
