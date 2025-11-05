@@ -8,7 +8,6 @@ __pycache__/
 *.env
 
 # Django stuff
-staticfiles/
 media/
 
 # VS Code settings
