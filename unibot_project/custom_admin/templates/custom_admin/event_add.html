@@ -1,9 +1,68 @@
 {% extends "custom_admin/base.html" %}
+
+{% block page_header %}
+  <h1 class="title">إضافة حدث</h1>
+  <p class="subtitle">أنشئ حدثاً جديداً ببيانات كاملة.</p>
+{% endblock %}
+
 {% block content %}
-  <h2>إضافة حدث</h2>
-  <form method="post" enctype="multipart/form-data" class="form">
+  <form class="form" method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button class="btn" type="submit">حفظ</button>
+
+    <div class="grid-2">
+      <label class="form-field">
+        <span>العنوان</span>
+        {{ form.title }}
+      </label>
+
+      <label class="form-field">
+        <span>الـ Slug (يُولَّد تلقائياً إن تركته فارغاً)</span>
+        {{ form.slug }}
+      </label>
+
+      <label class="form-field">
+        <span>تاريخ البداية</span>
+        {{ form.start_date }}
+      </label>
+
+      <label class="form-field">
+        <span>تاريخ النهاية (اختياري)</span>
+        {{ form.end_date }}
+      </label>
+
+      <label class="form-field">
+        <span>الموقع</span>
+        {{ form.location }}
+      </label>
+
+      <label class="form-field">
+        <span>الصورة</span>
+        {{ form.image }}
+        <img id="preview" class="preview" style="display:none;">
+      </label>
+    </div>
+
+    <label class="form-field">
+      <span>الوصف</span>
+      {{ form.description }}
+    </label>
+
+    <div class="toolbar">
+      <a class="btn" href="{% url 'custom_admin:events_list' %}">رجوع</a>
+      <button class="btn primary" type="submit">حفظ</button>
+    </div>
   </form>
+
+  <script>
+    const file = document.querySelector('input[type="file"]');
+    const img  = document.getElementById('preview');
+    if (file) {
+      file.addEventListener('change', e => {
+        const f = e.target.files[0];
+        if (!f) return;
+        const url = URL.createObjectURL(f);
+        img.src = url; img.style.display = 'block';
+      });
+    }
+  </script>
 {% endblock %}
