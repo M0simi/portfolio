@@ -9,6 +9,7 @@ __pycache__/
 
 # Django stuff
 media/
+staticfiles/
 
 # VS Code settings
 .vscode/
