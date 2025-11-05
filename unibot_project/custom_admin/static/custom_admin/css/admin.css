@@ -1,0 +1,14 @@
+:root { --primary:#1e40af; --bg:#0f172a; --panel:#111827; --text:#e5e7eb; --muted:#9ca3af; }
+*{box-sizing:border-box} body{margin:0; font-family:system-ui,Segoe UI,Roboto; color:var(--text); background:linear-gradient(135deg,#0b1220,#1f2941);}
+.sidebar{position:fixed; inset-block:0; inset-inline-start:0; width:240px; background:var(--panel); padding:16px; border-inline-end:1px solid #222}
+.brand{font-weight:700; color:#fff; margin-block-end:16px}
+.sidebar nav a{display:block; color:var(--text); text-decoration:none; padding:10px 12px; border-radius:8px; margin-block:6px}
+.sidebar nav a:hover{background:#1f2937}
+.content{margin-inline-start:260px; padding:24px}
+.card{background:rgba(255,255,255,0.06); padding:20px; border-radius:14px; backdrop-filter:blur(6px); border:1px solid rgba(255,255,255,0.08)}
+.toolbar{display:flex; align-items:center; justify-content:space-between; margin-block:12px}
+.table{width:100%; border-collapse:collapse; background:rgba(255,255,255,0.04); border-radius:12px; overflow:hidden}
+.table th,.table td{padding:12px 14px; border-bottom:1px solid rgba(255,255,255,0.08)}
+.btn{background:var(--primary); color:#fff; padding:10px 14px; border-radius:10px; border:none; text-decoration:none; display:inline-block}
+.form p{margin:0 0 12px}
+.form input, .form textarea, .form select{width:100%; background:#0b1220; color:#fff; border:1px solid #2a3550; border-radius:8px; padding:10px}
