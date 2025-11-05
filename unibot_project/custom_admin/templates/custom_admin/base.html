@@ -13,11 +13,11 @@
     </style>
   </head>
   <body>
-
-    <!-- الشريط العلوي -->
     <div class="topbar">
       <a href="{% url 'custom_admin:dashboard' %}" class="brand logo-wrap" aria-label="UniBot">
-        <img class="logo-svg" src="{% static 'custom_admin/img/logo.svg' %}" alt="UniBot Logo">
+        <img class="logo-svg"
+             src="{% static 'custom_admin/img/unibot-logo.svg' %}"
+             alt="UniBot Logo">
         <span class="sr-only">UniBot</span>
       </a>
 
@@ -26,7 +26,6 @@
       </div>
     </div>
 
-    <!-- الهيكل -->
     <div class="layout">
       <aside class="sidebar">
         <div class="menu-title">المحتوى</div>
