@@ -1,31 +1,95 @@
-:root {
-  --primary: #1e40af;     
-  --bg: #f8fafc;
+:root{
+  --uni-primary:#1e40af;    /* الأزرق */
+  --uni-primary-600:#16348c;
+  --uni-bg:#0f1115;         /* خلفية داكنة أنيقة */
+  --uni-panel:#151923;
+  --uni-border:#2a2f3a;
+  --uni-text:#e6e9f0;
+  --uni-muted:#9aa3b2;
+  --uni-accent:#22c55e;     /* أخضر للتوكيد */
 }
 
-html, body {
-  direction: rtl;
-  font-family: "Cairo", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+html,body{
+  direction:rtl;
+  font-family:"Cairo", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color:var(--uni-text);
+  background:var(--uni-bg);
 }
 
-#header {
-  background: var(--primary);
+/* الهيدر */
+#header{
+  background:var(--uni-primary);
+  border-bottom:1px solid rgba(255,255,255,.08);
 }
-#header a, #site-name a {
-  color: #fff !important;
-  text-decoration: none;
+#header #site-name a{ color:#fff !important; text-decoration:none; }
+.uni-brand{ display:flex; align-items:center; gap:.6rem; }
+.uni-logo{ height:22px; width:auto; filter:drop-shadow(0 1px 0 rgba(0,0,0,.2)); }
+
+/* الحاويات */
+#content{ background:transparent; }
+.dashboard .module,
+.module{
+  background:var(--uni-panel);
+  border:1px solid var(--uni-border);
+  border-radius:12px;
+  box-shadow:0 4px 20px rgba(0,0,0,.15);
+}
+.module h2, .module caption{
+  color:#fff;
+  background:transparent;
+  border-bottom:1px solid var(--uni-border);
+  padding:12px 14px;
 }
 
-#content {
-  background: var(--bg);
-  padding: 16px;
-  border-radius: 10px;
+/* الروابط/الأزرار */
+a{ color:#8ab4ff; }
+.object-tools a, .submit-row input, .button, .btn{
+  background:var(--uni-primary);
+  border:0;
+  color:#fff;
+  padding:8px 12px;
+  border-radius:10px;
+  cursor:pointer;
+}
+.object-tools a:hover, .submit-row input:hover, .button:hover, .btn:hover{
+  background:var(--uni-primary-600);
 }
 
-.module h2, .module caption {
-  color: var(--primary);
+/* الجداول */
+#changelist-form table,
+.change-list table,
+.inline-group table{
+  border-color:var(--uni-border);
+}
+tr{ background:transparent !important; }
+tr:nth-child(even){ background:rgba(255,255,255,.02) !important; }
+th, td{
+  color:var(--uni-text);
+  border-color:var(--uni-border) !important;
 }
 
-.breadcrumbs {
-  direction: rtl;
+/* الفلاتر الجانبية */
+#changelist-filter{ background:var(--uni-panel); border-color:var(--uni-border); }
+#changelist-filter h2{ color:#fff; }
+
+/* حقل البحث */
+#changelist-search input[type="text"]{
+  background:#0c0f14; border:1px solid var(--uni-border); color:#fff;
 }
+
+/* تنسيقات صغيرة */
+.breadcrumbs{ direction:rtl; border-bottom:1px solid var(--uni-border); }
+.help, .quiet, .small{ color:var(--uni-muted) !important; }
+.errornote, .errorlist li{ background:#ef4444; color:#fff; }
+
+/* فورم التعديل */
+fieldset{ border:1px solid var(--uni-border); border-radius:12px; }
+.submit-row{ background:transparent; border-top:1px solid var(--uni-border); }
+
+/* روابط الإضافة/التعديل الخضراء في الداشبورد */
+.dashboard .module .addlink, .dashboard .module .changelink{
+  color:var(--uni-accent) !important;
+}
+
+/* تحسينات لمسافات الـ RTL */
+#content-main, #content-related{ float:none; }
