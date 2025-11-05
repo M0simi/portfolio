@@ -1,0 +1,23 @@
+{% load i18n %}
+<nav id="ua-sidebar" class="ua-sidebar" aria-label="{% trans 'التنقل' %}">
+  <div class="ua-sidebar__section">
+    <div class="ua-sidebar__heading">CORE</div>
+    <ul class="ua-nav">
+      <li><a href="{% url 'admin:core_knowledgebase_changelist' %}">📚 قاعدة المعرفة</a></li>
+      <li><a href="{% url 'admin:core_event_changelist' %}">📅 الفعاليات</a></li>
+      <li><a href="{% url 'admin:core_faq_changelist' %}">❓ أسئلة شائعة</a></li>
+      <li><a href="{% url 'admin:core_favorite_changelist' %}">⭐ المفضلات</a></li>
+      <li><a href="{% url 'admin:core_feedback_changelist' %}">💬 التقييمات</a></li>
+      <li><a href="{% url 'admin:core_category_changelist' %}">🏷️ التصنيفات</a></li>
+      <li><a href="{% url 'admin:core_customuser_changelist' %}">👥 المستخدمون</a></li>
+    </ul>
+  </div>
+
+  <div class="ua-sidebar__section">
+    <div class="ua-sidebar__heading">{% trans "المصادقة والتفويض" %}</div>
+    <ul class="ua-nav">
+      <li><a href="{% url 'admin:auth_group_changelist' %}">👥 {% trans "المجموعات" %}</a></li>
+      <li><a href="{% url 'admin:authtoken_tokenproxy_changelist' %}">🔑 Tokens</a></li>
+    </ul>
+  </div>
+</nav>
