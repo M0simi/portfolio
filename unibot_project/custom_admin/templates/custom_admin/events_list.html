@@ -1,0 +1,30 @@
+{% extends "custom_admin/base.html" %}
+{% block content %}
+  <div class="toolbar">
+    <h2>الأحداث</h2>
+    <a class="btn" href="{% url 'custom_admin:event_add' %}">+ حدث جديد</a>
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>العنوان</th>
+        <th>البداية</th>
+        <th>الموقع</th>
+        <th>Slug</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in events %}
+      <tr>
+        <td>{{ e.title }}</td>
+        <td>{{ e.start_date|date:"Y-m-d H:i" }}</td>
+        <td>{{ e.location }}</td>
+        <td>{{ e.slug }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4">لا توجد أحداث بعد.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
