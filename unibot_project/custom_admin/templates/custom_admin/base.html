@@ -8,15 +8,28 @@
     <link rel="stylesheet" href="{% static 'custom_admin/css/admin.css' %}">
   </head>
   <body>
+    <!-- Topbar -->
     <div class="topbar">
-      <div class="brand">UniBot Console</div>
+      <!-- Brand with logo -->
+      <a href="{% url 'custom_admin:dashboard' %}" class="brand" style="display:flex;align-items:center;gap:10px">
+        <img
+          src="{% static 'custom_admin/img/unibot-logo.svg' %}"
+          onerror="this.onerror=null;this.src='{% static 'custom_admin/img/unibot-logo.png' %}';"
+          alt="UniBot"
+          style="height:28px;width:auto;display:block"
+        />
+        <span class="sr-only">UniBot</span>
+      </a>
+
       <div class="top-links">
         <a href="{% url 'custom_admin:dashboard' %}">الرئيسية</a>
-        <a href="/admin/">Django Admin</a>
+        {# أزلنا رابط Django Admin كما طلبت #}
       </div>
     </div>
 
+    <!-- Layout -->
     <div class="layout">
+      <!-- Sidebar -->
       <aside class="sidebar">
         <div class="menu-title">المحتوى</div>
         <a class="menu-link" href="{% url 'custom_admin:events_list' %}">الأحداث</a>
@@ -28,11 +41,13 @@
         <a class="menu-link" href="{% url 'custom_admin:knowledgebases_list' %}">Knowledge bases</a>
       </aside>
 
+      <!-- Content -->
       <main class="content">
         {% block content %}{% endblock %}
       </main>
     </div>
 
+    <!-- Footer -->
     <div class="footer">UniBot © {{ now|date:"Y" }}</div>
   </body>
 </html>
