@@ -1,35 +1,0 @@
-{% extends "admin/base_site.html" %}
-{% load i18n %}
-
-{% block content %}
-  <div class="ua-hero">
-    <div class="ua-hero__title">
-      {% with u=request.user %}
-        {% firstof u.first_name u.get_short_name u.get_username as display_name %}
-        {% if display_name %}مرحباً {{ display_name }}!{% else %}مرحباً!{% endif %}
-      {% endwith %} 👋
-    </div>
-    <div class="ua-hero__subtitle">أهلاً بك في لوحة إدارة UniBot</div>
-  </div>
-
-  <div class="ua-grid">
-    <a class="ua-card" href="{% url 'admin:core_event_changelist' %}">
-      <div class="ua-card__title">📅 الفعاليات</div>
-      <div class="ua-card__desc">إدارة الفعاليات والصور والـ slug</div>
-    </a>
-    <a class="ua-card" href="{% url 'admin:core_faq_changelist' %}">
-      <div class="ua-card__title">❓ الأسئلة الشائعة</div>
-      <div class="ua-card__desc">الأسئلة، الفئات، التحديثات</div>
-    </a>
-    <a class="ua-card" href="{% url 'admin:core_customuser_changelist' %}">
-      <div class="ua-card__title">👥 المستخدمون</div>
-      <div class="ua-card__desc">إدارة الحسابات والصلاحيات</div>
-    </a>
-    <a class="ua-card" href="{% url 'admin:core_knowledgebase_changelist' %}">
-      <div class="ua-card__title">📚 قاعدة المعرفة</div>
-      <div class="ua-card__desc">إدارة المحتوى التعليمي</div>
-    </a>
-  </div>
-
-  {{ block.super }}
-{% endblock %}
