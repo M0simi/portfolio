@@ -1,0 +1,12 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+  <div class="uni-grid" style="display:grid;grid-template-columns:1.2fr .8fr;gap:16px;">
+    <div>
+      {{ app_list|safe }}
+    </div>
+    <div>
+      {{ recent_actions|safe }}
+    </div>
+  </div>
+{% endblock %}
