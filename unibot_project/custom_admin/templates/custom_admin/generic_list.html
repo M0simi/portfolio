@@ -1,0 +1,45 @@
+{% extends "custom_admin/base.html" %}
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h2>{{ title }}</h2>
+      {% if request.resolver_match.url_name.endswith:'_list' %}
+        {% with add_name=request.resolver_match.url_name|cut:'_list'|add:'_add' %}
+          {% if add_name %}
+          <a class="btn" href="{% url 'custom_admin:'|add:add_name %}">+ إضافة</a>
+          {% endif %}
+        {% endwith %}
+      {% endif %}
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            {% for h in columns %}<th>{{ h }}</th>{% endfor %}
+            {% if actions %}<th>إجراءات</th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for pk, row in rows %}
+            <tr>
+              {% for cell in row %}<td>{{ cell }}</td>{% endfor %}
+              {% if actions %}
+                <td class="actions">
+                  {% for act in actions %}
+                    {% if act.pk %}
+                      <a class="link" href="{% url 'custom_admin:'|add:act.url_name pk=pk %}">{{ act.label }}</a>
+                    {% else %}
+                      <a class="link" href="{% url 'custom_admin:'|add:act.url_name %}">{{ act.label }}</a>
+                    {% endif %}
+                  {% endfor %}
+                </td>
+              {% endif %}
+            </tr>
+          {% empty %}
+            <tr><td colspan="99">لا توجد بيانات.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
