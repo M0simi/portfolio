@@ -1,27 +1,25 @@
 {% extends "custom_admin/generic_list.html" %}
-{% block title %}التعليقات{% endblock %}
-{% block subtitle %}تعليقات المستخدمين على الأسئلة{% endblock %}
 
-{% block table_head %}
-<tr>
+{% block list_title %}التعليقات{% endblock %}
+
+{% block list_headers %}
   <th>السؤال</th>
   <th>المستخدم</th>
   <th>مفيد؟</th>
   <th>التعليق</th>
   <th>التاريخ</th>
-</tr>
 {% endblock %}
 
-{% block table_rows %}
-{% for r in items %}
-<tr>
-  <td>{{ r.faq.question|truncatechars:40 }}</td>
-  <td>{% if r.user %}{{ r.user.email }}{% else %}-{% endif %}</td>
-  <td>{{ r.helpful|yesno:"نعم,لا" }}</td>
-  <td>{{ r.comment|default:"-"|truncatechars:50 }}</td>
-  <td>{{ r.created_at|date:"Y-m-d H:i" }}</td>
-</tr>
-{% empty %}
-<tr><td colspan="5">لا توجد بيانات</td></tr>
-{% endfor %}
+{% block list_rows %}
+  {% for r in items %}
+    <tr>
+      <td>{{ r.faq.question|truncatechars:40 }}</td>
+      <td>{{ r.user.email|default:"-" }}</td>
+      <td>{{ r.helpful|yesno:"نعم,لا" }}</td>
+      <td>{{ r.comment|default:"-"|truncatechars:60 }}</td>
+      <td>{{ r.created_at|date:"Y-m-d H:i" }}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="5">لا توجد تعليقات</td></tr>
+  {% endfor %}
 {% endblock %}
