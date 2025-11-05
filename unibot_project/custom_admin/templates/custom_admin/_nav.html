@@ -1,0 +1,14 @@
+<nav class="topbar">
+  <div class="brand">UniBot Console</div>
+  <ul class="menu">
+    <li><a href="{% url 'custom_admin:dashboard' %}">الرئيسية</a></li>
+    <li><a href="{% url 'custom_admin:events_list' %}">الأحداث</a></li>
+    <li><a href="{% url 'custom_admin:faqs_list' %}">الأسئلة الشائعة</a></li>
+    <li><a href="{% url 'custom_admin:categories_list' %}">الفئات</a></li>
+    <li><a href="{% url 'custom_admin:kb_list' %}">ملفات المعرفة</a></li>
+    <li><a href="{% url 'custom_admin:feedback_list' %}">التعليقات</a></li>
+    <li><a href="{% url 'custom_admin:favorites_list' %}">المفضلات</a></li>
+    <li><a href="{% url 'custom_admin:users_list' %}">المستخدمون</a></li>
+    <li><a href="/admin/">Django Admin</a></li>
+  </ul>
+</nav>
