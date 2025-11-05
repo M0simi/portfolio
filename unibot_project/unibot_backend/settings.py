@@ -20,9 +20,9 @@ ALLOWED_HOSTS = [
     "unibot.foo",
     "www.unibot.foo",
     "portfolio-1-ppb8.onrender.com",
+    ".onrender.com",
     "localhost",
     "127.0.0.1",
-    ".onrender.com",           
 ]
 
 # لو شغّال خلف بروكسي (Render)
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
     "core",
+    "custom_admin",  # ✅ لوحة مخصصة
 ]
 
 # ---------- Cloudinary (Auto-enable if creds exist) ----------
@@ -80,7 +81,7 @@ ROOT_URLCONF = "unibot_backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],   
+        "DIRS": [BASE_DIR / "templates"],   # لقوالبك العامة (وأي override لـ admin لاحقًا)
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -118,6 +119,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# مسارات تسجيل الدخول للّوحة المخصصة
+LOGIN_URL = "/admin/login/"
+LOGIN_REDIRECT_URL = "/dashboard/"
+
 # ==========================
 # I18N / TZ
 # ==========================
@@ -131,15 +136,18 @@ USE_TZ = True
 # ==========================
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# احتفظ بهذا لو عندك ملفات ستاتك خارج التطبيقات (مثلاً core/static)
+# وتأكد أن كل الملفات لها مسارات فريدة (مثل custom_admin/css/admin.css)
 STATICFILES_DIRS = [BASE_DIR / "core" / "static"]
 
-# WhiteNoise
+# WhiteNoise لإدارة الستاتك مع fingerprinting
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# Cloudinary media storage 
+# Cloudinary media storage (اختياري)
 if USE_CLOUDINARY:
     DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
     if not CLOUDINARY_URL:
