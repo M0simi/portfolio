@@ -1,30 +1,35 @@
 {% extends "admin/base_site.html" %}
-{% load i18n static %}
-
-{% block extrastyle %}
-    {{ block.super }}
-    <link rel="stylesheet" type="text/css" href="{% static 'unibot_admin/custom.css' %}">
-    <style>
-        .dashboard-welcome {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        .dashboard-welcome h2 {
-            margin: 0;
-            font-size: 28px;
-        }
-    </style>
-{% endblock %}
+{% load i18n %}
 
 {% block content %}
-<div class="dashboard-welcome">
-    <h2>👋 مرحباً {{ user.username }}!</h2>
-    <p>أهلاً بك في لوحة إدارة UniBot</p>
-</div>
+  <div class="ua-hero">
+    <div class="ua-hero__title">
+      {% with u=request.user %}
+        {% firstof u.first_name u.get_short_name u.get_username as display_name %}
+        {% if display_name %}مرحباً {{ display_name }}!{% else %}مرحباً!{% endif %}
+      {% endwith %} 👋
+    </div>
+    <div class="ua-hero__subtitle">أهلاً بك في لوحة إدارة UniBot</div>
+  </div>
 
-{{ block.super }}
+  <div class="ua-grid">
+    <a class="ua-card" href="{% url 'admin:core_event_changelist' %}">
+      <div class="ua-card__title">📅 الفعاليات</div>
+      <div class="ua-card__desc">إدارة الفعاليات والصور والـ slug</div>
+    </a>
+    <a class="ua-card" href="{% url 'admin:core_faq_changelist' %}">
+      <div class="ua-card__title">❓ الأسئلة الشائعة</div>
+      <div class="ua-card__desc">الأسئلة، الفئات، التحديثات</div>
+    </a>
+    <a class="ua-card" href="{% url 'admin:core_customuser_changelist' %}">
+      <div class="ua-card__title">👥 المستخدمون</div>
+      <div class="ua-card__desc">إدارة الحسابات والصلاحيات</div>
+    </a>
+    <a class="ua-card" href="{% url 'admin:core_knowledgebase_changelist' %}">
+      <div class="ua-card__title">📚 قاعدة المعرفة</div>
+      <div class="ua-card__desc">إدارة المحتوى التعليمي</div>
+    </a>
+  </div>
+
+  {{ block.super }}
 {% endblock %}
