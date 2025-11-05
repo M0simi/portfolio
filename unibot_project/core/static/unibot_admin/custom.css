@@ -1,92 +1,103 @@
-/* ========== تخصيص الألوان الرئيسية ========== */
-:root {
-    --primary: #1e40af;
-    --secondary: #3b82f6;
-    --accent: #60a5fa;
-    --dark: #1e293b;
-    --light: #f1f5f9;
+:root{
+  --ua-primary:#1e40af;
+  --ua-primary-700:#1b2f7a;
+  --ua-bg:#0b1020;
+  --ua-panel:#0f172a;
+  --ua-muted:#697394;
+  --ua-card:#111a32;
+  --ua-grad-1:#5b68ff;
+  --ua-grad-2:#9a4dff;
 }
 
-/* ========== خلفية عامة ========== */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+html,body{
+  direction:rtl;
+  font-family:"Cairo",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--ua-bg);
+  color:#e6ebff;
 }
 
-/* ========== الهيدر ========== */
-#header {
-    background: var(--dark) !important;
-    color: white;
-    border-bottom: 3px solid var(--secondary);
+/* اخفاء ترويسة Django الافتراضية */
+#header{ display:none !important; }
+
+/* Topbar */
+.ua-topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--ua-primary);
+  padding:10px 16px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.ua-topbar__brand{display:flex; align-items:center; gap:10px;}
+.ua-logo{font-size:22px}
+.ua-title{font-weight:700; font-size:16px}
+.ua-topbar__meta{display:flex; align-items:center; gap:10px; opacity:.95}
+.ua-link{color:#fff; text-decoration:none}
+.ua-dot{opacity:.7}
+
+/* Layout */
+#container{display:grid; grid-template-columns:260px 1fr;}
+
+/* Sidebar */
+.ua-sidebar{
+  background:linear-gradient(180deg,var(--ua-panel),#0b1220);
+  padding:14px;
+  border-inline-start:1px solid rgba(255,255,255,.05);
+  min-height:calc(100vh - 48px);
+}
+.ua-sidebar__heading{
+  font-weight:700; color:#cfd7ff; margin:8px 0 6px;
+  letter-spacing:.3px;
+}
+.ua-nav{list-style:none; margin:0; padding:0}
+.ua-nav li a{
+  display:block; padding:10px 12px; border-radius:10px;
+  text-decoration:none; color:#e6ebff; font-size:14px;
+}
+.ua-nav li a:hover{
+  background:rgba(91,104,255,.12);
+  color:#fff;
 }
 
-#branding h1 {
-    color: white !important;
-    font-weight: bold;
+/* Content wrapper */
+#content{
+  background:transparent;
+  padding:18px;
 }
 
-#branding h1 a:link,
-#branding h1 a:visited {
-    color: white !important;
+/* Hero */
+.ua-hero{
+  background:linear-gradient(115deg,var(--ua-grad-1),var(--ua-grad-2));
+  border-radius:16px;
+  padding:28px;
+  margin-bottom:16px;
+  box-shadow:0 12px 28px rgba(0,0,0,.25);
+  color:#fff;
+}
+.ua-hero__title{font-size:28px; font-weight:800; margin-bottom:6px}
+.ua-hero__subtitle{opacity:.9}
+
+/* Cards */
+.ua-grid{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); margin-bottom:14px}
+.ua-card{
+  background:var(--ua-card); border:1px solid rgba(255,255,255,.06);
+  border-radius:14px; padding:16px; text-decoration:none; color:#e6ebff;
+  transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.ua-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(91,104,255,.35);
+  box-shadow:0 10px 22px rgba(0,0,0,.25);
+}
+.ua-card__title{font-weight:700; margin-bottom:6px}
+.ua-card__desc{color:var(--ua-muted); font-size:13px}
+
+/* جداول Django الافتراضية */
+.module{background:var(--ua-panel); border-radius:12px; border:1px solid rgba(255,255,255,.06)}
+.module h2,.module caption{color:#cfd7ff}
+
+/* أزرار */
+.button, input[type=submit], .submit-row input{
+  border-radius:10px !important;
 }
 
-/* ========== القائمة الجانبية ========== */
-.module h2, 
-.module caption {
-    background: var(--primary) !important;
-    color: white !important;
-}
-
-/* ========== الجداول ========== */
-#content-main {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-/* ========== الأزرار ========== */
-.button, 
-input[type=submit], 
-input[type=button],
-.submit-row input {
-    background: var(--secondary) !important;
-    border: none !important;
-    padding: 10px 20px !important;
-    border-radius: 6px !important;
-    cursor: pointer !important;
-    transition: all 0.3s ease !important;
-}
-
-.button:hover,
-input[type=submit]:hover,
-input[type=button]:hover {
-    background: var(--primary) !important;
-    transform: translateY(-2px);
-}
-
-/* ========== روابط ========== */
-a:link, a:visited {
-    color: var(--secondary);
-}
-
-a:hover {
-    color: var(--primary);
-}
-
-/* ========== صفحة تسجيل الدخول ========== */
-#login {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    padding: 40px;
-}
-
-#login .submit-row {
-    padding: 20px 0 0 0;
-}
-
-/* ========== تحسينات الـ RTL للعربي ========== */
-body[dir="rtl"] #content-main {
-    text-align: right;
-}
+/* إصلاح RTL لبعض عناصر Django */
+.breadcrumbs{direction:rtl}
