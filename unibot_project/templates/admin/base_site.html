@@ -1,15 +1,25 @@
 {% extends "admin/base.html" %}
 {% load static %}
 
-{% block title %}لوحة إدارة UniBot{% endblock %}
-
-{% block extrastyle %}
-  {{ block.super }}
-  <link rel="stylesheet" href="{% static 'unibot_admin/custom.css' %}">
+{% block title %}
+    {% if subtitle %}
+        {{ subtitle }} | {{ site_title|default:_('لوحة إدارة UniBot') }}
+    {% else %}
+        {{ site_title|default:_('لوحة إدارة UniBot') }}
+    {% endif %}
 {% endblock %}
 
 {% block branding %}
-  <h1 id="site-name"><a href="{% url 'admin:index' %}">لوحة إدارة UniBot</a></h1>
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+         لوحة إدارة UniBot
+    </a>
+</h1>
+{% endblock %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'unibot_admin/custom.css' %}">
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
