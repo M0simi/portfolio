@@ -1,0 +1,9 @@
+{% extends "admin/login.html" %}
+{% load static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'unibot_admin/custom.css' %}">
+{% endblock %}
+
+{% block content_title %}تسجيل الدخول إلى لوحة UniBot{% endblock %}
