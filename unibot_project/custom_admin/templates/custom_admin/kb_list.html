@@ -1,23 +1,16 @@
 {% extends "custom_admin/generic_list.html" %}
-
-{% block list_title %}ملفات الـ Knowledge base{% endblock %}
-
+{% block list_title %}ملفات المعرفة (Knowledge Bases){% endblock %}
 {% block list_headers %}
   <th>العنوان</th>
   <th>الملف</th>
   <th>آخر تحديث</th>
 {% endblock %}
-
 {% block list_rows %}
   {% for k in items %}
     <tr>
       <td>{{ k.title }}</td>
       <td>
-        {% if k.file %}
-          <a href="{{ k.file.url }}" target="_blank">تنزيل</a>
-        {% else %}
-          -
-        {% endif %}
+        {% if k.file %}<a class="btn sm" href="{{ k.file.url }}" target="_blank">فتح</a>{% else %}-{% endif %}
       </td>
       <td>{{ k.updated_at|date:"Y-m-d H:i" }}</td>
     </tr>
