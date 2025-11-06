@@ -1,48 +1,38 @@
 {% extends "custom_admin/base.html" %}
-{% block title %}اللوحة{% endblock %}
-
+{% block title %}لوحة UniBot{% endblock %}
 {% block content %}
-  <h1 class="title">مرحباً 👋</h1>
-  <p class="subtitle">هذه لوحة الإدارة المخصصة لـ UniBot.</p>
+<div class="cards">
+  <div class="card"><div class="card-title">مستخدمون</div><div class="card-value">{{ stats.users }}</div></div>
+  <div class="card"><div class="card-title">الأسئلة</div><div class="card-value">{{ stats.faqs }}</div></div>
+  <div class="card"><div class="card-title">أحداث قادمة</div><div class="card-value">{{ stats.upcoming_events }}</div></div>
+</div>
 
-  <div class="grid-3">
-    <div class="stat">
-      <div class="stat-label">المستخدمون</div>
-      <div class="stat-value">{{ stats.users|default:"0" }}</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">الأسئلة</div>
-      <div class="stat-value">{{ stats.faqs|default:"0" }}</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">أحداث قادمة</div>
-      <div class="stat-value">{{ stats.upcoming_events|default:"0" }}</div>
-    </div>
-  </div>
+<div class="toolbar">
+  <a class="btn" href="{% url 'custom_admin:event_add' %}">+ حدث</a>
+  <a class="btn" href="{% url 'custom_admin:faq_add' %}">+ سؤال</a>
+  <a class="btn" href="{% url 'custom_admin:category_add' %}">+ فئة</a>
+  <a class="btn" href="{% url 'custom_admin:kb_add' %}">+ ملف معرفة</a>
+</div>
 
-  <h3 class="section-title">أحدث الأحداث</h3>
-  <div class="table-wrap">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>العنوان</th>
-          <th>البدء</th>
-          <th>المكان</th>
-          <th>آخر تعديل</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for e in recent_events %}
-        <tr>
-          <td>{{ e.title }}</td>
-          <td>{{ e.start_date|date:"Y-m-d H:i" }}</td>
-          <td>{{ e.location|default:"-" }}</td>
-          <td>{{ e.updated_at|date:"Y-m-d H:i" }}</td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="4">لا توجد أحداث</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+<h3 class="section-title">أحدث الأحداث</h3>
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>العنوان</th><th>البدء</th><th>المكان</th><th></th></tr></thead>
+    <tbody>
+      {% for e in recent_events %}
+      <tr>
+        <td>{{ e.title }}</td>
+        <td>{{ e.start_date|date:"Y-m-d H:i" }}</td>
+        <td>{{ e.location }}</td>
+        <td class="actions">
+          <a class="link" href="{% url 'custom_admin:event_edit' e.pk %}">تعديل</a>
+          <a class="link danger" href="{% url 'custom_admin:event_delete' e.pk %}">حذف</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4">لا توجد بيانات</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}
