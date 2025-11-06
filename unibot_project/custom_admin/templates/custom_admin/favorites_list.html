@@ -1,18 +1,28 @@
-{% extends "custom_admin/generic_list.html" %}
-{% block list_title %}المفضلات{% endblock %}
-{% block list_headers %}
-  <th>المستخدم</th>
-  <th>السؤال</th>
-  <th>التاريخ</th>
-{% endblock %}
-{% block list_rows %}
-  {% for fav in items %}
+{% extends "custom_admin/base.html" %}
+{% block title %}المفضلات{% endblock %}
+{% block content %}
+<h2>المفضلات</h2>
+<table class="table">
+  <thead><tr><th>المستخدم</th><th>السؤال</th><th>التاريخ</th><th></th></tr></thead>
+  <tbody>
+    {% for fav in items %}
     <tr>
       <td>{{ fav.user.email|default:"-" }}</td>
       <td>{{ fav.faq.question|truncatechars:60 }}</td>
       <td>{{ fav.created_at|date:"Y-m-d H:i" }}</td>
+      <td class="actions">
+        <a class="link danger" href="{% url 'custom_admin:favorite_delete' fav.pk %}">حذف</a>
+      </td>
     </tr>
-  {% empty %}
-    <tr><td colspan="3">لا توجد مفضلات</td></tr>
-  {% endfor %}
+    {% empty %}<tr><td colspan="4">لا توجد مفضلات</td></tr>{% endfor %}
+  </tbody>
+</table>
+
+{% if items.paginator.num_pages > 1 %}
+<div class="pager">
+  {% if items.has_previous %}<a href="?page={{ items.previous_page_number }}">السابق</a>{% endif %}
+  <span>{{ items.number }} / {{ items.paginator.num_pages }}</span>
+  {% if items.has_next %}<a href="?page={{ items.next_page_number }}">التالي</a>{% endif %}
+</div>
+{% endif %}
 {% endblock %}
