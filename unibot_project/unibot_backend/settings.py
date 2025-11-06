@@ -20,22 +20,26 @@ CSRF_TRUSTED_ORIGINS = [
     if o.strip()
 ]
 
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https)
 USE_X_FORWARDED_HOST = True
 
+
 INSTALLED_APPS = [
+    'cloudinary_storage',         
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'cloudinary',                 
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
     "core",
     "custom_admin",
 ]
+# ----------------------------------------------------
 
 CLOUDINARY_URL = get_env("CLOUDINARY_URL")
 CLOUDINARY_CLOUD_NAME = get_env("CLOUDINARY_CLOUD_NAME")
@@ -45,8 +49,7 @@ USE_CLOUDINARY = bool(
     CLOUDINARY_URL
     or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET)
 )
-if USE_CLOUDINARY:
-    INSTALLED_APPS += ["cloudinary", "cloudinary_storage"]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -122,7 +125,12 @@ WHITENOISE_MANIFEST_STRICT = False
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
-MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
+
+
+if not USE_CLOUDINARY:
+    MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
+# ------------------------------------------------
+
 FILE_UPLOAD_PERMISSIONS = 0o644
 
 if USE_CLOUDINARY:
