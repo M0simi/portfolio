@@ -12,7 +12,7 @@ const Profile = () => {
     if (!token) return;
 
     axios
-      .get("https://api.unibot.foo/api/prfile", {
+      .get("https://api.unibot.foo/api/profile", {
         headers: { Authorization: `Token ${token}` },
       })
       .then((res) => setProfile(res.data))
