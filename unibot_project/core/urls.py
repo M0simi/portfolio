@@ -12,8 +12,8 @@ from .views import (
 
 urlpatterns = [
     path('', api_root, name='api_root'),
-    path('login/', CustomLoginView.as_view(), name='login'),
-    path('register/', register_user, name='register_user'),
+    path('login', CustomLoginView.as_view(), name='login'),
+    path('register', register_user, name='register_user'),
 
     # الأحداث
     path('events/', get_events, name='events'),
@@ -26,3 +26,4 @@ urlpatterns = [
     # الملف الشخصي
     path('profile/', get_profile, name='get_profile'),
 ]
+
