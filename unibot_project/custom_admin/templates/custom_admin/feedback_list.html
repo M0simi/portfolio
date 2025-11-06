@@ -1,22 +1,30 @@
-{% extends "custom_admin/generic_list.html" %}
-{% block list_title %}التعليقات{% endblock %}
-{% block list_headers %}
-  <th>السؤال</th>
-  <th>المستخدم</th>
-  <th>مفيد؟</th>
-  <th>التعليق</th>
-  <th>التاريخ</th>
-{% endblock %}
-{% block list_rows %}
-  {% for fb in items %}
+{% extends "custom_admin/base.html" %}
+{% block title %}التعليقات{% endblock %}
+{% block content %}
+<h2>التعليقات</h2>
+<table class="table">
+  <thead><tr><th>السؤال</th><th>المستخدم</th><th>نافع؟</th><th>تعليق</th><th>التاريخ</th><th></th></tr></thead>
+  <tbody>
+    {% for fb in items %}
     <tr>
       <td>{{ fb.faq.question|truncatechars:40 }}</td>
       <td>{{ fb.user.email|default:"-" }}</td>
       <td>{{ fb.helpful|yesno:"نعم,لا" }}</td>
       <td>{{ fb.comment|default:"-"|truncatechars:50 }}</td>
       <td>{{ fb.created_at|date:"Y-m-d H:i" }}</td>
+      <td class="actions">
+        <a class="link danger" href="{% url 'custom_admin:feedback_delete' fb.pk %}">حذف</a>
+      </td>
     </tr>
-  {% empty %}
-    <tr><td colspan="5">لا توجد تعليقات</td></tr>
-  {% endfor %}
+    {% empty %}<tr><td colspan="6">لا توجد تعليقات</td></tr>{% endfor %}
+  </tbody>
+</table>
+
+{% if items.paginator.num_pages > 1 %}
+<div class="pager">
+  {% if items.has_previous %}<a href="?page={{ items.previous_page_number }}">السابق</a>{% endif %}
+  <span>{{ items.number }} / {{ items.paginator.num_pages }}</span>
+  {% if items.has_next %}<a href="?page={{ items.next_page_number }}">التالي</a>{% endif %}
+</div>
+{% endif %}
 {% endblock %}
