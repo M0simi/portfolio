@@ -1,16 +1,37 @@
-{% extends "custom_admin/generic_list.html" %}
-{% block list_title %}الفئات{% endblock %}
-{% block list_headers %}
-  <th>الاسم</th>
-  <th>تاريخ التحديث</th>
-{% endblock %}
-{% block list_rows %}
-  {% for c in items %}
+{% extends "custom_admin/base.html" %}
+{% block title %}الفئات{% endblock %}
+{% block content %}
+<div class="list-head">
+  <h2>الفئات</h2>
+  <div class="actions-inline">
+    <form method="get" class="search">
+      <input name="q" value="{{ q }}" placeholder="بحث بالاسم">
+      <button class="btn">بحث</button>
+    </form>
+    <a class="btn" href="{% url 'custom_admin:category_add' %}">+ إضافة</a>
+  </div>
+</div>
+
+<table class="table">
+  <thead><tr><th>الاسم</th><th></th></tr></thead>
+  <tbody>
+    {% for c in items %}
     <tr>
       <td>{{ c.name }}</td>
-      <td>{{ c.updated_at|date:"Y-m-d H:i" }}</td>
+      <td class="actions">
+        <a class="link" href="{% url 'custom_admin:category_edit' c.pk %}">تعديل</a>
+        <a class="link danger" href="{% url 'custom_admin:category_delete' c.pk %}">حذف</a>
+      </td>
     </tr>
-  {% empty %}
-    <tr><td colspan="2">لا توجد فئات</td></tr>
-  {% endfor %}
+    {% empty %}<tr><td colspan="2">لا توجد فئات</td></tr>{% endfor %}
+  </tbody>
+</table>
+
+{% if items.paginator.num_pages > 1 %}
+<div class="pager">
+  {% if items.has_previous %}<a href="?page={{ items.previous_page_number }}&q={{ q }}">السابق</a>{% endif %}
+  <span>{{ items.number }} / {{ items.paginator.num_pages }}</span>
+  {% if items.has_next %}<a href="?page={{ items.next_page_number }}&q={{ q }}">التالي</a>{% endif %}
+</div>
+{% endif %}
 {% endblock %}
