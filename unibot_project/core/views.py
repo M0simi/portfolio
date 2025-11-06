@@ -14,6 +14,8 @@ from .ai_service import ask_gemini
 import os
 from PyPDF2 import PdfReader
 from core.models import KnowledgeBase
+import requests
+from io import BytesIO
 
 # ✅ تسجيل الدخول (باستخدام البريد)
 class CustomLoginView(ObtainAuthToken):
@@ -231,5 +233,6 @@ def get_profile(request):
             'message': '✅ تم تحديث الملف الشخصي بنجاح',
             'user': serializer.data
         })
+
 
 
