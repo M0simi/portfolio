@@ -45,7 +45,7 @@ export default function SignUp() {
     setErrorMsg("");
 
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/register/", form);
+      const response = await axios.post("https://api.unibot.foo/api/register", form);
 
       if (response.status === 201 || response.status === 200) {
         alert("تم إنشاء الحساب بنجاح ✅");
