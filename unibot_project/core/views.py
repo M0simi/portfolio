@@ -149,38 +149,34 @@ def register_user(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def ai_general(request):
+    from io import BytesIO
+    import requests
+    from PyPDF2 import PdfReader
+
     user = request.user
     user_prompt = (request.data.get('prompt') or '').strip()
     if not user_prompt:
         return Response({'error': 'يرجى إدخال السؤال.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # آخر ملف قاعدة معرفة
     kb = KnowledgeBase.objects.order_by('-id').first()
     if not kb or not kb.file:
         return Response({'error': '⚠️ لا يوجد ملف قاعدة معرفة مرفوع بعد.'}, status=status.HTTP_404_NOT_FOUND)
 
+    # حمّل الـPDF من URL لو التخزين سحابي، وإلّا استخدم .open()
     pdf_text = ""
     try:
-        # 1) لو التخزين محلي وفيه path صالح
-        try:
-            pdf_path = kb.file.path  # ممكن يرفع استثناء مع Cloudinary
-            with open(pdf_path, "rb") as f:
+        if hasattr(kb.file, "url"):
+            resp = requests.get(kb.file.url, timeout=15)
+            resp.raise_for_status()
+            reader = PdfReader(BytesIO(resp.content))
+        else:
+            with kb.file.open("rb") as f:
                 reader = PdfReader(f)
-                for page in reader.pages:
-                    content = page.extract_text() or ""
-                    if content:
-                        pdf_text += content + "\n"
-        except Exception:
-            # 2) تخزين سحابي (Cloudinary) — نقرأ من URL
-            file_url = kb.file.url  # public URL
-            r = requests.get(file_url, timeout=15)
-            r.raise_for_status()
-            reader = PdfReader(BytesIO(r.content))
-            for page in reader.pages:
-                content = page.extract_text() or ""
-                if content:
-                    pdf_text += content + "\n"
 
+        for page in reader.pages:
+            content = page.extract_text() or ""
+            if content:
+                pdf_text += content + "\n"
     except Exception as e:
         return Response({'error': f'⚠️ خطأ أثناء قراءة الملف: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -190,29 +186,29 @@ def ai_general(request):
         return Response({'result': f"وعليكم السلام {name}! 👋 كيف أقدر أساعدك اليوم؟"})
 
     full_prompt = f"""
-    أنت UniBot 🎓 — مساعد جامعي عربي.
-    أجب اعتمادًا فقط على النص التالي المقتبس من دليل الجامعة.
-    إذا لم تجد إجابة مباشرة في النص، جاوب: "عذرًا، سؤالك غير موجود في الملف الحالي."
+    أنت UniBot 🎓 — مساعد جامعي بالعربية.
+    اجب فقط مما يلي. إن لم توجد الإجابة فقل: "عذرًا، سؤالك غير موجود في الملف الحالي."
 
-    --- نص الدليل (مقتطف) ---
+    [مقتطف من الملف]:
     {pdf_text[:6000]}
 
-    --- سؤال المستخدم ({name}) ---
+    [سؤال ({name})]:
     {user_prompt}
     """
 
     try:
         answer = ask_gemini(full_prompt).strip()
         clean = (answer.replace("حسب الملف", "")
-                        .replace("وفقًا للمستند", "")
-                        .replace("PDF", "")
-                        .replace("الملف", "")
-                        .strip())
-        if any(w in clean for w in ["غير واضح", "لا أعلم", "لا يمكنني", "غير موجود"]):
+                      .replace("وفقًا للمستند", "")
+                      .replace("PDF", "")
+                      .replace("الملف", "")
+                      .strip())
+        if any(t in clean for t in ["غير واضح", "لا أعلم", "لا يمكنني", "غير موجود"]):
             clean = "عذرًا، سؤالك غير موجود في الملف الحالي."
         return Response({'result': clean})
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 # ✅ الملف الشخصي
@@ -235,6 +231,7 @@ def get_profile(request):
             'message': '✅ تم تحديث الملف الشخصي بنجاح',
             'user': serializer.data
         })
+
 
 
 
