@@ -1,11 +1,13 @@
 {% extends "custom_admin/base.html" %}
+{% block title %}تأكيد الحذف{% endblock %}
 {% block content %}
-  <div class="card danger">
-    <h2>{{ title }}</h2>
-    <p>هل تريد المتابعة؟ هذا الإجراء لا يمكن التراجع عنه.</p>
-    <form method="post">{% csrf_token %}
-      <button class="btn danger" type="submit">نعم، حذف</button>
-      <a class="btn ghost" href="javascript:history.back()">إلغاء</a>
-    </form>
-  </div>
+<div class="card danger">
+  <h2>{{ title }}</h2>
+  <p>هل تريد تنفيذ الحذف؟ لا يمكن التراجع.</p>
+  <form method="post">
+    {% csrf_token %}
+    <button class="btn danger" type="submit">نعم، حذف</button>
+    <a class="btn ghost" href="javascript:history.back()">إلغاء</a>
+  </form>
+</div>
 {% endblock %}
