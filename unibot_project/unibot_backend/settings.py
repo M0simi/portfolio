@@ -5,53 +5,31 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 get_env = os.environ.get
 
-# ----------------------------
-# Security & Debug
-# ----------------------------
 SECRET_KEY = get_env("SECRET_KEY", "change-me")
 DEBUG = get_env("DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = [h.strip() for h in get_env("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
-CSRF_TRUSTED_ORIGINS = [o.strip() for o in get_env("CSRF_TRUSTED_ORIGINS", "http://localhost,http://127.0.0.1").split(",") if o.strip()]
+ALLOWED_HOSTS = [
+    h.strip()
+    for h in get_env("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+    if h.strip()
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    o.strip()
+    for o in get_env("CSRF_TRUSTED_ORIGINS", "http://localhost,http://127.0.0.1").split(",")
+    if o.strip()
+]
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = True
 
-# ----------------------------
-# Cloudinary toggle
-# ----------------------------
-CLOUDINARY_URL = get_env("CLOUDINARY_URL")
-CLOUDINARY_CLOUD_NAME = get_env("CLOUDINARY_CLOUD_NAME")
-CLOUDINARY_API_KEY = get_env("CLOUDINARY_API_KEY")
-CLOUDINARY_API_SECRET = get_env("CLOUDINARY_API_SECRET")
-USE_CLOUDINARY = bool(CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET))
-
-# ----------------------------
-# Applications (order matters)
-# ----------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-]
-
-if USE_CLOUDINARY:
-    INSTALLED_APPS += [
-        "cloudinary_storage",
-]
-
-INSTALLED_APPS += [
     "django.contrib.staticfiles",
-]
-
-if USE_CLOUDINARY:
-    INSTALLED_APPS += [
-        "cloudinary",
-    ]
-
-INSTALLED_APPS += [
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
@@ -59,9 +37,17 @@ INSTALLED_APPS += [
     "custom_admin",
 ]
 
-# ----------------------------
-# Middleware
-# ----------------------------
+CLOUDINARY_URL = get_env("CLOUDINARY_URL")
+CLOUDINARY_CLOUD_NAME = get_env("CLOUDINARY_CLOUD_NAME")
+CLOUDINARY_API_KEY = get_env("CLOUDINARY_API_KEY")
+CLOUDINARY_API_SECRET = get_env("CLOUDINARY_API_SECRET")
+USE_CLOUDINARY = bool(
+    CLOUDINARY_URL
+    or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET)
+)
+if USE_CLOUDINARY:
+    INSTALLED_APPS += ["cloudinary", "cloudinary_storage"]
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -77,9 +63,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "unibot_backend.urls"
 
-# ----------------------------
-# Templates
-# ----------------------------
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -98,17 +81,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "unibot_backend.wsgi.application"
 
-# ----------------------------
-# Database
-# ----------------------------
-_db_url = get_env("DATABASE_URL") or f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+_db_url = get_env("INTERNAL_DATABASE_URL") or get_env("DATABASE_URL")
+if not _db_url:
+    _db_url = f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+
 DATABASES = {
-    "default": dj_database_url.parse(_db_url, conn_max_age=600, ssl_require=_db_url.startswith("postgres")),
+    "default": dj_database_url.parse(
+        _db_url, conn_max_age=600, ssl_require=_db_url.startswith("postgres")
+    )
 }
 
-# ----------------------------
-# Authentication
-# ----------------------------
 AUTH_USER_MODEL = "core.CustomUser"
 AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
 
@@ -122,23 +104,26 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGIN_URL = "/admin/login/"
 LOGIN_REDIRECT_URL = "/dashboard/"
 
-# ----------------------------
-# I18N / TZ
-# ----------------------------
 LANGUAGE_CODE = "ar"
 TIME_ZONE = "Asia/Riyadh"
 USE_I18N = True
 USE_TZ = True
 
-# ----------------------------
-# Static & Media
-# ----------------------------
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / "core" / "static"]
+
+STATICFILES_DIRS = []
+_core_static = BASE_DIR / "core" / "static"
+if _core_static.exists():
+    STATICFILES_DIRS.append(_core_static)
+
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+WHITENOISE_MANIFEST_STRICT = False
 
 MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
+FILE_UPLOAD_PERMISSIONS = 0o644
 
 if USE_CLOUDINARY:
     DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
@@ -149,15 +134,10 @@ if USE_CLOUDINARY:
             "API_SECRET": CLOUDINARY_API_SECRET,
         }
 else:
-    MEDIA_ROOT = BASE_DIR / "media"
     DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
-    FILE_UPLOAD_PERMISSIONS = 0o644
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# ----------------------------
-# DRF
-# ----------------------------
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
@@ -172,9 +152,11 @@ REST_FRAMEWORK = {
     ],
 }
 
-# ----------------------------
-# CORS / CSRF
-# ----------------------------
+if not DEBUG:
+    REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = [
+        "rest_framework.renderers.JSONRenderer",
+    ]
+
 CORS_ALLOWED_ORIGINS = [
     "https://unibot.foo",
     "https://www.unibot.foo",
@@ -193,9 +175,6 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
-# ----------------------------
-# Production Security
-# ----------------------------
 if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
