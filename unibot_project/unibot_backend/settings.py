@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-
 import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -12,29 +11,23 @@ get_env = os.environ.get
 SECRET_KEY = get_env("SECRET_KEY", "change-me")
 DEBUG = get_env("DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = [
-    h.strip()
-    for h in get_env(
-        "ALLOWED_HOSTS",
-        "localhost,127.0.0.1"
-    ).split(",")
-    if h.strip()
-]
-
-CSRF_TRUSTED_ORIGINS = [
-    o.strip()
-    for o in get_env(
-        "CSRF_TRUSTED_ORIGINS",
-        "http://localhost,http://127.0.0.1"
-    ).split(",")
-    if o.strip()
-]
+ALLOWED_HOSTS = [h.strip() for h in get_env("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in get_env("CSRF_TRUSTED_ORIGINS", "http://localhost,http://127.0.0.1").split(",") if o.strip()]
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = True
 
 # ----------------------------
-# Applications
+# Cloudinary toggle
+# ----------------------------
+CLOUDINARY_URL = get_env("CLOUDINARY_URL")
+CLOUDINARY_CLOUD_NAME = get_env("CLOUDINARY_CLOUD_NAME")
+CLOUDINARY_API_KEY = get_env("CLOUDINARY_API_KEY")
+CLOUDINARY_API_SECRET = get_env("CLOUDINARY_API_SECRET")
+USE_CLOUDINARY = bool(CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET))
+
+# ----------------------------
+# Applications (order matters)
 # ----------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -42,24 +35,29 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+]
+
+if USE_CLOUDINARY:
+    INSTALLED_APPS += [
+        "cloudinary_storage",
+]
+
+INSTALLED_APPS += [
     "django.contrib.staticfiles",
+]
+
+if USE_CLOUDINARY:
+    INSTALLED_APPS += [
+        "cloudinary",
+    ]
+
+INSTALLED_APPS += [
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
     "core",
     "custom_admin",
 ]
-
-CLOUDINARY_URL = get_env("CLOUDINARY_URL")
-CLOUDINARY_CLOUD_NAME = get_env("CLOUDINARY_CLOUD_NAME")
-CLOUDINARY_API_KEY = get_env("CLOUDINARY_API_KEY")
-CLOUDINARY_API_SECRET = get_env("CLOUDINARY_API_SECRET")
-USE_CLOUDINARY = bool(
-    CLOUDINARY_URL
-    or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET)
-)
-if USE_CLOUDINARY:
-    INSTALLED_APPS += ["cloudinary", "cloudinary_storage"]
 
 # ----------------------------
 # Middleware
@@ -103,12 +101,9 @@ WSGI_APPLICATION = "unibot_backend.wsgi.application"
 # ----------------------------
 # Database
 # ----------------------------
-_db_url = get_env("INTERNAL_DATABASE_URL") or get_env("DATABASE_URL")
-if not _db_url:
-    _db_url = f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
-
+_db_url = get_env("DATABASE_URL") or f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
 DATABASES = {
-    "default": dj_database_url.parse(_db_url, conn_max_age=600, ssl_require=_db_url.startswith("postgres"))
+    "default": dj_database_url.parse(_db_url, conn_max_age=600, ssl_require=_db_url.startswith("postgres")),
 }
 
 # ----------------------------
@@ -144,10 +139,6 @@ STATICFILES_DIRS = [BASE_DIR / "core" / "static"]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
-# ensure directory exists in container
-MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
-FILE_UPLOAD_PERMISSIONS = 0o644
 
 if USE_CLOUDINARY:
     DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
@@ -158,7 +149,9 @@ if USE_CLOUDINARY:
             "API_SECRET": CLOUDINARY_API_SECRET,
         }
 else:
+    MEDIA_ROOT = BASE_DIR / "media"
     DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+    FILE_UPLOAD_PERMISSIONS = 0o644
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -210,5 +203,3 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-
-
