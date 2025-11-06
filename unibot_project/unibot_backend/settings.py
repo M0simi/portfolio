@@ -120,7 +120,7 @@ _core_static = BASE_DIR / "core" / "static"
 if _core_static.exists():
     STATICFILES_DIRS.append(_core_static)
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 WHITENOISE_MANIFEST_STRICT = False
 
 MEDIA_URL = "/media/"
@@ -190,4 +190,5 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
 
