@@ -1,18 +1,39 @@
-{% extends "custom_admin/generic_list.html" %}
-{% block list_title %}الأسئلة الشائعة{% endblock %}
-{% block list_headers %}
-  <th>السؤال</th>
-  <th>الفئة</th>
-  <th>آخر تحديث</th>
-{% endblock %}
-{% block list_rows %}
-  {% for f in items %}
+{% extends "custom_admin/base.html" %}
+{% block title %}الأسئلة الشائعة{% endblock %}
+{% block content %}
+<div class="list-head">
+  <h2>الأسئلة الشائعة</h2>
+  <div class="actions-inline">
+    <form method="get" class="search">
+      <input name="q" value="{{ q }}" placeholder="بحث في السؤال/الإجابة">
+      <button class="btn">بحث</button>
+    </form>
+    <a class="btn" href="{% url 'custom_admin:faq_add' %}">+ إضافة</a>
+  </div>
+</div>
+
+<table class="table">
+  <thead><tr><th>السؤال</th><th>الفئة</th><th>آخر تحديث</th><th></th></tr></thead>
+  <tbody>
+    {% for f in items %}
     <tr>
       <td>{{ f.question|truncatechars:60 }}</td>
       <td>{{ f.category.name|default:"-" }}</td>
       <td>{{ f.updated_at|date:"Y-m-d H:i" }}</td>
+      <td class="actions">
+        <a class="link" href="{% url 'custom_admin:faq_edit' f.pk %}">تعديل</a>
+        <a class="link danger" href="{% url 'custom_admin:faq_delete' f.pk %}">حذف</a>
+      </td>
     </tr>
-  {% empty %}
-    <tr><td colspan="3">لا توجد أسئلة</td></tr>
-  {% endfor %}
+    {% empty %}<tr><td colspan="4">لا توجد أسئلة</td></tr>{% endfor %}
+  </tbody>
+</table>
+
+{% if items.paginator.num_pages > 1 %}
+<div class="pager">
+  {% if items.has_previous %}<a href="?page={{ items.previous_page_number }}&q={{ q }}">السابق</a>{% endif %}
+  <span>{{ items.number }} / {{ items.paginator.num_pages }}</span>
+  {% if items.has_next %}<a href="?page={{ items.next_page_number }}&q={{ q }}">التالي</a>{% endif %}
+</div>
+{% endif %}
 {% endblock %}
