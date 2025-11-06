@@ -147,39 +147,37 @@ def register_user(request):
 @permission_classes([IsAuthenticated])
 def ai_general(request):
     user = request.user
-    user_prompt = (request.data.get('prompt') or '').strip()
+    user_prompt = request.data.get('prompt', '').strip()
 
     if not user_prompt:
         return Response({'error': 'يرجى إدخال السؤال.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # آخر ملف قاعدة معرفة
     kb = KnowledgeBase.objects.order_by('-id').first()
     if not kb or not kb.file:
-        return Response({'error': 'لا يوجد ملف قاعدة معرفة مرفوع بعد.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': '⚠️ لا يوجد ملف قاعدة معرفة مرفوع بعد.'}, status=status.HTTP_404_NOT_FOUND)
 
-    # افتح الملف من التخزين (محلي/سحابي) بدون الاعتماد على .path
     pdf_text = ""
     try:
-        kb.file.open('rb')
-        try:
-            reader = PdfReader(kb.file)
-            # لتسريع القراءة وتجنب PDF كبير جداً، خذ أول 30 صفحة كحد أقصى
-            pages = reader.pages[:30] if len(reader.pages) > 30 else reader.pages
-            for page in pages:
-                content = page.extract_text() or ""
-                if content:
+        # لو التخزين محلي عندنا .path، لو Cloudinary نستخدم .url وننزّل الملف
+        if hasattr(kb.file, "path"):
+            pdf_path = kb.file.path
+            with open(pdf_path, "rb") as f:
+                reader = PdfReader(f)
+                for page in reader.pages:
+                    content = page.extract_text() or ""
                     pdf_text += content + "\n"
-        finally:
-            kb.file.close()
-    except FileNotFoundError:
-        return Response({'error': 'الملف غير موجود على الخادم. أعد رفعه من لوحة الإدارة.'},
-                        status=status.HTTP_404_NOT_FOUND)
-    except PdfReadError as e:
-        return Response({'error': f'خطأ في قراءة ملف PDF: {e}'},
-                        status=status.HTTP_400_BAD_REQUEST)
+        else:
+            pdf_url = kb.file.url  # Cloudinary URL
+            resp = requests.get(pdf_url, timeout=20)
+            resp.raise_for_status()
+            with BytesIO(resp.content) as bio:
+                reader = PdfReader(bio)
+                for page in reader.pages:
+                    content = page.extract_text() or ""
+                    pdf_text += content + "\n"
     except Exception as e:
-        return Response({'error': f'تعذر فتح الملف: {e}'},
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'error': f'⚠️ خطأ أثناء قراءة الملف: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
     name = user.name or "الطالب"
     greetings = ["السلام عليكم", "مرحبا", "هلا", "صباح الخير", "مساء الخير", "أهلاً", "هلا والله"]
@@ -233,4 +231,5 @@ def get_profile(request):
             'message': '✅ تم تحديث الملف الشخصي بنجاح',
             'user': serializer.data
         })
+
 
