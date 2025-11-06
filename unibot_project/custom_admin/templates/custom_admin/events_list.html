@@ -1,39 +1,43 @@
 {% extends "custom_admin/base.html" %}
-
-{% block page_header %}
-  <h1 class="title">الأحداث</h1>
-  <p class="subtitle">إدارة جميع الأحداث المنشورة أو القادمة.</p>
-{% endblock %}
-
+{% block title %}الأحداث{% endblock %}
 {% block content %}
-  <form class="toolbar" method="get">
-    <input class="input" type="search" name="q" placeholder="ابحث بالعنوان…" value="{{ q|default:'' }}">
-    <button class="btn">بحث</button>
-    <a class="btn primary" href="{% url 'custom_admin:event_add' %}">+ حدث جديد</a>
-  </form>
-
-  <div class="table-wrap">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>العنوان</th>
-          <th>البداية</th>
-          <th>الموقع</th>
-          <th>Slug</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for e in events %}
-        <tr>
-          <td>{{ e.title }}</td>
-          <td>{{ e.start_date|date:"Y-m-d H:i" }}</td>
-          <td>{{ e.location|default:"-" }}</td>
-          <td class="muted">{{ e.slug }}</td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="4" class="muted">لا نتائج.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+<div class="list-head">
+  <h2>الأحداث</h2>
+  <div class="actions-inline">
+    <form method="get" class="search">
+      <input name="q" value="{{ q }}" placeholder="بحث بالعنوان/المكان/الاسم اللطيف">
+      <button class="btn">بحث</button>
+    </form>
+    <a class="btn" href="{% url 'custom_admin:event_add' %}">+ إضافة</a>
   </div>
+</div>
+
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>العنوان</th><th>البدء</th><th>النهاية</th><th>المكان</th><th>Slug</th><th></th></tr></thead>
+    <tbody>
+      {% for e in events %}
+      <tr>
+        <td>{{ e.title }}</td>
+        <td>{{ e.start_date|date:"Y-m-d H:i" }}</td>
+        <td>{{ e.end_date|date:"Y-m-d H:i" }}</td>
+        <td>{{ e.location }}</td>
+        <td>{{ e.slug }}</td>
+        <td class="actions">
+          <a class="link" href="{% url 'custom_admin:event_edit' e.pk %}">تعديل</a>
+          <a class="link danger" href="{% url 'custom_admin:event_delete' e.pk %}">حذف</a>
+        </td>
+      </tr>
+      {% empty %}<tr><td colspan="6">لا توجد أحداث</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if events.paginator.num_pages > 1 %}
+<div class="pager">
+  {% if events.has_previous %}<a href="?page={{ events.previous_page_number }}&q={{ q }}">السابق</a>{% endif %}
+  <span>{{ events.number }} / {{ events.paginator.num_pages }}</span>
+  {% if events.has_next %}<a href="?page={{ events.next_page_number }}&q={{ q }}">التالي</a>{% endif %}
+</div>
+{% endif %}
 {% endblock %}
