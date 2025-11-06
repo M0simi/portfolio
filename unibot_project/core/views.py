@@ -147,68 +147,70 @@ def register_user(request):
 @permission_classes([IsAuthenticated])
 def ai_general(request):
     user = request.user
-    user_prompt = request.data.get('prompt', '').strip()
+    user_prompt = (request.data.get('prompt') or '').strip()
 
     if not user_prompt:
         return Response({'error': 'يرجى إدخال السؤال.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # 🔹 جلب آخر ملف PDF مرفوع
+    # آخر ملف قاعدة معرفة
     kb = KnowledgeBase.objects.order_by('-id').first()
     if not kb or not kb.file:
-        return Response({'error': '⚠️ لا يوجد ملف قاعدة معرفة مرفوع بعد.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'لا يوجد ملف قاعدة معرفة مرفوع بعد.'}, status=status.HTTP_404_NOT_FOUND)
 
-    pdf_path = kb.file.path
+    # افتح الملف من التخزين (محلي/سحابي) بدون الاعتماد على .path
     pdf_text = ""
     try:
-        with open(pdf_path, "rb") as f:
-            reader = PdfReader(f)
-            for page in reader.pages:
-                content = page.extract_text()
+        kb.file.open('rb')
+        try:
+            reader = PdfReader(kb.file)
+            # لتسريع القراءة وتجنب PDF كبير جداً، خذ أول 30 صفحة كحد أقصى
+            pages = reader.pages[:30] if len(reader.pages) > 30 else reader.pages
+            for page in pages:
+                content = page.extract_text() or ""
                 if content:
                     pdf_text += content + "\n"
+        finally:
+            kb.file.close()
+    except FileNotFoundError:
+        return Response({'error': 'الملف غير موجود على الخادم. أعد رفعه من لوحة الإدارة.'},
+                        status=status.HTTP_404_NOT_FOUND)
+    except PdfReadError as e:
+        return Response({'error': f'خطأ في قراءة ملف PDF: {e}'},
+                        status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return Response({'error': f'⚠️ خطأ أثناء قراءة الملف: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'error': f'تعذر فتح الملف: {e}'},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     name = user.name or "الطالب"
-
-    # 👋 تحيات شائعة (استثناء من التقييد)
     greetings = ["السلام عليكم", "مرحبا", "هلا", "صباح الخير", "مساء الخير", "أهلاً", "هلا والله"]
-    if any(greet in user_prompt for greet in greetings):
+    if any(g in user_prompt for g in greetings):
         return Response({'result': f"وعليكم السلام {name}! 👋 كيف أقدر أساعدك اليوم؟"})
 
-    # 🎯 البرومبت الذكي المقيد على محتوى الملف فقط
     full_prompt = f"""
-    أنت UniBot 🎓 — مساعد جامعي ذكي ناطق بالعربية الفصحى.
-    يجب أن تعتمد إجابتك فقط على النص التالي المأخوذ من دليل الجامعة.
-    إذا لم تجد أي معلومة تساعدك على الإجابة من النص، فأجب فقط بعبارة:
+    أنت UniBot 🎓 — مساعد جامعي عربي.
+    أجب اعتماداً فقط على النص التالي من دليل الجامعة. إن لم تجد الجواب في النص فقل:
     "عذرًا، سؤالك غير موجود في الملف الحالي."
 
-    🔹 محتوى الملف الجامعي:
+    النص:
     {pdf_text[:6000]}
 
-    🔹 سؤال المستخدم ({name}):
+    سؤال المستخدم ({name}):
     {user_prompt}
     """
 
     try:
         answer = ask_gemini(full_prompt).strip()
-
-        clean_answer = (
-            answer.replace("حسب الملف", "")
-                  .replace("وفقًا للمستند", "")
-                  .replace("PDF", "")
-                  .replace("الملف", "")
-                  .strip()
-        )
-
-        # 🛑 لو الرد عام أو مو أكاديمي → نرجع الرد الثابت
-        if any(kw in clean_answer for kw in ["غير واضح", "لا أعلم", "لا يمكنني", "غير موجود"]):
-            clean_answer = "عذرًا، سؤالك غير موجود في الملف الحالي."
-
-        return Response({'result': clean_answer})
-
+        cleaned = (answer.replace("حسب الملف", "")
+                         .replace("وفقًا للمستند", "")
+                         .replace("PDF", "")
+                         .replace("الملف", "")
+                         .strip())
+        if any(x in cleaned for x in ["غير واضح", "لا أعلم", "لا يمكنني", "غير موجود"]):
+            cleaned = "عذرًا، سؤالك غير موجود في الملف الحالي."
+        return Response({'result': cleaned})
     except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'error': f'فشل استدعاء نموذج الذكاء الاصطناعي: {e}'},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # ✅ الملف الشخصي
@@ -231,3 +233,4 @@ def get_profile(request):
             'message': '✅ تم تحديث الملف الشخصي بنجاح',
             'user': serializer.data
         })
+
