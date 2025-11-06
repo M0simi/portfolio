@@ -5,6 +5,8 @@ from django.db.models import Q
 from django.forms import ModelForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
+from django.http import HttpResponse
+from core.models import KnowledgeBase
 
 from core.models import (
     Event,
@@ -255,3 +257,8 @@ def kb_delete(request, pk):
         messages.success(request, "File deleted.")
         return redirect("custom_admin:knowledgebases_list")
     return render(request, "custom_admin/generic_confirm_delete.html", {"title": "Confirm delete", "obj": obj})
+
+@staff_member_required
+def kb_reset(request):
+    deleted, _ = KnowledgeBase.objects.all().delete()
+    return HttpResponse(f"OK - deleted KB rows: {deleted}")
