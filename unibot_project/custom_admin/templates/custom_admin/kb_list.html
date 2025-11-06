@@ -1,20 +1,42 @@
-{% extends "custom_admin/generic_list.html" %}
-{% block list_title %}ملفات المعرفة (Knowledge Bases){% endblock %}
-{% block list_headers %}
-  <th>العنوان</th>
-  <th>الملف</th>
-  <th>آخر تحديث</th>
-{% endblock %}
-{% block list_rows %}
-  {% for k in items %}
+{% extends "custom_admin/base.html" %}
+{% block title %}ملفات المعرفة{% endblock %}
+{% block content %}
+<div class="list-head">
+  <h2>ملفات المعرفة (Knowledge Bases)</h2>
+  <div class="actions-inline">
+    <form method="get" class="search">
+      <input name="q" value="{{ q }}" placeholder="بحث بالعنوان">
+      <button class="btn">بحث</button>
+    </form>
+    <a class="btn" href="{% url 'custom_admin:kb_add' %}">+ إضافة</a>
+  </div>
+</div>
+
+<table class="table">
+  <thead><tr><th>العنوان</th><th>الملف</th><th>آخر تحديث</th><th></th></tr></thead>
+  <tbody>
+    {% for k in items %}
     <tr>
       <td>{{ k.title }}</td>
       <td>
-        {% if k.file %}<a class="btn sm" href="{{ k.file.url }}" target="_blank">فتح</a>{% else %}-{% endif %}
+        {% if k.file %}
+          <a class="link" href="{{ k.file.url }}" target="_blank">فتح</a>
+        {% else %}-{% endif %}
       </td>
       <td>{{ k.updated_at|date:"Y-m-d H:i" }}</td>
+      <td class="actions">
+        <a class="link danger" href="{% url 'custom_admin:kb_delete' k.pk %}">حذف</a>
+      </td>
     </tr>
-  {% empty %}
-    <tr><td colspan="3">لا توجد ملفات</td></tr>
-  {% endfor %}
+    {% empty %}<tr><td colspan="4">لا توجد ملفات</td></tr>{% endfor %}
+  </tbody>
+</table>
+
+{% if items.paginator.num_pages > 1 %}
+<div class="pager">
+  {% if items.has_previous %}<a href="?page={{ items.previous_page_number }}&q={{ q }}">السابق</a>{% endif %}
+  <span>{{ items.number }} / {{ items.paginator.num_pages }}</span>
+  {% if items.has_next %}<a href="?page={{ items.next_page_number }}&q={{ q }}">التالي</a>{% endif %}
+</div>
+{% endif %}
 {% endblock %}
