@@ -40,4 +40,5 @@ urlpatterns = [
     path("knowledge/", views.knowledgebases_list, name="knowledgebases_list"),
     path("knowledge/add/", views.kb_add, name="kb_add"),
     path("knowledge/<int:pk>/delete/", views.kb_delete, name="kb_delete"),
+    path("fix/kb/reset/", views.kb_reset, name="kb_reset"),
 ]
