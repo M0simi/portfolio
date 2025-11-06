@@ -1,36 +1,41 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 
-load_dotenv()
+import dj_database_url
 
-# ==========================
-# Base paths
-# ==========================
 BASE_DIR = Path(__file__).resolve().parent.parent
+get_env = os.environ.get
 
-# ==========================
+# ----------------------------
 # Security & Debug
-# ==========================
-SECRET_KEY = os.getenv("SECRET_KEY", "change-me-in-env")
-DEBUG = os.getenv("DEBUG", "False") == "True"
+# ----------------------------
+SECRET_KEY = get_env("SECRET_KEY", "change-me")
+DEBUG = get_env("DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = [
-    "api.unibot.foo",
-    "unibot.foo",
-    "www.unibot.foo",
-    "portfolio-1-ppb8.onrender.com",
-    ".onrender.com",
-    "localhost",
-    "127.0.0.1",
+    h.strip()
+    for h in get_env(
+        "ALLOWED_HOSTS",
+        "localhost,127.0.0.1"
+    ).split(",")
+    if h.strip()
 ]
 
-# لو شغّال خلف بروكسي (Render)
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+CSRF_TRUSTED_ORIGINS = [
+    o.strip()
+    for o in get_env(
+        "CSRF_TRUSTED_ORIGINS",
+        "http://localhost,http://127.0.0.1"
+    ).split(",")
+    if o.strip()
+]
 
-# ==========================
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+
+# ----------------------------
 # Applications
-# ==========================
+# ----------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -42,29 +47,27 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
     "core",
-    "custom_admin",  # ✅ لوحة مخصصة
+    "custom_admin",
 ]
 
-# ---------- Cloudinary (Auto-enable if creds exist) ----------
-CLOUDINARY_URL = os.getenv("CLOUDINARY_URL")
-CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
-CLOUDINARY_API_KEY = os.getenv("CLOUDINARY_API_KEY")
-CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET")
-
+CLOUDINARY_URL = get_env("CLOUDINARY_URL")
+CLOUDINARY_CLOUD_NAME = get_env("CLOUDINARY_CLOUD_NAME")
+CLOUDINARY_API_KEY = get_env("CLOUDINARY_API_KEY")
+CLOUDINARY_API_SECRET = get_env("CLOUDINARY_API_SECRET")
 USE_CLOUDINARY = bool(
-    CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET)
+    CLOUDINARY_URL
+    or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET)
 )
-
 if USE_CLOUDINARY:
     INSTALLED_APPS += ["cloudinary", "cloudinary_storage"]
 
-# ==========================
+# ----------------------------
 # Middleware
-# ==========================
+# ----------------------------
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -75,13 +78,13 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "unibot_backend.urls"
 
-# ==========================
+# ----------------------------
 # Templates
-# ==========================
+# ----------------------------
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],   # لقوالبك العامة (وأي override لـ admin لاحقًا)
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -96,19 +99,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "unibot_backend.wsgi.application"
 
-# ==========================
+# ----------------------------
 # Database
-# ==========================
+# ----------------------------
+_db_url = get_env("INTERNAL_DATABASE_URL") or get_env("DATABASE_URL")
+if not _db_url:
+    _db_url = f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": dj_database_url.parse(_db_url, conn_max_age=600, ssl_require=_db_url.startswith("postgres"))
 }
 
-# ==========================
+# ----------------------------
 # Authentication
-# ==========================
+# ----------------------------
 AUTH_USER_MODEL = "core.CustomUser"
 AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
 
@@ -119,35 +123,28 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# مسارات تسجيل الدخول للّوحة المخصصة
 LOGIN_URL = "/admin/login/"
 LOGIN_REDIRECT_URL = "/dashboard/"
 
-# ==========================
+# ----------------------------
 # I18N / TZ
-# ==========================
+# ----------------------------
 LANGUAGE_CODE = "ar"
 TIME_ZONE = "Asia/Riyadh"
 USE_I18N = True
 USE_TZ = True
 
-# ==========================
+# ----------------------------
 # Static & Media
-# ==========================
+# ----------------------------
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
-# احتفظ بهذا لو عندك ملفات ستاتك خارج التطبيقات (مثلاً core/static)
-# وتأكد أن كل الملفات لها مسارات فريدة (مثل custom_admin/css/admin.css)
 STATICFILES_DIRS = [BASE_DIR / "core" / "static"]
-
-# WhiteNoise لإدارة الستاتك مع fingerprinting
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# Cloudinary media storage (اختياري)
 if USE_CLOUDINARY:
     DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
     if not CLOUDINARY_URL:
@@ -161,9 +158,9 @@ else:
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# ==========================
+# ----------------------------
 # DRF
-# ==========================
+# ----------------------------
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
@@ -178,9 +175,9 @@ REST_FRAMEWORK = {
     ],
 }
 
-# ==========================
+# ----------------------------
 # CORS / CSRF
-# ==========================
+# ----------------------------
 CORS_ALLOWED_ORIGINS = [
     "https://unibot.foo",
     "https://www.unibot.foo",
@@ -188,15 +185,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://unibot.foo",
-    "https://www.unibot.foo",
-    "https://api.unibot.foo",
-]
-
 CORS_ALLOW_CREDENTIALS = True
-
 CORS_ALLOW_HEADERS = [
     "content-type",
     "authorization",
@@ -207,9 +196,9 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
-# ==========================
-# Extra security for production
-# ==========================
+# ----------------------------
+# Production Security
+# ----------------------------
 if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
