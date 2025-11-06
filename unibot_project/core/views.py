@@ -1,21 +1,23 @@
 from django.utils import timezone
 from django.db.models import Q
+from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import make_password
+
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
-from rest_framework import status
-from django.contrib.auth import authenticate
-from django.contrib.auth.hashers import make_password
-from .models import Event, FAQ, CustomUser
+
+from .models import Event, FAQ, CustomUser, KnowledgeBase
 from .serializers import EventSerializer, FAQSerializer, UserSerializer
 from .ai_service import ask_gemini
-import os
+
 from PyPDF2 import PdfReader
-from core.models import KnowledgeBase
 import requests
 from io import BytesIO
+
 
 # ✅ تسجيل الدخول (باستخدام البريد)
 class CustomLoginView(ObtainAuthToken):
@@ -144,42 +146,43 @@ def register_user(request):
         'token': token.key
     }, status=status.HTTP_201_CREATED)
 
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def ai_general(request):
     user = request.user
-    user_prompt = request.data.get('prompt', '').strip()
-
+    user_prompt = (request.data.get('prompt') or '').strip()
     if not user_prompt:
         return Response({'error': 'يرجى إدخال السؤال.'}, status=status.HTTP_400_BAD_REQUEST)
 
+    # آخر ملف قاعدة معرفة
     kb = KnowledgeBase.objects.order_by('-id').first()
     if not kb or not kb.file:
         return Response({'error': '⚠️ لا يوجد ملف قاعدة معرفة مرفوع بعد.'}, status=status.HTTP_404_NOT_FOUND)
 
     pdf_text = ""
     try:
-        # لو التخزين محلي عندنا .path، لو Cloudinary نستخدم .url وننزّل الملف
-        if hasattr(kb.file, "path"):
-            pdf_path = kb.file.path
+        # 1) لو التخزين محلي وفيه path صالح
+        try:
+            pdf_path = kb.file.path  # ممكن يرفع استثناء مع Cloudinary
             with open(pdf_path, "rb") as f:
                 reader = PdfReader(f)
                 for page in reader.pages:
                     content = page.extract_text() or ""
+                    if content:
+                        pdf_text += content + "\n"
+        except Exception:
+            # 2) تخزين سحابي (Cloudinary) — نقرأ من URL
+            file_url = kb.file.url  # public URL
+            r = requests.get(file_url, timeout=15)
+            r.raise_for_status()
+            reader = PdfReader(BytesIO(r.content))
+            for page in reader.pages:
+                content = page.extract_text() or ""
+                if content:
                     pdf_text += content + "\n"
-        else:
-            pdf_url = kb.file.url  # Cloudinary URL
-            resp = requests.get(pdf_url, timeout=20)
-            resp.raise_for_status()
-            with BytesIO(resp.content) as bio:
-                reader = PdfReader(bio)
-                for page in reader.pages:
-                    content = page.extract_text() or ""
-                    pdf_text += content + "\n"
+
     except Exception as e:
         return Response({'error': f'⚠️ خطأ أثناء قراءة الملف: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
     name = user.name or "الطالب"
     greetings = ["السلام عليكم", "مرحبا", "هلا", "صباح الخير", "مساء الخير", "أهلاً", "هلا والله"]
@@ -188,29 +191,28 @@ def ai_general(request):
 
     full_prompt = f"""
     أنت UniBot 🎓 — مساعد جامعي عربي.
-    أجب اعتماداً فقط على النص التالي من دليل الجامعة. إن لم تجد الجواب في النص فقل:
-    "عذرًا، سؤالك غير موجود في الملف الحالي."
+    أجب اعتمادًا فقط على النص التالي المقتبس من دليل الجامعة.
+    إذا لم تجد إجابة مباشرة في النص، جاوب: "عذرًا، سؤالك غير موجود في الملف الحالي."
 
-    النص:
+    --- نص الدليل (مقتطف) ---
     {pdf_text[:6000]}
 
-    سؤال المستخدم ({name}):
+    --- سؤال المستخدم ({name}) ---
     {user_prompt}
     """
 
     try:
         answer = ask_gemini(full_prompt).strip()
-        cleaned = (answer.replace("حسب الملف", "")
-                         .replace("وفقًا للمستند", "")
-                         .replace("PDF", "")
-                         .replace("الملف", "")
-                         .strip())
-        if any(x in cleaned for x in ["غير واضح", "لا أعلم", "لا يمكنني", "غير موجود"]):
-            cleaned = "عذرًا، سؤالك غير موجود في الملف الحالي."
-        return Response({'result': cleaned})
+        clean = (answer.replace("حسب الملف", "")
+                        .replace("وفقًا للمستند", "")
+                        .replace("PDF", "")
+                        .replace("الملف", "")
+                        .strip())
+        if any(w in clean for w in ["غير واضح", "لا أعلم", "لا يمكنني", "غير موجود"]):
+            clean = "عذرًا، سؤالك غير موجود في الملف الحالي."
+        return Response({'result': clean})
     except Exception as e:
-        return Response({'error': f'فشل استدعاء نموذج الذكاء الاصطناعي: {e}'},
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # ✅ الملف الشخصي
@@ -233,6 +235,7 @@ def get_profile(request):
             'message': '✅ تم تحديث الملف الشخصي بنجاح',
             'user': serializer.data
         })
+
 
 
 
