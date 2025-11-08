@@ -175,18 +175,22 @@ class FavoriteAdmin(admin.ModelAdmin):
 # ==========================
 @admin.register(KnowledgeBase)
 class KnowledgeBaseAdmin(admin.ModelAdmin):
-    list_display = ('title', 'updated_at')
-    search_fields = ('title', 'content')
-    ordering = ['-updated_at']
+    # اعرض العنوان والملف وتاريخ التحديث
+    list_display = ("id", "title", "file", "updated_at")
+    search_fields = ("title",)  
+    ordering = ["-updated_at"]
     list_per_page = 20
-    
+
     fieldsets = (
-        ('📚 المحتوى', {
-            'fields': ('title', 'content')
+        ("📚 المحتوى", {
+            "fields": ("title", "file")  
         }),
-        ('📅 التواريخ', {
-            'fields': ('updated_at',),
-            'classes': ('collapse',)
+        ("📅 التواريخ", {
+            "fields": ("updated_at",),
+            "classes": ("collapse",),
         }),
     )
-    readonly_fields = ('updated_at',)
+
+    readonly_fields = ("updated_at",)
+
+
