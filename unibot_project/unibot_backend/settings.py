@@ -1,3 +1,4 @@
+# unibot_backend/settings.py
 import os
 from pathlib import Path
 import dj_database_url
@@ -37,16 +38,14 @@ INSTALLED_APPS = [
     "custom_admin",
 ]
 
-CLOUDINARY_URL = get_env("CLOUDINARY_URL")
-CLOUDINARY_CLOUD_NAME = get_env("CLOUDINARY_CLOUD_NAME")
-CLOUDINARY_API_KEY = get_env("CLOUDINARY_API_KEY")
-CLOUDINARY_API_SECRET = get_env("CLOUDINARY_API_SECRET")
-USE_CLOUDINARY = bool(
-    CLOUDINARY_URL
-    or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET)
-)
-if USE_CLOUDINARY:
-    INSTALLED_APPS += ["cloudinary", "cloudinary_storage"]
+# ------------- بداية التعديلات -------------
+# 1) تعطيل Cloudinary مؤقتاً لحين تثبيت الحزم أو حل التعارض
+USE_CLOUDINARY = False
+
+# 2) التأكد من إنشاء مجلد media أثناء التشغيل
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
+# ------------- نهاية التعديلات -------------
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -121,20 +120,8 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 WHITENOISE_MANIFEST_STRICT = False
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
-MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 FILE_UPLOAD_PERMISSIONS = 0o644
-
-if USE_CLOUDINARY:
-    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
-    if not CLOUDINARY_URL:
-        CLOUDINARY_STORAGE = {
-            "CLOUD_NAME": CLOUDINARY_CLOUD_NAME,
-            "API_KEY": CLOUDINARY_API_KEY,
-            "API_SECRET": CLOUDINARY_API_SECRET,
-        }
-else:
-    DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
