@@ -1,23 +1,16 @@
-from django.utils import timezone
-from django.db.models import Q
-from django.contrib.auth import authenticate
-from django.contrib.auth.hashers import make_password
-
-from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.authtoken.models import Token
+from rest_framework import status
 
-from .models import Event, FAQ, CustomUser, KnowledgeBase
+from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import make_password
+from django.utils import timezone
+from django.db import models
+
+from .models import Event, FAQ, CustomUser 
 from .serializers import EventSerializer, FAQSerializer, UserSerializer
 from .ai_service import ask_gemini
-
-from PyPDF2 import PdfReader
-import requests
-from io import BytesIO
-
 
 # ✅ تسجيل الدخول (باستخدام البريد)
 class CustomLoginView(ObtainAuthToken):
@@ -155,15 +148,17 @@ def ai_general(request):
     if not user_prompt:
         return Response({'error': 'يرجى إدخال السؤال.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # تحيات سريعة
+    # رد سريع على التحيات
     greetings = ["السلام عليكم", "مرحبا", "هلا", "صباح الخير", "مساء الخير", "أهلاً", "هلا والله"]
     if any(g in user_prompt for g in greetings):
-        return Response({'result': f"وعليكم السلام {user.name or 'الطالب'}! 👋 كيف أقدر أساعدك اليوم؟"})
+        name = user.name or "الطالب"
+        return Response({'result': f"وعليكم السلام {name}! 👋 كيف أقدر أساعدك اليوم؟"})
 
-    # آخر سجل لقاعدة المعرفة
-    kb = KnowledgeBase.objects.order_by('-id').first()
-    if not kb:
-        return Response({'error': '⚠️ لا توجد قاعدة معرفة متاحة.'}, status=status.HTTP_404_NOT_FOUND)
+    # استدعاء Gemini (يشمل قراءة أحدث PDF عبر default_storage داخل ai_service)
+    answer = ask_gemini(user_prompt)
+
+    # نرجع 200 حتى لو كانت رسالة تحذير/خطأ نصّية، عشان الواجهة تعرضها للمستخدم
+    return Response({'result': answer}, status=status.HTTP_200_OK)
 
     # نجمع النص من أحد المصدرين:
     # 1) content النصّي (إن وجد)
@@ -276,6 +271,7 @@ def get_profile(request):
             'message': '✅ تم تحديث الملف الشخصي بنجاح',
             'user': serializer.data
         })
+
 
 
 
