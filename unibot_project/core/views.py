@@ -149,67 +149,112 @@ def register_user(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def ai_general(request):
-    from io import BytesIO
-    import requests
-    from PyPDF2 import PdfReader
-
     user = request.user
     user_prompt = (request.data.get('prompt') or '').strip()
+
     if not user_prompt:
         return Response({'error': 'يرجى إدخال السؤال.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    kb = KnowledgeBase.objects.order_by('-id').first()
-    if not kb or not kb.file:
-        return Response({'error': '⚠️ لا يوجد ملف قاعدة معرفة مرفوع بعد.'}, status=status.HTTP_404_NOT_FOUND)
-
-    # حمّل الـPDF من URL لو التخزين سحابي، وإلّا استخدم .open()
-    pdf_text = ""
-    try:
-        if hasattr(kb.file, "url"):
-            resp = requests.get(kb.file.url, timeout=15)
-            resp.raise_for_status()
-            reader = PdfReader(BytesIO(resp.content))
-        else:
-            with kb.file.open("rb") as f:
-                reader = PdfReader(f)
-
-        for page in reader.pages:
-            content = page.extract_text() or ""
-            if content:
-                pdf_text += content + "\n"
-    except Exception as e:
-        return Response({'error': f'⚠️ خطأ أثناء قراءة الملف: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    name = user.name or "الطالب"
+    # تحيات سريعة
     greetings = ["السلام عليكم", "مرحبا", "هلا", "صباح الخير", "مساء الخير", "أهلاً", "هلا والله"]
     if any(g in user_prompt for g in greetings):
-        return Response({'result': f"وعليكم السلام {name}! 👋 كيف أقدر أساعدك اليوم؟"})
+        return Response({'result': f"وعليكم السلام {user.name or 'الطالب'}! 👋 كيف أقدر أساعدك اليوم؟"})
 
+    # آخر سجل لقاعدة المعرفة
+    kb = KnowledgeBase.objects.order_by('-id').first()
+    if not kb:
+        return Response({'error': '⚠️ لا توجد قاعدة معرفة متاحة.'}, status=status.HTTP_404_NOT_FOUND)
+
+    # نجمع النص من أحد المصدرين:
+    # 1) content النصّي (إن وجد)
+    # 2) ملف PDF مرفوع: محلي (path) أو Cloudinary (url)
+    pdf_text = ""
+
+    # لو عندك حقل نصّي اسمه content ونستخدمه مباشرة
+    content_text = getattr(kb, 'content', '') or ''
+    if content_text.strip():
+        pdf_text = content_text.strip()
+    else:
+        # نحاول قراءة ملف PDF
+        file_field = getattr(kb, 'file', None)
+        if not file_field:
+            return Response({'error': '⚠️ لا يوجد ملف مرفوع أو محتوى نصي في قاعدة المعرفة.'},
+                            status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            # إذا التخزين محلي يوفر .path نستخدمه
+            file_bytes = None
+            if hasattr(file_field, 'path'):
+                # بعض التخزينات السحابية لا تدعم .path (سيرفع استثناء)؛ لذلك نحميه بـ try آخر
+                try:
+                    with open(file_field.path, 'rb') as f:
+                        file_bytes = f.read()
+                except Exception:
+                    file_bytes = None
+
+            # إذا ما قدرنا نقرأ من path (Cloudinary مثلاً) نقرأ من url
+            if file_bytes is None:
+                file_url = getattr(file_field, 'url', None)
+                if not file_url:
+                    return Response({'error': '⚠️ تعذّر تحديد رابط الملف المرفوع.'},
+                                    status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                resp = requests.get(file_url, timeout=20)
+                resp.raise_for_status()
+                file_bytes = resp.content
+
+            # الآن نفك الـ PDF ونستخرج النص
+            reader = PdfReader(BytesIO(file_bytes))
+            parts = []
+            for p in reader.pages:
+                try:
+                    t = p.extract_text() or ''
+                    if t:
+                        parts.append(t)
+                except Exception:
+                    # نتجاوز صفحات صامتة بدل ما نكسر كل العملية
+                    continue
+            pdf_text = "\n".join(parts).strip()
+
+            if not pdf_text:
+                return Response({'error': '⚠️ تعذّر استخراج نصوص من ملف PDF.'},
+                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except requests.RequestException as e:
+            return Response({'error': f'⚠️ فشل تنزيل الملف من التخزين السحابي: {e}'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as e:
+            return Response({'error': f'⚠️ خطأ أثناء قراءة الملف: {e}'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # بناء البرومبت
+    name = user.name or "الطالب"
     full_prompt = f"""
-    أنت UniBot 🎓 — مساعد جامعي بالعربية.
-    اجب فقط مما يلي. إن لم توجد الإجابة فقل: "عذرًا، سؤالك غير موجود في الملف الحالي."
+    أنت UniBot 🎓 — مساعد جامعي ذكي ناطق بالعربية الفصحى.
+    أجب فقط بناءً على النص التالي المستخرج من دليل الجامعة. إذا لم تجد إجابة في النص، أجب بجملة:
+    "عذرًا، سؤالك غير موجود في الملف الحالي."
 
-    [مقتطف من الملف]:
+    --- محتوى الدليل (مقتطف حتى 6000 حرف) ---
     {pdf_text[:6000]}
 
-    [سؤال ({name})]:
+    --- سؤال المستخدم ({name}) ---
     {user_prompt}
     """
 
     try:
-        answer = ask_gemini(full_prompt).strip()
-        clean = (answer.replace("حسب الملف", "")
-                      .replace("وفقًا للمستند", "")
-                      .replace("PDF", "")
-                      .replace("الملف", "")
-                      .strip())
-        if any(t in clean for t in ["غير واضح", "لا أعلم", "لا يمكنني", "غير موجود"]):
-            clean = "عذرًا، سؤالك غير موجود في الملف الحالي."
-        return Response({'result': clean})
+        answer = (ask_gemini(full_prompt) or "").strip()
+        clean_answer = (
+            answer.replace("حسب الملف", "")
+                  .replace("وفقًا للمستند", "")
+                  .replace("PDF", "")
+                  .replace("الملف", "")
+                  .strip()
+        )
+        if not clean_answer or any(kw in clean_answer for kw in ["غير واضح", "لا أعلم", "لا يمكنني", "غير موجود"]):
+            clean_answer = "عذرًا، سؤالك غير موجود في الملف الحالي."
+        return Response({'result': clean_answer})
     except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
+        # نُرجع الرسالة للواجهة عشان يظهر السبب أثناء الاختبار
+        return Response({'error': f'LLM error: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # ✅ الملف الشخصي
 @api_view(['GET', 'PUT'])
@@ -231,6 +276,7 @@ def get_profile(request):
             'message': '✅ تم تحديث الملف الشخصي بنجاح',
             'user': serializer.data
         })
+
 
 
 
