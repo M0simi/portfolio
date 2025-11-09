@@ -140,26 +140,18 @@ def register_user(request):
 
 
 # ✅ بوت الذكاء (Gemini)
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def ai_general(request):
-    user = request.user
-    user_prompt = (request.data.get('prompt') or '').strip()
-
-    if not user_prompt:
-        return Response({'error': 'يرجى إدخال السؤال.'}, status=status.HTTP_400_BAD_REQUEST)
-
-    greetings = ["السلام عليكم", "مرحبا", "هلا", "صباح الخير", "مساء الخير", "أهلاً", "هلا والله"]
-    if any(g in user_prompt for g in greetings):
-        name = user.name or "الطالب"
-        return Response({'result': f"وعليكم السلام {name}! 👋 كيف أقدر أساعدك اليوم؟"})
-
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def ai_models(request):
     try:
-        answer = (ask_gemini(user_prompt) or "").strip()
-        return Response({'result': answer}, status=status.HTTP_200_OK)
+        ver = getattr(genai, "__version__", "unknown")
+        names = []
+        for m in genai.list_models():
+            if getattr(m, "supported_generation_methods", []) and "generateContent" in m.supported_generation_methods:
+                names.append(m.name)
+        return Response({"genai_version": ver, "models": names})
     except Exception as e:
-        # نرجّع 200 مع رسالة مفهومة للفرونت بدلاً من HTML 500
-        return Response({'result': f"⚠️ حدث خطأ في خدمة الذكاء: {e}"}, status=status.HTTP_200_OK)
+        return Response({"error": str(e)}, status=500)
 
 
 # ✅ الملف الشخصي
@@ -182,3 +174,4 @@ def get_profile(request):
         'message': '✅ تم تحديث الملف الشخصي بنجاح',
         'user': serializer.data
     })
+
