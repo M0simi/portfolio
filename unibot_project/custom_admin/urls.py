@@ -5,7 +5,10 @@ from . import views
 app_name = "custom_admin"
 
 urlpatterns = [
+     # الجذر يفتح الداشبورد
     path("", views.dashboard, name="dashboard"),
+    # وقناة احتياطية لو كتبت /dashboard/ يفتح نفس الصفحة
+    path("dashboard/", views.dashboard, name="dashboard_explicit"),
 
     # Events
     path("events/", views.event_list, name="events_list"),
