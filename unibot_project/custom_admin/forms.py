@@ -1,32 +1,15 @@
 from django import forms
-from core.models import Category, FAQ, Favorite, Feedback, KnowledgeBase, Event
-
-class CategoryForm(forms.ModelForm):
-    class Meta:
-        model = Category
-        fields = ["name"]
-
-class FAQForm(forms.ModelForm):
-    class Meta:
-        model = FAQ
-        fields = ["question", "answer", "category"]
+from core.models import Event
 
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ["title", "description", "location", "start_date", "end_date", "image"]
-
-class FavoriteForm(forms.ModelForm):
-    class Meta:
-        model = Favorite
-        fields = ["user", "faq"]
-
-class FeedbackForm(forms.ModelForm):
-    class Meta:
-        model = Feedback
-        fields = ["faq", "user", "helpful", "comment"]
-
-class KnowledgeBaseForm(forms.ModelForm):
-    class Meta:
-        model = KnowledgeBase
-        fields = ["title", "file"]
+        fields = ["title", "slug", "description", "start_date", "end_date", "location", "image"]
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "input", "placeholder": "عنوان الحدث"}),
+            "slug": forms.TextInput(attrs={"class": "input", "placeholder": "slug (يُملأ تلقائيًا إن تركته فارغًا)"}),
+            "description": forms.Textarea(attrs={"rows": 4, "placeholder": "وصف مختصر"}),
+            "start_date": forms.DateTimeInput(attrs={"type": "datetime-local"}),
+            "end_date": forms.DateTimeInput(attrs={"type": "datetime-local"}),
+            "location": forms.TextInput(attrs={"placeholder": "الموقع"}),
+        }
