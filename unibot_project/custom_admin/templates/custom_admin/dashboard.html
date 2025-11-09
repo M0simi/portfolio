@@ -1,52 +1,52 @@
 {% extends "custom_admin/base.html" %}
 {% block content %}
-  <h2>لوحة التحكّم</h2>
-  <p class="muted">نظرة سريعة على النظام.</p>
 
-  <section class="grid grid-3">
-    <div class="card">
-      <h3>الأحداث</h3>
-      <p style="font-size:2rem; margin:0">{{ stats.events_count }}</p>
-      <small class="muted">إجمالي الأحداث</small>
-    </div>
-    <div class="card">
-      <h3>الأسئلة الشائعة</h3>
-      <p style="font-size:2rem; margin:0">{{ stats.faqs_count }}</p>
-      <small class="muted">إجمالي الأسئلة</small>
-    </div>
-    <div class="card">
-      <h3>المستخدمون</h3>
-      <p style="font-size:2rem; margin:0">{{ stats.users_count }}</p>
-      <small class="muted">إجمالي المستخدمين</small>
+  <section class="card" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px">
+    <div>
+      <h2 style="margin:0">👋 مرحبًا</h2>
+      <p class="muted" style="margin:.3rem 0 0">هذه لوحة الإدارة المخصصة لـ UniBot.</p>
     </div>
   </section>
 
-  <section class="grid grid-2" style="margin-top:20px">
+  <section class="cards">
     <div class="card">
-      <h4>آخر 5 أحداث</h4>
-      <ul>
+      <div class="muted">أحداث</div>
+      <div class="kpi">{{ stats.events_count|default:0 }}</div>
+    </div>
+    <div class="card">
+      <div class="muted">الأسئلة</div>
+      <div class="kpi">{{ stats.faqs_count|default:0 }}</div>
+    </div>
+    <div class="card">
+      <div class="muted">المستخدمون</div>
+      <div class="kpi">{{ stats.users_count|default:0 }}</div>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:8px">
+    <h4 style="margin:0 0 10px">أحدث الأحداث</h4>
+    <table class="table" dir="rtl">
+      <thead>
+        <tr>
+          <th>العنوان</th>
+          <th>البدء</th>
+          <th>المكان</th>
+          <th>آخر تعديل</th>
+        </tr>
+      </thead>
+      <tbody>
         {% for e in latest_events %}
-          <li>
-            <strong>{{ e.title }}</strong>
-            <div class="muted">{{ e.start_date }}{% if e.end_date %} → {{ e.end_date }}{% endif %}</div>
-          </li>
+          <tr>
+            <td><strong>{{ e.title }}</strong></td>
+            <td>{{ e.start_date }}</td>
+            <td>{{ e.location|default:"—" }}</td>
+            <td>{{ e.updated_at }}</td>
+          </tr>
         {% empty %}
-          <li class="muted">لا توجد أحداث بعد.</li>
+          <tr><td colspan="4" class="muted">لا توجد أحداث بعد.</td></tr>
         {% endfor %}
-      </ul>
-    </div>
-    <div class="card">
-      <h4>آخر 5 أسئلة شائعة</h4>
-      <ul>
-        {% for f in latest_faqs %}
-          <li>
-            <strong>{{ f.question }}</strong>
-            <div class="muted">{{ f.answer|truncatechars:80 }}</div>
-          </li>
-        {% empty %}
-          <li class="muted">لا توجد أسئلة بعد.</li>
-        {% endfor %}
-      </ul>
-    </div>
+      </tbody>
+    </table>
   </section>
+
 {% endblock %}
