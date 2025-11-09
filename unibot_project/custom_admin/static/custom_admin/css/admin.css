@@ -39,24 +39,35 @@ a:hover{color:var(--primary-700)}
    ========================= */
 .layout{
   display:grid;
-  grid-template-columns: 1fr 260px;   /* المحتوى يسار | الشريط الجانبي يمين */
+  grid-template-columns: 1fr 260px;   /* المحتوى ثم الشريط */
   min-height:calc(100vh - 56px);
 }
 
-/* Sidebar on the RIGHT */
 .sidebar{
-  grid-column: 2;                     /* ثبّت الشريط الجانبي بالعمود الثاني (يمين) */
-  border-right:1px solid var(--outline);
+  grid-column: 2;                     /* ثبّت الشريط في العمود الثاني (يمين) */
+  border-left:1px solid var(--outline);
   background:var(--panel);
   padding:18px;
 }
 
-/* Content on the LEFT */
 .content{
-  grid-column: 1;
+  grid-column: 1;                     /* المحتوى في العمود الأول (يسار) */
   padding:28px;
 }
 
+/* Responsive: شاشة صغيرة = عمود واحد، الشريط فوق المحتوى */
+@media (max-width: 900px){
+  .layout{
+    grid-template-columns: 1fr;
+  }
+  .sidebar{
+    grid-column: 1;
+    border-left: none;
+    border-bottom:1px solid var(--outline);
+  }
+  .content{
+    grid-column: 1;
+  }
 /* Responsive: stack on small screens */
 @media (max-width: 900px){
   .layout{ grid-template-columns: 1fr; }
