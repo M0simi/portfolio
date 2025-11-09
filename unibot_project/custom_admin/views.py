@@ -1,113 +1,83 @@
-from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
-from django.core.paginator import Paginator
-from django.db.models import Q
-from django.shortcuts import get_object_or_404, redirect, render
+# custom_admin/forms.py
+from django import forms
+from django.contrib.auth import get_user_model
+from core.models import Event, FAQ, Category, KnowledgeBase
 
-from core.models import Event, FAQ, CustomUser
-from .forms import EventForm
-
-
-@staff_member_required
-def dashboard(request):
-    """لوحة التحكم الرئيسية: إحصائيات + آخر العناصر"""
-    stats = {
-        "events_count": Event.objects.count(),
-        "faqs_count": FAQ.objects.count(),
-        "users_count": CustomUser.objects.count(),
-    }
-    latest_events = Event.objects.order_by("-start_date")[:5]
-    latest_faqs = FAQ.objects.order_by("-id")[:5]
-    return render(request, "custom_admin/dashboard.html", {
-        "stats": stats,
-        "latest_events": latest_events,
-        "latest_faqs": latest_faqs,
-        "title": "لوحة التحكّم | UniBot",
-    })
+User = get_user_model()
 
 
 # =========================
-# Events CRUD
+# Events
 # =========================
-@staff_member_required
-def events_list(request):
-    """قائمة الأحداث مع بحث وترقيم"""
-    q = request.GET.get("q", "").strip()
-    qs = Event.objects.all().order_by("-start_date")
-    if q:
-        qs = qs.filter(
-            Q(title__icontains=q) |
-            Q(location__icontains=q) |
-            Q(description__icontains=q)
-        )
-    paginator = Paginator(qs, 10)
-    page_obj = paginator.get_page(request.GET.get("page"))
-
-    return render(request, "custom_admin/events_list.html", {
-        "title": "إدارة الأحداث",
-        "q": q,
-        "count": qs.count(),
-        "page_obj": page_obj,
-    })
+class EventForm(forms.ModelForm):
+    class Meta:
+        model = Event
+        fields = ["title", "slug", "description", "start_date", "end_date", "location", "image"]
+        widgets = {
+            "title": forms.TextInput(attrs={"placeholder": "عنوان الحدث"}),
+            "slug": forms.TextInput(attrs={"placeholder": "slug (يُملأ تلقائيًا إن تركته فارغًا)"}),
+            "description": forms.Textarea(attrs={"rows": 4, "placeholder": "وصف مختصر"}),
+            "start_date": forms.DateTimeInput(attrs={"type": "datetime-local"}),
+            "end_date": forms.DateTimeInput(attrs={"type": "datetime-local"}),
+            "location": forms.TextInput(attrs={"placeholder": "الموقع"}),
+        }
 
 
-@staff_member_required
-def event_add(request):
-    """إضافة حدث جديد"""
-    if request.method == "POST":
-        form = EventForm(request.POST, request.FILES)
-        if form.is_valid():
-            obj = form.save()
-            messages.success(request, f"تم إنشاء الحدث «{obj.title}» بنجاح.")
-            return redirect("custom_admin:events_list")
-        messages.error(request, "تعذر حفظ النموذج. فضلاً تحقق من الحقول.")
-    else:
-        form = EventForm()
-
-    return render(request, "custom_admin/generic_form.html", {
-        "title": "إضافة حدث",
-        "form": form,
-        "submit_label": "حفظ",
-        "back_url": "custom_admin:events_list",
-        "enctype_multipart": True,  # ضروري لرفع الصورة
-    })
+# =========================
+# FAQs
+# =========================
+class FAQForm(forms.ModelForm):
+    class Meta:
+        model = FAQ
+        fields = ["question", "answer", "category", "updated_by"]
+        widgets = {
+            "question": forms.Textarea(attrs={"rows": 3, "placeholder": "نص السؤال"}),
+            "answer": forms.Textarea(attrs={"rows": 6, "placeholder": "الإجابة"}),
+            "category": forms.Select(),
+            "updated_by": forms.Select(),
+        }
 
 
-@staff_member_required
-def event_edit(request, pk):
-    """تعديل حدث"""
-    obj = get_object_or_404(Event, pk=pk)
-    if request.method == "POST":
-        form = EventForm(request.POST, request.FILES, instance=obj)
-        if form.is_valid():
-            obj = form.save()
-            messages.success(request, f"تم تحديث الحدث «{obj.title}».")
-            return redirect("custom_admin:events_list")
-        messages.error(request, "تعذر حفظ التعديلات. فضلاً تحقق من الحقول.")
-    else:
-        form = EventForm(instance=obj)
-
-    return render(request, "custom_admin/generic_form.html", {
-        "title": f"تعديل: {obj.title}",
-        "form": form,
-        "submit_label": "تحديث",
-        "back_url": "custom_admin:events_list",
-        "enctype_multipart": True,
-    })
+# =========================
+# Categories
+# =========================
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ["name"]
+        widgets = {
+            "name": forms.TextInput(attrs={"placeholder": "اسم الفئة"}),
+        }
 
 
-@staff_member_required
-def event_delete(request, pk):
-    """حذف حدث مع تأكيد"""
-    obj = get_object_or_404(Event, pk=pk)
-    if request.method == "POST":
-        title = obj.title
-        obj.delete()
-        messages.success(request, f"تم حذف الحدث «{title}».")
-        return redirect("custom_admin:events_list")
+# =========================
+# Knowledge Base
+# =========================
+class KnowledgeBaseForm(forms.ModelForm):
+    class Meta:
+        model = KnowledgeBase
+        fields = ["title", "file"]
+        widgets = {
+            "title": forms.TextInput(attrs={"placeholder": "عنوان الملف/المصدر"}),
+            # الملف يُدار تلقائياً عبر حقل FileField
+        }
 
-    return render(request, "custom_admin/generic_confirm_delete.html", {
-        "title": f"حذف: {obj.title}",
-        "object": obj,
-        "back_url": "custom_admin:events_list",
-    })
+
+# =========================
+# Users (اختياري لإدارة مبسطة)
+# =========================
+class UserRoleForm(forms.ModelForm):
+    """
+    إدارة مبسطة للمستخدم: تغيير الدور و is_staff فقط (بدون كلمات مرور).
+    """
+    class Meta:
+        model = User
+        fields = ["name", "email", "role", "is_staff", "is_active"]
+        widgets = {
+            "name": forms.TextInput(attrs={"placeholder": "الاسم"}),
+            "email": forms.EmailInput(attrs={"placeholder": "البريد"}),
+            "role": forms.Select(),
+        }
+        help_texts = {
+            "is_staff": "يمنح صلاحية الدخول للوحة التحكم المخصصة.",
+        }
