@@ -1,37 +1,30 @@
-# ai_service.py
 import os
 from io import BytesIO
-
 import requests
-import google.generativeai as genai
-from google.generativeai.types import HarmCategory, HarmBlockThreshold
 
 from django.core.files.storage import default_storage
 from PyPDF2 import PdfReader
-
 from .models import KnowledgeBase
 
-# =======================
-# إعداد مفتاح ونوع الموديل
-# =======================
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
-MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-1.0-pro").strip()   
+GEMINI_API_KEY = (os.getenv("GEMINI_API_KEY") or "").strip()
+# تقدر تغيّر الاسم من البيئة؛ لاحظ تنسيق v1 الصحيح: يبدأ بـ models/
+MODEL_NAME = (os.getenv("GEMINI_MODEL") or "models/gemini-1.5-flash").strip()
 
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
+# Safety settings (نخليها أخف ما يمكن)
+SAFETY_SETTINGS = [
+    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_HATE_SPEECH",       "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_HARASSMENT",        "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+]
 
-SAFETY_SETTINGS = {
-    HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-    HarmCategory.HARM_CATEGORY_HATE_SPEECH:       HarmBlockThreshold.BLOCK_NONE,
-    HarmCategory.HARM_CATEGORY_HARASSMENT:        HarmBlockThreshold.BLOCK_NONE,
-    HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-}
-
-def _read_latest_kb_text(max_chars: int = 60_000) -> str:
+def _read_latest_kb_text(max_chars: int = 60000) -> str:
+    """يقرأ أحدث دليل/FAQ من قاعدة المعرفة (يدعم التخزين المحلي و Cloudinary)."""
     kb = KnowledgeBase.objects.order_by("-id").first()
     if not kb:
         return ""
 
+    # أولوية: النص إن وُجد
     text = (getattr(kb, "content", "") or "").strip()
     if text:
         return text[:max_chars]
@@ -40,6 +33,7 @@ def _read_latest_kb_text(max_chars: int = 60_000) -> str:
     if not f:
         return ""
 
+    # جرّب القراءة مباشرة من التخزين
     data = None
     try:
         with default_storage.open(f.name, "rb") as fh:
@@ -47,22 +41,22 @@ def _read_latest_kb_text(max_chars: int = 60_000) -> str:
     except Exception:
         data = None
 
+    # لو فشلت (كلاودينري مثلاً) نحمّل من الرابط العام
     if data is None:
-        file_url = getattr(f, "url", None)
-        if not file_url:
+        url = getattr(f, "url", None)
+        if not url:
             return ""
-        try:
-            r = requests.get(file_url, timeout=30)
-            r.raise_for_status()
-            data = r.content
-        except Exception:
-            return ""
+        resp = requests.get(url, timeout=30)
+        resp.raise_for_status()
+        data = resp.content
 
+    # استخراج نص من PDF
     try:
         reader = PdfReader(BytesIO(data))
-        parts, total = [], 0
+        parts = []
+        total = 0
         for p in reader.pages:
-            t = (p.extract_text() or "")
+            t = (p.extract_text() or "").strip()
             if t:
                 parts.append(t)
                 total += len(t)
@@ -72,39 +66,55 @@ def _read_latest_kb_text(max_chars: int = 60_000) -> str:
     except Exception:
         return ""
 
+
 def ask_gemini(user_prompt: str) -> str:
+    """استدعاء Gemini v1 مباشرة عبر REST (بدون SDK)."""
     if not GEMINI_API_KEY:
         return "❌ مفقود متغير البيئة GEMINI_API_KEY."
 
     kb_text = _read_latest_kb_text()
 
     system_rule = (
-        "أنت UniBot 🎓، المساعد الذكي الرسمي لجامعتنا. "
-        "استخدم العربية الفصحى. لا تُنشئ معلومات غير موجودة بالدليل. "
-        "إن لم تجد الإجابة في النص، قل: «عذرًا، المعلومة التي تبحث عنها غير متوفرة في الدليل الحالي.»"
+        "أنت UniBot 🎓، المساعد الذكي الرسمي للجامعة."
+        " أجب بالعربية الفصحى، وبناءً فقط على محتوى الدليل المرفق."
+        " إن لم تجد الإجابة في النص، قل: «عذرًا، المعلومة غير متوفرة في الدليل الحالي.»"
     )
 
-    prompt = f"""{system_rule}
+    prompt_text = f"""{system_rule}
+
 --- مقتطف من الدليل/الأسئلة ---
 {kb_text if kb_text else "لا يتوفر محتوى معرفة حالياً."}
+
 --- سؤال المستخدم ---
 {user_prompt}
 """
 
-    for name in [MODEL_NAME, "gemini-1.5-flash-latest"]:
+    url = f"https://generativelanguage.googleapis.com/v1/{MODEL_NAME}:generateContent?key={GEMINI_API_KEY}"
+    payload = {
+        "contents": [{"parts": [{"text": prompt_text}]}],
+        "safetySettings": SAFETY_SETTINGS,
+    }
+
+    try:
+        r = requests.post(url, json=payload, timeout=60)
+        # لو ردّ 404 هنا، بيكون واضح أنه اسم الموديل غلط، مو v1beta
+        r.raise_for_status()
+        data = r.json()
+        text = (
+            data.get("candidates", [{}])[0]
+                .get("content", {})
+                .get("parts", [{}])[0]
+                .get("text", "")
+        ).strip()
+
+        if not text:
+            return "عذرًا، المعلومة غير متوفرة في الدليل الحالي."
+        return text
+    except requests.HTTPError as e:
         try:
-            model = genai.GenerativeModel(name, safety_settings=SAFETY_SETTINGS)
-            resp = model.generate_content(prompt)
-
-            if not getattr(resp, "candidates", None):
-                return "عذرًا، تم حظر الرد لأسباب تتعلق بالأمان. حاول إعادة صياغة السؤال."
-
-            text = (getattr(resp, "text", "") or "").strip()
-            if not text:
-                text = "عذرًا، المعلومة التي تبحث عنها غير متوفرة في الدليل الحالي."
-            return text
-        except Exception as e:
-            last_err = e
-            continue
-
-    return f"⚠️ خطأ أثناء الاتصال بـ Gemini: {last_err}"
+            detail = r.json()
+        except Exception:
+            detail = {}
+        return f"⚠️ خطأ أثناء الاتصال بـ Gemini: {e} | {detail}"
+    except Exception as e:
+        return f"⚠️ خطأ في الاتصال: {e}"
