@@ -12,7 +12,7 @@ urlpatterns = [
     path("api/", include("core.urls")),
 
     # dashboard
-    path("dashboard/", include("custom_admin.urls")),
+    path("", include("custom_admin.urls", namespace="custom_admin")),
 
     # test
     path("healthz/", lambda r: JsonResponse({"ok": True}, status=200)),
@@ -21,3 +21,4 @@ urlpatterns = [
 
 # media
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
