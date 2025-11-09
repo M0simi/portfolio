@@ -1,52 +1,53 @@
 {% extends "custom_admin/base.html" %}
+{% block title %}لوحة التحكّم | UniBot{% endblock %}
+
 {% block content %}
+  <h1 class="title">لوحة التحكّم</h1>
+  <p class="subtitle">نظرة عامة سريعة.</p>
 
-  <section class="card" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px">
-    <div>
-      <h2 style="margin:0">👋 مرحبًا</h2>
-      <p class="muted" style="margin:.3rem 0 0">هذه لوحة الإدارة المخصصة لـ UniBot.</p>
+  <section class="grid-3">
+    <div class="stat">
+      <div class="stat-label">الأحداث</div>
+      <div class="stat-value">{{ stats.events_count }}</div>
+      <a class="stat-link" href="/admin/core/event/">إدارة الأحداث</a>
+    </div>
+    <div class="stat">
+      <div class="stat-label">الأسئلة الشائعة</div>
+      <div class="stat-value">{{ stats.faqs_count }}</div>
+      <a class="stat-link" href="/admin/core/faq/">إدارة الأسئلة</a>
+    </div>
+    <div class="stat">
+      <div class="stat-label">المستخدمون</div>
+      <div class="stat-value">{{ stats.users_count }}</div>
+      <a class="stat-link" href="/admin/core/customuser/">إدارة المستخدمين</a>
     </div>
   </section>
 
-  <section class="cards">
+  <section class="grid-2">
     <div class="card">
-      <div class="muted">أحداث</div>
-      <div class="kpi">{{ stats.events_count|default:0 }}</div>
+      <h3 class="section-title">آخر 5 أحداث</h3>
+      {% if latest_events %}
+        <ul>
+          {% for e in latest_events %}
+            <li><strong>{{ e.title }}</strong></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="empty">لا توجد أحداث بعد.</div>
+      {% endif %}
     </div>
+
     <div class="card">
-      <div class="muted">الأسئلة</div>
-      <div class="kpi">{{ stats.faqs_count|default:0 }}</div>
-    </div>
-    <div class="card">
-      <div class="muted">المستخدمون</div>
-      <div class="kpi">{{ stats.users_count|default:0 }}</div>
+      <h3 class="section-title">آخر 5 أسئلة شائعة</h3>
+      {% if latest_faqs %}
+        <ul>
+          {% for f in latest_faqs %}
+            <li><strong>{{ f.question }}</strong></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="empty">لا توجد أسئلة بعد.</div>
+      {% endif %}
     </div>
   </section>
-
-  <section class="card" style="margin-top:8px">
-    <h4 style="margin:0 0 10px">أحدث الأحداث</h4>
-    <table class="table" dir="rtl">
-      <thead>
-        <tr>
-          <th>العنوان</th>
-          <th>البدء</th>
-          <th>المكان</th>
-          <th>آخر تعديل</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for e in latest_events %}
-          <tr>
-            <td><strong>{{ e.title }}</strong></td>
-            <td>{{ e.start_date }}</td>
-            <td>{{ e.location|default:"—" }}</td>
-            <td>{{ e.updated_at }}</td>
-          </tr>
-        {% empty %}
-          <tr><td colspan="4" class="muted">لا توجد أحداث بعد.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </section>
-
 {% endblock %}
