@@ -1,30 +1,52 @@
 {% extends "custom_admin/base.html" %}
-{% block title %}التعليقات{% endblock %}
 {% block content %}
-<h2>التعليقات</h2>
-<table class="table">
-  <thead><tr><th>السؤال</th><th>المستخدم</th><th>نافع؟</th><th>تعليق</th><th>التاريخ</th><th></th></tr></thead>
-  <tbody>
-    {% for fb in items %}
-    <tr>
-      <td>{{ fb.faq.question|truncatechars:40 }}</td>
-      <td>{{ fb.user.email|default:"-" }}</td>
-      <td>{{ fb.helpful|yesno:"نعم,لا" }}</td>
-      <td>{{ fb.comment|default:"-"|truncatechars:50 }}</td>
-      <td>{{ fb.created_at|date:"Y-m-d H:i" }}</td>
-      <td class="actions">
-        <a class="link danger" href="{% url 'custom_admin:feedback_delete' fb.pk %}">حذف</a>
-      </td>
-    </tr>
-    {% empty %}<tr><td colspan="6">لا توجد تعليقات</td></tr>{% endfor %}
-  </tbody>
-</table>
+  <h2>التعليقات (Feedback)</h2>
+  {% include "custom_admin/_messages.html" %}
 
-{% if items.paginator.num_pages > 1 %}
-<div class="pager">
-  {% if items.has_previous %}<a href="?page={{ items.previous_page_number }}">السابق</a>{% endif %}
-  <span>{{ items.number }} / {{ items.paginator.num_pages }}</span>
-  {% if items.has_next %}<a href="?page={{ items.next_page_number }}">التالي</a>{% endif %}
-</div>
-{% endif %}
+  <form method="get" class="grid grid-2" style="margin:12px 0;">
+    <input name="q" value="{{ q }}" placeholder="بحث في السؤال/التعليق" />
+    <div style="display:flex; gap:8px; justify-content:flex-end;">
+      <select name="helpful">
+        <option value="">الكل</option>
+        <option value="true" {% if helpful == 'true' %}selected{% endif %}>مفيد</option>
+        <option value="false" {% if helpful == 'false' %}selected{% endif %}>غير مفيد</option>
+      </select>
+      <a class="secondary" href="{% url 'custom_admin:feedback_list' %}">مسح</a>
+      <button type="submit">بحث</button>
+    </div>
+  </form>
+
+  <p class="muted">الإجمالي: {{ count }}</p>
+
+  <div class="grid" style="gap:12px;">
+    {% for fb in page_obj.object_list %}
+      <article class="card">
+        <header style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div>
+            <strong>{{ fb.faq.question|truncatechars:80 }}</strong>
+            <div class="muted" style="font-size:.9rem">
+              بواسطة: {{ fb.user|default:"—" }} • {{ fb.created_at }}
+            </div>
+          </div>
+          <div>
+            {% if fb.helpful %}
+              <span style="color:#10b981;font-weight:bold">✅ مفيد</span>
+            {% else %}
+              <span style="color:#ef4444;font-weight:bold">❌ غير مفيد</span>
+            {% endif %}
+          </div>
+        </header>
+        {% if fb.comment %}
+          <p class="muted" style="margin-top:8px">{{ fb.comment }}</p>
+        {% endif %}
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
+          <a class="secondary outline" href="{% url 'custom_admin:feedback_delete' fb.pk %}">حذف</a>
+        </div>
+      </article>
+    {% empty %}
+      <div class="card"><em class="muted">لا توجد تعليقات.</em></div>
+    {% endfor %}
+  </div>
+
+  {% include "custom_admin/_pagination.html" with page_obj=page_obj q=q %}
 {% endblock %}
