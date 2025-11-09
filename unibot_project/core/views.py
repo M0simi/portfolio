@@ -1,16 +1,19 @@
+from django.utils import timezone
+from django.db.models import Q
+from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import make_password
+
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
 
-from django.contrib.auth import authenticate
-from django.contrib.auth.hashers import make_password
-from django.utils import timezone
-from django.db import models
-
-from .models import Event, FAQ, CustomUser 
+from .models import Event, FAQ, CustomUser
 from .serializers import EventSerializer, FAQSerializer, UserSerializer
 from .ai_service import ask_gemini
+
 
 # ✅ تسجيل الدخول (باستخدام البريد)
 class CustomLoginView(ObtainAuthToken):
@@ -48,17 +51,13 @@ def get_events(request):
     qs = Event.objects.all()
     now = timezone.now()
 
-    # فلتر حسب الحالة
     status_param = (request.GET.get('status') or '').lower()
     if status_param == 'upcoming':
-        # يبدأ الآن أو لاحقًا
         qs = qs.filter(start_date__gte=now)
     elif status_param == 'past':
-        # انتهى: (له end_date وانتهى) أو (بدون end_date لكنه بدأ قبل الآن)
         qs = qs.filter(Q(end_date__lt=now) | Q(end_date__isnull=True, start_date__lt=now))
     # else: all
 
-    # فلتر البحث
     q = request.GET.get('q')
     if q:
         qs = qs.filter(Q(title__icontains=q) | Q(description__icontains=q))
@@ -84,8 +83,8 @@ def get_event_detail(request, slug):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def search_faqs(request):
-    query = request.data.get('query', '')
-    faqs = FAQ.objects.filter(question__icontains=query)[:5]
+    query = request.data.get('query', '').strip()
+    faqs = FAQ.objects.filter(question__icontains=query)[:5] if query else []
     serializer = FAQSerializer(faqs, many=True)
     return Response({'results': serializer.data})
 
@@ -100,7 +99,7 @@ def api_root(request):
             'register': 'POST /api/register/',
             'login': 'POST /api/login/',
             'events': 'GET /api/events/',
-            'event_detail': 'GET /api/events/<slug>/',  # تمت إضافة التفاصيل
+            'event_detail': 'GET /api/events/<slug>/',
             'search': 'POST /api/search/',
             'ai_general': 'POST /api/ai/general/',
         },
@@ -139,6 +138,8 @@ def register_user(request):
         'token': token.key
     }, status=status.HTTP_201_CREATED)
 
+
+# ✅ بوت الذكاء (Gemini)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def ai_general(request):
@@ -148,108 +149,18 @@ def ai_general(request):
     if not user_prompt:
         return Response({'error': 'يرجى إدخال السؤال.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # رد سريع على التحيات
     greetings = ["السلام عليكم", "مرحبا", "هلا", "صباح الخير", "مساء الخير", "أهلاً", "هلا والله"]
     if any(g in user_prompt for g in greetings):
         name = user.name or "الطالب"
         return Response({'result': f"وعليكم السلام {name}! 👋 كيف أقدر أساعدك اليوم؟"})
 
-    # استدعاء Gemini (يشمل قراءة أحدث PDF عبر default_storage داخل ai_service)
-    answer = ask_gemini(user_prompt)
-
-    # نرجع 200 حتى لو كانت رسالة تحذير/خطأ نصّية، عشان الواجهة تعرضها للمستخدم
-    return Response({'result': answer}, status=status.HTTP_200_OK)
-
-    # نجمع النص من أحد المصدرين:
-    # 1) content النصّي (إن وجد)
-    # 2) ملف PDF مرفوع: محلي (path) أو Cloudinary (url)
-    pdf_text = ""
-
-    # لو عندك حقل نصّي اسمه content ونستخدمه مباشرة
-    content_text = getattr(kb, 'content', '') or ''
-    if content_text.strip():
-        pdf_text = content_text.strip()
-    else:
-        # نحاول قراءة ملف PDF
-        file_field = getattr(kb, 'file', None)
-        if not file_field:
-            return Response({'error': '⚠️ لا يوجد ملف مرفوع أو محتوى نصي في قاعدة المعرفة.'},
-                            status=status.HTTP_404_NOT_FOUND)
-
-        try:
-            # إذا التخزين محلي يوفر .path نستخدمه
-            file_bytes = None
-            if hasattr(file_field, 'path'):
-                # بعض التخزينات السحابية لا تدعم .path (سيرفع استثناء)؛ لذلك نحميه بـ try آخر
-                try:
-                    with open(file_field.path, 'rb') as f:
-                        file_bytes = f.read()
-                except Exception:
-                    file_bytes = None
-
-            # إذا ما قدرنا نقرأ من path (Cloudinary مثلاً) نقرأ من url
-            if file_bytes is None:
-                file_url = getattr(file_field, 'url', None)
-                if not file_url:
-                    return Response({'error': '⚠️ تعذّر تحديد رابط الملف المرفوع.'},
-                                    status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-                resp = requests.get(file_url, timeout=20)
-                resp.raise_for_status()
-                file_bytes = resp.content
-
-            # الآن نفك الـ PDF ونستخرج النص
-            reader = PdfReader(BytesIO(file_bytes))
-            parts = []
-            for p in reader.pages:
-                try:
-                    t = p.extract_text() or ''
-                    if t:
-                        parts.append(t)
-                except Exception:
-                    # نتجاوز صفحات صامتة بدل ما نكسر كل العملية
-                    continue
-            pdf_text = "\n".join(parts).strip()
-
-            if not pdf_text:
-                return Response({'error': '⚠️ تعذّر استخراج نصوص من ملف PDF.'},
-                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        except requests.RequestException as e:
-            return Response({'error': f'⚠️ فشل تنزيل الملف من التخزين السحابي: {e}'},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        except Exception as e:
-            return Response({'error': f'⚠️ خطأ أثناء قراءة الملف: {e}'},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    # بناء البرومبت
-    name = user.name or "الطالب"
-    full_prompt = f"""
-    أنت UniBot 🎓 — مساعد جامعي ذكي ناطق بالعربية الفصحى.
-    أجب فقط بناءً على النص التالي المستخرج من دليل الجامعة. إذا لم تجد إجابة في النص، أجب بجملة:
-    "عذرًا، سؤالك غير موجود في الملف الحالي."
-
-    --- محتوى الدليل (مقتطف حتى 6000 حرف) ---
-    {pdf_text[:6000]}
-
-    --- سؤال المستخدم ({name}) ---
-    {user_prompt}
-    """
-
     try:
-        answer = (ask_gemini(full_prompt) or "").strip()
-        clean_answer = (
-            answer.replace("حسب الملف", "")
-                  .replace("وفقًا للمستند", "")
-                  .replace("PDF", "")
-                  .replace("الملف", "")
-                  .strip()
-        )
-        if not clean_answer or any(kw in clean_answer for kw in ["غير واضح", "لا أعلم", "لا يمكنني", "غير موجود"]):
-            clean_answer = "عذرًا، سؤالك غير موجود في الملف الحالي."
-        return Response({'result': clean_answer})
+        answer = (ask_gemini(user_prompt) or "").strip()
+        return Response({'result': answer}, status=status.HTTP_200_OK)
     except Exception as e:
-        # نُرجع الرسالة للواجهة عشان يظهر السبب أثناء الاختبار
-        return Response({'error': f'LLM error: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # نرجّع 200 مع رسالة مفهومة للفرونت بدلاً من HTML 500
+        return Response({'result': f"⚠️ حدث خطأ في خدمة الذكاء: {e}"}, status=status.HTTP_200_OK)
+
 
 # ✅ الملف الشخصي
 @api_view(['GET', 'PUT'])
@@ -261,20 +172,13 @@ def get_profile(request):
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
-    elif request.method == 'PUT':
-        data = request.data
-        user.name = data.get('name', user.name)
-        user.role = data.get('role', user.role)
-        user.save()
-        serializer = UserSerializer(user)
-        return Response({
-            'message': '✅ تم تحديث الملف الشخصي بنجاح',
-            'user': serializer.data
-        })
-
-
-
-
-
-
-
+    # PUT
+    data = request.data
+    user.name = data.get('name', user.name)
+    user.role = data.get('role', user.role)
+    user.save()
+    serializer = UserSerializer(user)
+    return Response({
+        'message': '✅ تم تحديث الملف الشخصي بنجاح',
+        'user': serializer.data
+    })
