@@ -1,132 +1,53 @@
-:root{
-  --bg:#0f172a;          /* خلفية عامة */
-  --card:#111827;        /* صناديق */
-  --muted:#9ca3af;
-  --text:#e5e7eb;
-  --primary:#2563eb;
-  --primary-700:#1d4ed8;
-  --outline:#374151;
-  --panel:#0b1220;
-  --panel-2:#0f1a34;
-}
+{% extends "custom_admin/base.html" %}
+{% block title %}لوحة التحكّم | UniBot{% endblock %}
 
-/* قاعدة عامة */
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
-.ub-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:"Cairo",system-ui,Segoe UI,Roboto,Arial,sans-serif;
-  direction: rtl;           /* مهم للـ RTL */
-  text-align: right;
-}
-a{color:var(--primary);text-decoration:none}
-a:hover{color:var(--primary-700)}
-.muted{color:var(--muted)}
+{% block content %}
+  <h1 class="title">لوحة التحكّم</h1>
+  <p class="subtitle">نظرة عامة سريعة.</p>
 
-/* الشريط العلوي */
-.topbar{
-  position:sticky;top:0;z-index:50;
-  background:#1f2937;
-  border-bottom:1px solid var(--outline);
-}
-.topbar-nav{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:16px;padding:12px 18px;
-}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700}
-.brand img{height:28px;width:auto}
-.toplink{margin-inline-start:14px}
+  <section class="grid-3">
+    <div class="stat">
+      <div class="stat-label">الأحداث</div>
+      <div class="stat-value">{{ stats.events_count }}</div>
+      <a class="stat-link" href="/admin/core/event/">إدارة الأحداث</a>
+    </div>
+    <div class="stat">
+      <div class="stat-label">الأسئلة الشائعة</div>
+      <div class="stat-value">{{ stats.faqs_count }}</div>
+      <a class="stat-link" href="/admin/core/faq/">إدارة الأسئلة</a>
+    </div>
+    <div class="stat">
+      <div class="stat-label">المستخدمون</div>
+      <div class="stat-value">{{ stats.users_count }}</div>
+      <a class="stat-link" href="/admin/core/customuser/">إدارة المستخدمين</a>
+    </div>
+  </section>
 
-/* التخطيط: نخلي الـ sidebar يمين “فعليًا” */
-.layout{
-  display:flex;
-  flex-direction: row-reverse; /* أهم سطر: يقلب الاتجاه: القائمة يمين والمحتوى يسار */
-  gap:18px;
-  min-height: calc(100vh - 56px);
-  padding:18px;
-}
+  <section class="grid-2">
+    <div class="card">
+      <h3 class="section-title">آخر 5 أحداث</h3>
+      {% if latest_events %}
+        <ul>
+          {% for e in latest_events %}
+            <li><strong>{{ e.title }}</strong></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="empty">لا توجد أحداث بعد.</div>
+      {% endif %}
+    </div>
 
-/* الشريط الجانبي (يمين) */
-.sidebar{
-  width:260px;
-  flex:0 0 260px;
-  background:var(--panel);
-  border:1px solid var(--outline);
-  border-radius:14px;
-  padding:16px;
-  height: fit-content;
-}
-.menu-title{font-size:12px;color:var(--muted);margin:10px 0 8px}
-.menu-link{
-  display:block;
-  padding:10px 12px;
-  border-radius:10px;
-  color:var(--text);
-  border:1px solid transparent;
-}
-.menu-link:hover{
-  background:#0f1a34;
-  border-color: var(--outline);
-}
-.menu-link.active{
-  background:rgba(37,99,235,.14);
-  border:1px solid rgba(37,99,235,.35);
-}
-
-/* المحتوى */
-.content{
-  flex:1 1 auto;
-  min-width:0;
-}
-
-/* بطاقات وأقسام */
-.card{
-  background:var(--card);
-  border:1px solid #1f2937;
-  border-radius:16px;
-  padding:22px;
-}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:22px}
-.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-@media (max-width:900px){.grid-3,.grid-2{grid-template-columns:1fr}}
-
-/* إحصائيات */
-.stat{background:var(--panel);border:1px solid var(--outline);border-radius:14px;padding:18px}
-.stat-label{color:var(--muted);font-size:12px}
-.stat-value{font-size:26px;margin:6px 0 10px}
-.stat-link{font-size:12px}
-
-/* جدول */
-.table-wrap{overflow:auto;border:1px solid var(--outline);border-radius:14px}
-.table{width:100%;border-collapse:separate;border-spacing:0;background:var(--panel)}
-.table th,.table td{padding:12px 14px;border-bottom:1px solid var(--outline)}
-.table th{color:#cbd5e1;background:var(--panel-2);text-align:right}
-.table tr:last-child td{border-bottom:none}
-.table tbody tr:hover{background:rgba(255,255,255,.02)}
-
-/* أزرار */
-.btn{
-  display:inline-block;background:var(--panel);border:1px solid var(--outline);
-  padding:10px 14px;border-radius:10px;color:var(--text);transition:.15s ease
-}
-.btn:hover{border-color:#2b3547;transform:translateY(-1px)}
-.btn:active{transform:translateY(0)}
-.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
-.btn.primary:hover{background:var(--primary-700)}
-.btn.ghost{background:transparent;border-color:var(--outline)}
-.btn.sm{padding:6px 10px;font-size:12px}
-
-/* فوتر */
-.footer{
-  padding:14px 22px;border-top:1px solid var(--outline);
-  color:var(--muted);text-align:center
-}
-
-/* رسائل */
-.alert{
-  border:1px solid var(--outline);border-radius:12px;padding:12px 14px;margin:8px 0;
-  background:rgba(255,255,255,.02)
-}
-.alert.success{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.06)}
-.alert.danger{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.06)}
+    <div class="card">
+      <h3 class="section-title">آخر 5 أسئلة شائعة</h3>
+      {% if latest_faqs %}
+        <ul>
+          {% for f in latest_faqs %}
+            <li><strong>{{ f.question }}</strong></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="empty">لا توجد أسئلة بعد.</div>
+      {% endif %}
+    </div>
+  </section>
+{% endblock %}
