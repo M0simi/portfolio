@@ -12,8 +12,8 @@ urlpatterns = [
     path("api/", include("core.urls")),
 
     # dashboard
-    path("", include("custom_admin.urls", namespace="custom_admin")),
-
+    path("", include("custom_admin.urls")),
+    
     # test
     path("healthz/", lambda r: JsonResponse({"ok": True}, status=200)),
     path("api/ping/", lambda r: JsonResponse({"pong": True}, status=200)),
