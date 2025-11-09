@@ -1,36 +1,59 @@
-{% extends "custom_admin/base.html" %}
-{% block title %}لوحة التحكّم | UniBot{% endblock %}
+{% load static %}
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}UniBot Console{% endblock %}</title>
 
-{% block content %}
-  <h2 class="title">لوحة التحكّم</h2>
-  <p class="subtitle muted">نظرة سريعة على النظام.</p>
+    <link rel="stylesheet" href="{% static 'custom_admin/css/admin.css' %}?v=10">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  </head>
 
-  <div class="grid-3">
-    <div class="stat">
-      <div class="stat-label">الأحداث</div>
-      <div class="stat-value">{{ stats.events_count }}</div>
-      <a class="stat-link" href="{% url 'custom_admin:events_list' %}">إدارة الأحداث →</a>
-    </div>
-    <div class="stat">
-      <div class="stat-label">الأسئلة الشائعة</div>
-      <div class="stat-value">{{ stats.faqs_count }}</div>
-      <a class="stat-link" href="{% url 'custom_admin:faqs_list' %}">إدارة الأسئلة →</a>
-    </div>
-    <div class="stat">
-      <div class="stat-label">المستخدمون</div>
-      <div class="stat-value">{{ stats.users_count }}</div>
-      <a class="stat-link" href="{% url 'custom_admin:users_list' %}">إدارة المستخدمين →</a>
-    </div>
-  </div>
+  <body>
+    <!-- الشريط العلوي -->
+    <header class="topbar">
+      <nav class="topbar-inner">
+        <div class="brand">
+          <img src="{% static 'custom_admin/img/unibot-logo.svg' %}" alt="UniBot" />
+          <span>UniBot Console</span>
+        </div>
+        <div class="top-links">
+          <a href="/api/">API</a>
+          <a href="/admin/">Django Admin</a>
+          <a href="{% url 'custom_admin:dashboard' %}">اللوحة</a>
+        </div>
+      </nav>
+    </header>
 
-  <div class="grid-2" style="margin-top:16px">
-    <div class="card">
-      <h4 class="section-title">آخر 5 أحداث</h4>
-      <div class="empty">سيتم عرض أحدث الأحداث هنا لاحقًا.</div>
+    <!-- تخطيط: قائمة يمين + محتوى يسار -->
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="menu-title">المحتوى</div>
+        <a class="menu-link" href="/admin/core/event/">الأحداث</a>
+        <a class="menu-link" href="/admin/core/category/">الفئات</a>
+        <a class="menu-link" href="/admin/core/faq/">الأسئلة الشائعة</a>
+        <a class="menu-link" href="/admin/core/favorite/">المفضلات</a>
+        <a class="menu-link" href="/admin/core/feedback/">التعليقات</a>
+        <a class="menu-link" href="/admin/core/customuser/">المستخدمون</a>
+        <a class="menu-link" href="/admin/core/knowledgebase/">Knowledge bases</a>
+
+        <div class="menu-title" style="margin-top:14px">روابط</div>
+        <a class="menu-link" href="{% url 'custom_admin:dashboard' %}">لوحة التحكم</a>
+        <a class="menu-link" href="/admin/password_change/">تغيير كلمة المرور</a>
+        <a class="menu-link" href="/admin/logout/">تسجيل الخروج</a>
+      </aside>
+
+      <main class="content">
+        {% block content %}{% endblock %}
+      </main>
     </div>
-    <div class="card">
-      <h4 class="section-title">آخر 5 أسئلة شائعة</h4>
-      <div class="empty">سيتم عرض أحدث الأسئلة هنا لاحقًا.</div>
-    </div>
-  </div>
-{% endblock %}
+
+    <footer class="footer">
+      <small>© {% now "Y" %} UniBot</small>
+    </footer>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
