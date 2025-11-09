@@ -15,7 +15,7 @@ from .models import KnowledgeBase
 # إعداد مفتاح ونوع الموديل
 # =======================
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
-MODEL_NAME     = os.getenv("GEMINI_MODEL", "gemini-1.5-flash-latest").strip()   # التعديل هنا
+MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-1.0-pro").strip()   
 
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
