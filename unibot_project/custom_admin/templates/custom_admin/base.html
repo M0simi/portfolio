@@ -1,41 +1,40 @@
+{% load static %}
 <!doctype html>
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>{{ title|default:"لوحة التحكّم" }}</title>
+
+    <!-- PicoCSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+
     <style>
-      body { background:#0f172a; color:#e2e8f0 }
-      header, footer { background:#0b1220 }
-      .card { background:#111827; border-radius:14px; padding:16px; border:1px solid #1f2937 }
-      .muted { color:#94a3b8; font-size:0.9rem }
-      a { color:#60a5fa }
-      .grid { display:grid; gap:16px }
-      .grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)) }
-      .grid-2 { grid-template-columns: repeat(2, minmax(0,1fr)) }
+      :root { --bg:#0f172a; --bg2:#0b1220; --card:#111827; --muted:#94a3b8; --border:#1f2937; }
+      body{ background:var(--bg); color:#e2e8f0 }
+      header, footer{ background:var(--bg2) }
+      .card{ background:var(--card); border-radius:14px; padding:16px; border:1px solid var(--border) }
+      .muted{ color:var(--muted); font-size:0.95rem }
+      a{ color:#60a5fa }
+      .grid{ display:grid; gap:16px }
+      .grid-3{ grid-template-columns: repeat(3, minmax(0,1fr)) }
+      .grid-2{ grid-template-columns: repeat(2, minmax(0,1fr)) }
       @media (max-width: 900px){ .grid-3{grid-template-columns:1fr} .grid-2{grid-template-columns:1fr} }
+      /* nav tweaks */
+      header nav ul{ list-style:none; padding:0; margin:0; display:flex; align-items:center; gap:10px; flex-wrap:wrap }
+      header nav a[aria-current="page"]{ font-weight:700; text-decoration:underline }
     </style>
   </head>
   <body>
-    <header class="container">
-      <nav>
-        <ul>
-          <li><strong>UniBot Dashboard</strong></li>
-        </ul>
-        <ul>
-          <li><a href="/">اللوحة</a></li>
-          <li><a href="/admin/">Django Admin</a></li>
-          <li><a href="/api/">API</a></li>
-        </ul>
-      </nav>
-    </header>
+
+    {# ✅ استخدم شريط التنقّل الجديد بدون Django Admin #}
+    {% include "custom_admin/_nav.html" %}
 
     <main class="container">
       {% block content %}{% endblock %}
     </main>
 
-    <footer class="container">
+    <footer class="container" style="margin-top:28px">
       <small class="muted">© {{ now|default:None }} UniBot</small>
     </footer>
   </body>
