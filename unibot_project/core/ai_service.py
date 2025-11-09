@@ -1,34 +1,50 @@
-# core/ai_service.py
 import os
 from io import BytesIO
-from PyPDF2 import PdfReader
+from typing import Tuple
+
 import google.generativeai as genai
+from PyPDF2 import PdfReader
+
+from django.core.files.storage import default_storage  # للاحتياط
 from core.models import KnowledgeBase
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
-def _read_latest_kb_bytes():
-    kb = KnowledgeBase.objects.order_by('-id').first()
-    if not kb:
-        return None, "⚠️ لا يوجد ملف/محتوى في قاعدة المعرفة."
+# =======================
+# إعداد Gemini
+# =======================
+API_KEY = os.getenv("GEMINI_API_KEY")
+MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
 
-    
-    content = (getattr(kb, 'content', '') or '').strip()
-    if content:
-        return content.encode('utf-8'), None
+if API_KEY:
+    genai.configure(api_key=API_KEY)
 
-    f = getattr(kb, 'file', None)
-    if not f:
-        return None, "⚠️ لا يوجد ملف مرفوع في قاعدة المعرفة."
 
-    try:
-        with f.storage.open(f.name, 'rb') as fh:
-            data = fh.read()
-        return data, None
-    except Exception as e:
-        return None, f"⚠️ تعذّر فتح الملف من التخزين: {e}"
+def _open_file_bytes_from_field(file_field) -> bytes:
+    """
+    يقرأ بايتات الملف من الـ storage المرتبط بالحقل نفسه.
+    لا يستخدم أي URL عام – هذا يتجنب 401 من Cloudinary.
+    """
+    # أفضل طريقة: نستخدم storage الخاص بالحقل
+    storage = getattr(file_field, "storage", None)
+    name = getattr(file_field, "name", None)
+
+    if storage and name:
+        with storage.open(name, "rb") as f:
+            return f.read()
+
+    # احتياط (حالات نادرة): لو ما قدرنا نستخدم storage الخاص بالحقل
+    # نجرّب default_storage بنفس الاسم
+    if name:
+        with default_storage.open(name, "rb") as f:
+            return f.read()
+
+    raise RuntimeError("تعذّر تحديد موضع الملف لقراءته (لا storage ولا name).")
+
 
 def _extract_text_from_pdf_bytes(pdf_bytes: bytes) -> str:
+    """
+    يستخرج نصًا من ملف PDF (بايتات).
+    """
     reader = PdfReader(BytesIO(pdf_bytes))
     parts = []
     for p in reader.pages:
@@ -37,40 +53,72 @@ def _extract_text_from_pdf_bytes(pdf_bytes: bytes) -> str:
             if t:
                 parts.append(t)
         except Exception:
+            # نتجاوز أي صفحة تسبّب خطأ
             continue
     return "\n".join(parts).strip()
 
+
+def _load_latest_kb_text() -> Tuple[str, str]:
+    """
+    يرجع (title, text) لآخر عنصر بقاعدة المعرفة.
+    لو فيه field نصّي مستقبلاً بنستعمله؛ الآن نعتمد على PDF.
+    """
+    kb = KnowledgeBase.objects.order_by("-id").first()
+    if not kb or not kb.file:
+        raise RuntimeError("لا يوجد ملف قاعدة معرفة مرفوع بعد.")
+
+    pdf_bytes = _open_file_bytes_from_field(kb.file)
+    text = _extract_text_from_pdf_bytes(pdf_bytes)
+    if not text:
+        raise RuntimeError("تعذّر استخراج نصوص من ملف PDF.")
+
+    return kb.title or "Knowledge Base", text
+
+
 def ask_gemini(user_prompt: str) -> str:
-    if not GEMINI_API_KEY:
-        return "❌ لم يتم ضبط متغير البيئة GEMINI_API_KEY."
+    """
+    يجيب على سؤال المستخدم مع تقييد الإجابة بما هو موجود في PDF فقط.
+    """
+    if not API_KEY:
+        return "❌ مفقود متغير البيئة GEMINI_API_KEY."
 
-    kb_bytes, err = _read_latest_kb_bytes()
-    if err:
-        return err
-
-   
     try:
-        # محاولة اعتباره نص مباشرة
-        pdf_text = kb_bytes.decode('utf-8')
-    except UnicodeDecodeError:
-        # إذن هو PDF
-        pdf_text = _extract_text_from_pdf_bytes(kb_bytes)
+        kb_title, kb_text = _load_latest_kb_text()
+    except Exception as e:
+        # نُظهر السبب للمستخدم أثناء الاختبار
+        return f"⚠️ تعذّر فتح/قراءة ملف المعرفة: {e}"
 
-    if not pdf_text:
-        return "⚠️ تعذّر استخراج نصوص من ملف قاعدة المعرفة."
-
-    system_prompt = (
-        "أنت UniBot 🎓 — مساعد جامعي ذكي ناطق بالعربية الفصحى. "
-        "أجب فقط بناءً على النص التالي. "
-        "إن لم تجد إجابة في النص، قل: عذرًا، سؤالك غير موجود في الملف الحالي."
+    system_rule = (
+        "أنت UniBot 🎓 — مساعد جامعي يجيب بالعربية الفصحى،"
+        " وتعتمد إجابتك فقط على النص التالي من دليل الجامعة. "
+        "إذا لم تجد الإجابة في النص، قل: "
+        "«عذرًا، سؤالك غير موجود في الملف الحالي.»"
     )
-    full_prompt = f"{system_prompt}\n\n--- محتوى الدليل ---\n{pdf_text[:6000]}\n\n--- سؤال المستخدم ---\n{user_prompt}"
+
+    prompt = (
+        f"{system_rule}\n\n"
+        f"--- مقتطف من ({kb_title}) ---\n"
+        f"{kb_text[:6000]}\n"
+        f"--- نهاية المقتطف ---\n\n"
+        f"سؤال المستخدم:\n{user_prompt}\n"
+    )
 
     try:
-        genai.configure(api_key=GEMINI_API_KEY)
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        resp = model.generate_content(full_prompt)
-        answer = (resp.text or "").strip()
-        return answer or "عذرًا، سؤالك غير موجود في الملف الحالي."
+        model = genai.GenerativeModel(MODEL_NAME)
+        resp = model.generate_content(prompt)
+        text = getattr(resp, "text", "") or ""
+        if not text.strip():
+            return "عذرًا، سؤالك غير موجود في الملف الحالي."
+        # تنظيف بسيط
+        text = (
+            text.replace("حسب الملف", "")
+                .replace("وفقًا للمستند", "")
+                .replace("PDF", "")
+                .replace("الملف", "")
+                .strip()
+        )
+        if not text:
+            return "عذرًا، سؤالك غير موجود في الملف الحالي."
+        return text
     except Exception as e:
         return f"⚠️ خطأ أثناء الاتصال بـ Gemini: {e}"
