@@ -1,3 +1,4 @@
+# core/views.py
 from django.utils import timezone
 from django.db.models import Q
 from django.contrib.auth import authenticate
@@ -9,13 +10,18 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
-import google.generativeai as genai
+
 from .models import Event, FAQ, CustomUser
 from .serializers import EventSerializer, FAQSerializer, UserSerializer
 from .ai_service import ask_gemini
 
+# (اختياري) فحص النماذج المتاحة من Gemini
+import google.generativeai as genai
 
-# ✅ تسجيل الدخول (باستخدام البريد)
+
+# =========================
+# تسجيل الدخول (بالبريد)
+# =========================
 class CustomLoginView(ObtainAuthToken):
     permission_classes = [AllowAny]
 
@@ -24,11 +30,13 @@ class CustomLoginView(ObtainAuthToken):
         password = request.data.get('password')
 
         if not email or not password:
-            return Response({'error': 'يجب إدخال البريد وكلمة المرور.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'يجب إدخال البريد وكلمة المرور.'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         user = authenticate(request, email=email, password=password)
         if not user:
-            return Response({'error': 'بيانات الدخول غير صحيحة.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'بيانات الدخول غير صحيحة.'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         token, _ = Token.objects.get_or_create(user=user)
         return Response({
@@ -40,13 +48,16 @@ class CustomLoginView(ObtainAuthToken):
         })
 
 
-# ✅ عرض الأحداث (قائمة) مع فلاتر status و q
+# =========================
+# الأحداث
+# =========================
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_events(request):
     """
-    - status=upcoming | past | all (افتراضي all)
-    - q=بحث بالعنوان أو الوصف
+    بارامترات اختيارية:
+    - status = upcoming | past | all (افتراضي all)
+    - q      = بحث بالعنوان أو الوصف
     """
     qs = Event.objects.all()
     now = timezone.now()
@@ -67,7 +78,6 @@ def get_events(request):
     return Response(serializer.data)
 
 
-# ✅ تفاصيل حدث بالـ slug (مفتوح للجميع)
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_event_detail(request, slug):
@@ -79,35 +89,43 @@ def get_event_detail(request, slug):
     return Response(serializer.data)
 
 
-# ✅ البحث في الأسئلة
+# =========================
+# البحث في الأسئلة الشائعة
+# =========================
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def search_faqs(request):
-    query = request.data.get('query', '').strip()
+    query = (request.data.get('query') or '').strip()
     faqs = FAQ.objects.filter(question__icontains=query)[:5] if query else []
     serializer = FAQSerializer(faqs, many=True)
     return Response({'results': serializer.data})
 
 
-# ✅ الصفحة الرئيسية للـ API
+# =========================
+# الجذر التعريفي للـ API
+# =========================
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def api_root(request):
     return Response({
         'message': '🎓 مرحباً بك في UniBot API',
         'endpoints': {
-            'register': 'POST /api/register/',
-            'login': 'POST /api/login/',
-            'events': 'GET /api/events/',
+            'register': 'POST /api/register/ (وأيضاً بدون السلاش)',
+            'login':    'POST /api/login/ (وأيضاً بدون السلاش)',
+            'events':   'GET  /api/events/ (وأيضاً بدون السلاش)',
             'event_detail': 'GET /api/events/<slug>/',
-            'search': 'POST /api/search/',
-            'ai_general': 'POST /api/ai/general/',
+            'search':   'POST /api/search/ (محمية)',
+            'ai_general': 'POST /api/ai/general/ (محمية)',
+            'profile':  'GET/PUT /api/profile/ (محمية)',
+            'ai_models': 'GET /api/ai/models/ (اختياري للتشخيص)',
         },
         'status': '✅ API جاهز للعمل'
     })
 
 
-# ✅ تسجيل مستخدم جديد
+# =========================
+# إنشاء حساب جديد
+# =========================
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register_user(request):
@@ -117,10 +135,12 @@ def register_user(request):
     role = request.data.get('role', 'student')
 
     if not all([email, password]):
-        return Response({'error': 'الرجاء إدخال البريد وكلمة المرور.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'الرجاء إدخال البريد وكلمة المرور.'},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     if CustomUser.objects.filter(email=email).exists():
-        return Response({'error': 'البريد الإلكتروني مستخدم مسبقاً.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'البريد الإلكتروني مستخدم مسبقاً.'},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     user = CustomUser.objects.create(
         name=name or "",
@@ -128,7 +148,6 @@ def register_user(request):
         password=make_password(password),
         role=role
     )
-
     serializer = UserSerializer(user)
     token, _ = Token.objects.get_or_create(user=user)
 
@@ -139,10 +158,43 @@ def register_user(request):
     }, status=status.HTTP_201_CREATED)
 
 
-# ✅ بوت الذكاء (Gemini)
+# =========================
+# الذكاء الاصطناعي
+# =========================
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def ai_general(request):
+    """
+    يستقبل: { "prompt": "..." }
+    يرجع:   { "result": "..." }
+    - يرد بسرعة على التحيات.
+    - يستدعي ask_gemini() (التي تقرأ أحدث PDF/نص من قاعدة المعرفة).
+    - يرجع 200 حتى لو رد نصّياً برسالة خطأ ودّية، عشان الواجهة تعرضها.
+    """
+    user = request.user
+    user_prompt = (request.data.get('prompt') or '').strip()
+
+    if not user_prompt:
+        return Response({'error': 'يرجى إدخال السؤال.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # ردّ سريع للتحيات
+    greetings = ["السلام عليكم", "مرحبا", "هلا", "صباح الخير", "مساء الخير", "أهلاً", "هلا والله"]
+    if any(g in user_prompt for g in greetings):
+        name = user.name or "الطالب"
+        return Response({'result': f"وعليكم السلام {name}! 👋 كيف أقدر أساعدك اليوم؟"})
+
+    # استدعاء Gemini عبر خدمة ai_service
+    answer = (ask_gemini(user_prompt) or "").strip()
+    return Response({'result': answer}, status=status.HTTP_200_OK)
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def ai_models(request):
+    """
+    نقطة تشخيصية: تُرجع نسخة google-generativeai وقائمة النماذج
+    التي تدعم generateContent (تفيدنا إذا صار لخبطة إصدارات).
+    """
     try:
         ver = getattr(genai, "__version__", "unknown")
         names = []
@@ -154,7 +206,9 @@ def ai_models(request):
         return Response({"error": str(e)}, status=500)
 
 
-# ✅ الملف الشخصي
+# =========================
+# الملف الشخصي
+# =========================
 @api_view(['GET', 'PUT'])
 @permission_classes([IsAuthenticated])
 def get_profile(request):
@@ -174,5 +228,3 @@ def get_profile(request):
         'message': '✅ تم تحديث الملف الشخصي بنجاح',
         'user': serializer.data
     })
-
-
