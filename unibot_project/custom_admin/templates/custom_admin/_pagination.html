@@ -1,0 +1,17 @@
+{% if page_obj.paginator.num_pages > 1 %}
+  <nav aria-label="Pagination" style="display:flex;gap:8px;justify-content:center;margin:16px 0;">
+    {% if page_obj.has_previous %}
+      <a href="?{% if q %}q={{ q }}&{% endif %}page={{ page_obj.previous_page_number }}">السابق</a>
+    {% else %}
+      <span class="secondary" aria-disabled="true">السابق</span>
+    {% endif %}
+
+    <span class="muted">صفحة {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+      <a href="?{% if q %}q={{ q }}&{% endif %}page={{ page_obj.next_page_number }}">التالي</a>
+    {% else %}
+      <span class="secondary" aria-disabled="true">التالي</span>
+    {% endif %}
+  </nav>
+{% endif %}
