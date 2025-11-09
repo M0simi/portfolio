@@ -1,34 +1,13 @@
 from django.urls import path
-from .views import (
-    CustomLoginView,
-    get_events,
-    search_faqs,
-    api_root,
-    register_user,
-    ai_general,
-    get_profile,
-    get_event_detail,
-)
-
-# مهم علشان include(namespace) يشتغل بدون أخطاء
-app_name = "core"
+from .views import CustomLoginView, get_profile, get_events, get_event_detail, search_faqs, api_root, ai_general, register_user
 
 urlpatterns = [
-    # Root
     path("", api_root, name="api_root"),
-
-    # Auth
-    path("login/", CustomLoginView.as_view(), name="login"),
-    path("register/", register_user, name="register_user"),
-
-    # Events
-    path("events/", get_events, name="events"),
+    path("login/",    CustomLoginView.as_view(), name="login"),
+    path("register/", register_user,              name="register_user"),
+    path("profile/",  get_profile,                name="get_profile"),
+    path("events/",   get_events,                 name="events"),
     path("events/<slug:slug>/", get_event_detail, name="event_detail"),
-
-    # Search & AI
-    path("search/", search_faqs, name="search"),
-    path("ai/general/", ai_general, name="ai_general"),
-
-    # Profile
-    path("profile/", get_profile, name="get_profile"),
+    path("search/",   search_faqs,                name="search"),
+    path("ai/general/", ai_general,               name="ai_general"),
 ]
