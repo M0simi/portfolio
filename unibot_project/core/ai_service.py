@@ -2,29 +2,36 @@ import os
 from io import BytesIO
 
 import google.generativeai as genai
-from google.generativeai.types import HarmCategory, HarmBlockThreshold
+
+try:
+    from google.generativeai.types import HarmCategory, HarmBlockThreshold
+    _HC  = HarmCategory
+    _HBT = HarmBlockThreshold
+    SAFETY_SETTINGS = [
+        {"category": getattr(_HC,  "HARM_CATEGORY_HATE_SPEECH",       "HARM_CATEGORY_HATE_SPEECH"),      "threshold": getattr(_HBT, "BLOCK_NONE", "BLOCK_NONE")},
+        {"category": getattr(_HC,  "HARM_CATEGORY_HARASSMENT",        "HARM_CATEGORY_HARASSMENT"),       "threshold": getattr(_HBT, "BLOCK_NONE", "BLOCK_NONE")},
+        {"category": getattr(_HC,  "HARM_CATEGORY_SEXUAL_CONTENT",    "HARM_CATEGORY_SEXUAL_CONTENT"),   "threshold": getattr(_HBT, "BLOCK_NONE", "BLOCK_NONE")},
+        {"category": getattr(_HC,  "HARM_CATEGORY_DANGEROUS_CONTENT", "HARM_CATEGORY_DANGEROUS_CONTENT"),"threshold": getattr(_HBT, "BLOCK_NONE", "BLOCK_NONE")},
+    ]
+except Exception:
+    
+    SAFETY_SETTINGS = [
+        {"category": "HARM_CATEGORY_HATE_SPEECH",       "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_HARASSMENT",        "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_SEXUAL_CONTENT",    "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+    ]
 
 from django.core.files.storage import default_storage
 from PyPDF2 import PdfReader
 
 from .models import KnowledgeBase
 
-# =======================
-# Gemini setup
-# =======================
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
-MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-1.5-flash").strip()
+MODEL_NAME     = os.getenv("GEMINI_MODEL", "gemini-1.5-flash").strip()
 
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
-
-# Safety settings (disable blocking)
-SAFETY_SETTINGS = [
-    {"category": HarmCategory.HARM_CATEGORY_HATE_SPEECH,        "threshold": HarmBlockThreshold.BLOCK_NONE},
-    {"category": HarmCategory.HARM_CATEGORY_HARASSMENT,         "threshold": HarmBlockThreshold.BLOCK_NONE},
-    {"category": HarmCategory.HARM_CATEGORY_SEXUAL_CONTENT,     "threshold": HarmBlockThreshold.BLOCK_NONE},
-    {"category": HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,  "threshold": HarmBlockThreshold.BLOCK_NONE},
-]
 
 GEN_CFG = {"temperature": 0.2, "max_output_tokens": 2048}
 
