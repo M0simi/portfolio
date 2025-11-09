@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% block title %}UniBot Console{% endblock %}</title>
 
-    <!-- ستايل لوحة التحكم المخصص -->
-  <link rel="stylesheet" href="{% static 'custom_admin/css/admin.css' %}?v=2025-11-09-03">
+    <!-- ستايل لوحة التحكم -->
+    <link rel="stylesheet" href="{% static 'custom_admin/css/admin.css' %}?v=3">
 
-    <!-- (اختياري) خط Cairo -->
+    <!-- خط Cairo (اختياري) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
@@ -18,62 +18,43 @@
   <body>
     <!-- الشريط العلوي -->
     <header class="topbar">
-      <div class="brand" style="display:flex;align-items:center;gap:10px">
+      <div class="brand">
         <img src="{% static 'custom_admin/img/unibot-logo.svg' %}" alt="UniBot" />
         <span>UniBot Console</span>
       </div>
 
-      <nav class="top-links" style="display:flex;align-items:center;gap:18px">
-        <a href="/api/">API</a>
-        <a href="/admin/">Django Admin</a>
+      <nav class="top-links">
         <a href="{% url 'custom_admin:dashboard' %}">اللوحة</a>
+        <a href="/admin/">Django Admin</a>
+        <a href="/api/">API</a>
       </nav>
     </header>
 
-    <!-- التخطيط الأساسي: قائمة يمين + محتوى يسار -->
+    <!-- تخطيط رئيسي: المحتوى يسار + القائمة يمين -->
     <div class="layout">
-      <!-- الشريط الجانبي (يمـين) -->
-      <aside class="sidebar">
-        <div class="menu-title">المحتوى</div>
-
-        <!-- روابط الأدمن الرسمية لنماذج core -->
-        <a class="menu-link {% if request and '/admin/core/event/' in request.path %}active{% endif %}"
-           href="/admin/core/event/">الأحداث</a>
-
-        <a class="menu-link {% if request and '/admin/core/category/' in request.path %}active{% endif %}"
-           href="/admin/core/category/">الفئات</a>
-
-        <a class="menu-link {% if request and '/admin/core/faq/' in request.path %}active{% endif %}"
-           href="/admin/core/faq/">الأسئلة الشائعة</a>
-
-        <a class="menu-link {% if request and '/admin/core/favorite/' in request.path %}active{% endif %}"
-           href="/admin/core/favorite/">المفضلات</a>
-
-        <a class="menu-link {% if request and '/admin/core/feedback/' in request.path %}active{% endif %}"
-           href="/admin/core/feedback/">التعليقات</a>
-
-        <a class="menu-link {% if request and '/admin/core/customuser/' in request.path %}active{% endif %}"
-           href="/admin/core/customuser/">المستخدمون</a>
-
-        <a class="menu-link {% if request and '/admin/core/knowledgebase/' in request.path %}active{% endif %}"
-           href="/admin/core/knowledgebase/">Knowledge bases</a>
-
-        <div class="menu-title" style="margin-top:16px">روابط</div>
-
-        <a class="menu-link {% if request and request.resolver_match and request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
-           href="{% url 'custom_admin:dashboard' %}">لوحة التحكم</a>
-
-        <a class="menu-link" href="/admin/password_change/">تغيير كلمة المرور</a>
-        <a class="menu-link" href="/admin/logout/">تسجيل الخروج</a>
-      </aside>
-
       <!-- المحتوى -->
       <main class="content">
         {% block content %}{% endblock %}
       </main>
+
+      <!-- القائمة الجانبية (يمين) -->
+      <aside class="sidebar">
+        <div class="menu-title">المحتوى</div>
+        <a class="menu-link" href="/admin/core/event/">الأحداث</a>
+        <a class="menu-link" href="/admin/core/category/">الفئات</a>
+        <a class="menu-link" href="/admin/core/faq/">الأسئلة الشائعة</a>
+        <a class="menu-link" href="/admin/core/favorite/">المفضلات</a>
+        <a class="menu-link" href="/admin/core/feedback/">التعليقات</a>
+        <a class="menu-link" href="/admin/core/customuser/">المستخدمون</a>
+        <a class="menu-link" href="/admin/core/knowledgebase/">Knowledge bases</a>
+
+        <div class="menu-title" style="margin-top:16px">روابط</div>
+        <a class="menu-link" href="{% url 'custom_admin:dashboard' %}">لوحة التحكم</a>
+        <a class="menu-link" href="/admin/password_change/">تغيير كلمة المرور</a>
+        <a class="menu-link" href="/admin/logout/">تسجيل الخروج</a>
+      </aside>
     </div>
 
-    <!-- الفوتر -->
     <footer class="footer">
       <small>© {% now "Y" %} UniBot</small>
     </footer>
