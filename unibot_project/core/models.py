@@ -149,10 +149,20 @@ class Favorite(models.Model):
     def __str__(self):
         return f"{self.user.email} - {self.faq.question[:20]}"
 
+
+from django.db import models
+from cloudinary_storage.storage import RawMediaCloudinaryStorage  # سطر مهم
+
 class KnowledgeBase(models.Model):
-    title = models.CharField(max_length=255, verbose_name="اسم الملف")
-    file = models.FileField(upload_to='knowledge/', verbose_name="ملف الأسئلة (PDF)")
+    title = models.CharField(max_length=255)
+  
+
+    file = models.FileField(
+        upload_to='knowledge/',
+        storage=RawMediaCloudinaryStorage(),   
+        blank=True,
+        null=True,
+    )
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return self.title
+
