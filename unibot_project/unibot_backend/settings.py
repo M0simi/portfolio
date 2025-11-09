@@ -52,7 +52,8 @@ if USE_CLOUDINARY:
 # ----------------------------
 MIDDLEWARE = [
        "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",   
+    "whitenoise.middleware.WhiteNoiseMiddleware", 
+    "corsheaders.middleware.CorsMiddleware", 
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -201,6 +202,15 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://unibot.foo",
+    "https://www.unibot.foo",
+    "https://api.unibot.foo",
+    "http://localhost",
+    "http://127.0.0.1",
+]
+
 # ----------------------------
 # Extra security (prod)
 # ----------------------------
@@ -211,6 +221,7 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
 
 
 
