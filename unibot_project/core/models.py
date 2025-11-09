@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager  # استيراد BaseUserManager للمخصص (BaseUserManager for custom)
 from django.utils.text import slugify  # لتوليد slug من العنوان (Generate slug from title)
 import uuid  # مكتبة UUID للـ _id (UUID library for _id)
+from cloudinary_storage.storage import RawMediaCloudinaryStorage
 
 # مدير المستخدم المخصص (Custom User Manager - FIXED with self.model)
 class CustomUserManager(BaseUserManager):
