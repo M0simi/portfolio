@@ -1,8 +1,10 @@
 import os
 from io import BytesIO
+import requests  # <-- سنستخدم هذه المكتبة
 
 import google.generativeai as genai
 
+# --- (هذا الكود لإعدادات الأمان سليم) ---
 try:
     from google.generativeai.types import HarmCategory, HarmBlockThreshold
     _HC  = HarmCategory
@@ -14,7 +16,6 @@ try:
         {"category": getattr(_HC,  "HARM_CATEGORY_DANGEROUS_CONTENT", "HARM_CATEGORY_DANGEROUS_CONTENT"),"threshold": getattr(_HBT, "BLOCK_NONE", "BLOCK_NONE")},
     ]
 except Exception:
-    
     SAFETY_SETTINGS = [
         {"category": "HARM_CATEGORY_HATE_SPEECH",       "threshold": "BLOCK_NONE"},
         {"category": "HARM_CATEGORY_HARASSMENT",        "threshold": "BLOCK_NONE"},
@@ -38,9 +39,8 @@ GEN_CFG = {"temperature": 0.2, "max_output_tokens": 2048}
 
 def _read_latest_kb_text(max_chars: int = 60_000) -> str:
     """
-    يقرأ أحدث محتوى من KnowledgeBase:
-    - إذا كان الحقل النصي content موجود → نستخدمه.
-    - وإلا نقرأ ملف PDF عبر default_storage (يدعم Cloudinary ومحلي).
+    (الحل الجذري)
+    يقرأ أحدث ملف PDF عن طريق تحميله من رابطه العام مباشرة (لتجاوز 401).
     """
     kb = KnowledgeBase.objects.order_by("-id").first()
     if not kb:
@@ -56,9 +56,27 @@ def _read_latest_kb_text(max_chars: int = 60_000) -> str:
     if not f:
         return ""
 
-    # مهم: use default_storage حتى مع CloudinaryStorage
-    with default_storage.open(f.name, "rb") as fh:
-        data = fh.read()
+    # --- 🚀 هذا هو التعديل الكامل (الخطة ب) ---
+    
+    file_url = f.url  # <-- نحصل على الرابط العام (Public URL)
+    if not file_url:
+        raise RuntimeError("الملف موجود في قاعدة البيانات ولكن ليس له رابط URL.")
+
+    try:
+        # نتظاهر بأننا متصفح (Browser) لتجنب الحظر
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        }
+        # نقوم بتحميل الرابط العام
+        response = requests.get(file_url, headers=headers)
+        response.raise_for_status() # سيعطي خطأ إذا كان الرابط 404 أو 403
+        
+        data = response.content # هذا هو محتوى الملف (بايت)
+
+    except requests.RequestException as e:
+        # هذا سيمسك أي خطأ في تحميل الرابط
+        raise RuntimeError(f"فشل تحميل الملف من الرابط العام: {e}")
+    # --- نهاية التعديل ---
 
     reader = PdfReader(BytesIO(data))
     parts = []
@@ -85,6 +103,7 @@ def ask_gemini(user_prompt: str) -> str:
         return "❌ مفقود متغير البيئة GEMINI_API_KEY."
 
     try:
+        # الكود الآن سيستخدم الدالة المعدلة في الأعلى
         kb_text = _read_latest_kb_text()
 
         system_rule = (
@@ -104,7 +123,8 @@ def ask_gemini(user_prompt: str) -> str:
 """
 
         last_err = None
-        for name in (MODEL_NAME, "gemini-1.5-flash"):
+        # (استخدام set() لإزالة التكرار إذا كان MODEL_NAME هو نفسه "gemini-1.5-flash")
+        for name in set([MODEL_NAME, "gemini-1.5-flash"]): 
             try:
                 model = genai.GenerativeModel(
                     model_name=name,
@@ -113,7 +133,6 @@ def ask_gemini(user_prompt: str) -> str:
                 )
                 resp = model.generate_content(prompt)
 
-                # في حال الرد انحظر أو خالي
                 if not getattr(resp, "candidates", None):
                     return "عذرًا، تم حظر الرد لأسباب تتعلق بالأمان. حاول إعادة صياغة السؤال."
 
@@ -121,7 +140,7 @@ def ask_gemini(user_prompt: str) -> str:
                 if not text:
                     return ("عذرًا، المعلومة التي تبحث عنها غير متوفرة في الدليل الحالي. "
                             "للحصول على تفاصيل أدق، أنصحك بمراجعة القسم المختص في الجامعة.")
-                # تنظيف خفيف
+                
                 for kw in ("حسب الملف", "وفقًا للمستند", "PDF", "الملف"):
                     text = text.replace(kw, "")
                 return text.strip()
@@ -133,4 +152,5 @@ def ask_gemini(user_prompt: str) -> str:
         return f"⚠️ خطأ أثناء الاتصال بـ Gemini: {last_err}"
 
     except Exception as e:
+        # الآن إذا فشل، سيظهر لنا الخطأ من 'requests'
         return f"⚠️ خطأ في الإعداد أو قراءة الملف: {e}"
