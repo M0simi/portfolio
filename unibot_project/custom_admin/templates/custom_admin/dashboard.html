@@ -1,38 +1,23 @@
-{% extends "custom_admin/base.html" %}
-{% block title %}لوحة UniBot{% endblock %}
-{% block content %}
-<div class="cards">
-  <div class="card"><div class="card-title">مستخدمون</div><div class="card-value">{{ stats.users }}</div></div>
-  <div class="card"><div class="card-title">الأسئلة</div><div class="card-value">{{ stats.faqs }}</div></div>
-  <div class="card"><div class="card-title">أحداث قادمة</div><div class="card-value">{{ stats.upcoming_events }}</div></div>
-</div>
-
-<div class="toolbar">
-  <a class="btn" href="{% url 'custom_admin:event_add' %}">+ حدث</a>
-  <a class="btn" href="{% url 'custom_admin:faq_add' %}">+ سؤال</a>
-  <a class="btn" href="{% url 'custom_admin:category_add' %}">+ فئة</a>
-  <a class="btn" href="{% url 'custom_admin:kb_add' %}">+ ملف معرفة</a>
-</div>
-
-<h3 class="section-title">أحدث الأحداث</h3>
-<div class="table-wrap">
-  <table class="table">
-    <thead><tr><th>العنوان</th><th>البدء</th><th>المكان</th><th></th></tr></thead>
-    <tbody>
-      {% for e in recent_events %}
-      <tr>
-        <td>{{ e.title }}</td>
-        <td>{{ e.start_date|date:"Y-m-d H:i" }}</td>
-        <td>{{ e.location }}</td>
-        <td class="actions">
-          <a class="link" href="{% url 'custom_admin:event_edit' e.pk %}">تعديل</a>
-          <a class="link danger" href="{% url 'custom_admin:event_delete' e.pk %}">حذف</a>
-        </td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="4">لا توجد بيانات</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="utf-8">
+  <title>لوحة UniBot</title>
+  <style>
+    body{font-family:Arial;background:#f7f7f7;margin:0;padding:2rem}
+    .card{background:#fff;padding:1rem;margin:1rem 0;border-radius:6px;box-shadow:0 0 4px rgba(0,0,0,.1)}
+    .btn{display:inline-block;background:#007bff;color:#fff;padding:.5rem 1rem;border-radius:4px;text-decoration:none;margin:.25rem}
+  </style>
+</head>
+<body>
+  <h1>لوحة التحكم</h1>
+  <div class="card">
+    <strong>مستخدمون:</strong> {{ stats.users }}<br>
+    <strong>أسئلة:</strong> {{ stats.faqs }}<br>
+    <strong>أحداث قادمة:</strong> {{ stats.upcoming_events }}
+  </div>
+  <div>
+    <a class="btn" href="{% url 'custom_admin:dashboard' %}">تحديث</a>
+  </div>
+</body>
+</html>
