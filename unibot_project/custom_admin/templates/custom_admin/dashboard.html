@@ -1,53 +1,96 @@
 {% extends "custom_admin/base.html" %}
-{% block title %}لوحة التحكّم | UniBot{% endblock %}
+{% load static %}
+
+{% block title %}لوحة التحكم | UniBot{% endblock %}
 
 {% block content %}
-  <h1 class="title">لوحة التحكّم</h1>
+
+<div class="card">
+  <h2 class="title">لوحة التحكّم</h2>
   <p class="subtitle">نظرة عامة سريعة.</p>
+</div>
 
-  <section class="grid-3">
-    <div class="stat">
-      <div class="stat-label">الأحداث</div>
-      <div class="stat-value">{{ stats.events_count }}</div>
-      <a class="stat-link" href="/admin/core/event/">إدارة الأحداث</a>
-    </div>
-    <div class="stat">
-      <div class="stat-label">الأسئلة الشائعة</div>
-      <div class="stat-value">{{ stats.faqs_count }}</div>
-      <a class="stat-link" href="/admin/core/faq/">إدارة الأسئلة</a>
-    </div>
-    <div class="stat">
-      <div class="stat-label">المستخدمون</div>
-      <div class="stat-value">{{ stats.users_count }}</div>
-      <a class="stat-link" href="/admin/core/customuser/">إدارة المستخدمين</a>
-    </div>
+<div class="grid-3">
+  <!-- المستخدمون -->
+  <div class="stat">
+    <div class="stat-label">المستخدمون</div>
+    <div class="stat-value">{{ stats.users|default:0 }}</div>
+    <a class="stat-link" href="{% url 'custom_admin:users_list' %}">إدارة المستخدمين</a>
+  </div>
+
+  <!-- الأسئلة الشائعة -->
+  <div class="stat">
+    <div class="stat-label">الأسئلة الشائعة</div>
+    <div class="stat-value">{{ stats.faqs|default:0 }}</div>
+    <a class="stat-link" href="{% url 'custom_admin:faqs_list' %}">إدارة الأسئلة</a>
+  </div>
+
+  <!-- الأحداث -->
+  <div class="stat">
+    <div class="stat-label">الأحداث</div>
+    <div class="stat-value">{{ stats.events|default:0 }}</div>
+    <a class="stat-link" href="{% url 'custom_admin:events_list' %}">إدارة الأحداث</a>
+  </div>
+</div>
+
+<div class="grid-2">
+  <!-- آخر 5 أسئلة -->
+  <section class="card">
+    <h3 class="section-title">آخر 5 أسئلة شائعة</h3>
+    {% if latest_faqs %}
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>السؤال</th>
+              <th>الفئة</th>
+              <th>آخر تحديث</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for f in latest_faqs %}
+            <tr>
+              <td>{{ f.question }}</td>
+              <td>{{ f.category }}</td>
+              <td>{{ f.updated_at }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty">لا توجد أسئلة بعد.</div>
+    {% endif %}
   </section>
 
-  <section class="grid-2">
-    <div class="card">
-      <h3 class="section-title">آخر 5 أحداث</h3>
-      {% if latest_events %}
-        <ul>
-          {% for e in latest_events %}
-            <li><strong>{{ e.title }}</strong></li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <div class="empty">لا توجد أحداث بعد.</div>
-      {% endif %}
-    </div>
-
-    <div class="card">
-      <h3 class="section-title">آخر 5 أسئلة شائعة</h3>
-      {% if latest_faqs %}
-        <ul>
-          {% for f in latest_faqs %}
-            <li><strong>{{ f.question }}</strong></li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <div class="empty">لا توجد أسئلة بعد.</div>
-      {% endif %}
-    </div>
+  <!-- آخر 5 أحداث -->
+  <section class="card">
+    <h3 class="section-title">آخر 5 أحداث</h3>
+    {% if latest_events %}
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>العنوان</th>
+              <th>البدء</th>
+              <th>المكان</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for e in latest_events %}
+            <tr>
+              <td>{{ e.title }}</td>
+              <td>{{ e.start_date }}</td>
+              <td>{{ e.location }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty">لا توجد أحداث بعد.</div>
+    {% endif %}
   </section>
+</div>
+
 {% endblock %}
