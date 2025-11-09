@@ -14,11 +14,10 @@ urlpatterns = [
     # dashboard
     path("", include("custom_admin.urls")),
     
-    # test
-    path("healthz/", lambda r: JsonResponse({"ok": True}, status=200)),
-    path("api/ping/", lambda r: JsonResponse({"pong": True}, status=200)),
+  
 ]
 
 # media
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 
