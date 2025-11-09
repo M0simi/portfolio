@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
-
+import google.generativeai as genai
 from .models import Event, FAQ, CustomUser
 from .serializers import EventSerializer, FAQSerializer, UserSerializer
 from .ai_service import ask_gemini
@@ -174,4 +174,5 @@ def get_profile(request):
         'message': '✅ تم تحديث الملف الشخصي بنجاح',
         'user': serializer.data
     })
+
 
