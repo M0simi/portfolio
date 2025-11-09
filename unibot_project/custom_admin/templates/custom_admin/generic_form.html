@@ -1,21 +1,28 @@
 {% extends "custom_admin/base.html" %}
-{% block title %}{{ title }}{% endblock %}
+{% load static %}
 {% block content %}
-<h2>{{ title }}</h2>
-<form method="post" enctype="multipart/form-data" class="form">
-  {% csrf_token %}
-  {{ form.non_field_errors }}
-  {% for field in form %}
-    <div class="form-row">
-      <label>{{ field.label }}</label>
-      {{ field }}
-      {% if field.help_text %}<small class="hint">{{ field.help_text }}</small>{% endif %}
-      {% for e in field.errors %}<div class="err">{{ e }}</div>{% endfor %}
+  <h2>{{ title }}</h2>
+  {% include "custom_admin/_messages.html" %}
+
+  <form method="post" {% if enctype_multipart %}enctype="multipart/form-data"{% endif %} style="margin-top:12px">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="grid" style="gap:12px;">
+      {% for field in form %}
+        <label>
+          <span style="display:block;margin-bottom:6px">{{ field.label }}</span>
+          {{ field }}
+          {% if field.help_text %}<small class="muted">{{ field.help_text }}</small>{% endif %}
+          {% for error in field.errors %}
+            <small style="color:#ef4444">{{ error }}</small>
+          {% endfor %}
+        </label>
+      {% endfor %}
     </div>
-  {% endfor %}
-  <div class="form-actions">
-    <button class="btn" type="submit">حفظ</button>
-    <a class="btn ghost" href="javascript:history.back()">عودة</a>
-  </div>
-</form>
+
+    <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+      <a class="secondary" href="{% url back_url %}">رجوع</a>
+      <button type="submit">{{ submit_label|default:"حفظ" }}</button>
+    </div>
+  </form>
 {% endblock %}
