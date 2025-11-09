@@ -7,12 +7,12 @@ urlpatterns = [
     # Django admin
     path("admin/", admin.site.urls),
 
-    # API
-    path("api/", include("core.urls", namespace="core")),
+    # API (بدون namespace عشان ما يطلب app_name إجباري)
+    path("api/", include("core.urls")),
 
-    # Custom dashboard (home & /dashboard/)
+    # Custom dashboard (الرئيسية و /dashboard/)
     path("", include("custom_admin.urls", namespace="custom_admin")),
 ]
 
-# Media (served by Django; fine on Render for user uploads)
+# Media
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
