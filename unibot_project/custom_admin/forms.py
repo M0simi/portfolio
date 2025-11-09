@@ -1,5 +1,4 @@
 from django import forms
-from django.utils import timezone
 from core.models import (
     Event,
     FAQ,
@@ -10,12 +9,9 @@ from core.models import (
     CustomUser,
 )
 
-# ---- أدوات عامة ----
+# === Widgets وتهيئة ===
 _DT_WIDGET = forms.DateTimeInput(attrs={"type": "datetime-local"})
 _TEXTAREA = forms.Textarea(attrs={"rows": 4})
-
-# Django يتوقع naive datetime في الـ widgets من نوع datetime-local.
-# لذلك نضبط الـ input_formats الأكثر شيوعًا.
 _DATETIME_INPUT_FORMATS = [
     "%Y-%m-%dT%H:%M",
     "%Y-%m-%d %H:%M",
@@ -78,9 +74,8 @@ class KnowledgeBaseForm(forms.ModelForm):
         fields = ["title", "file"]
 
     def clean_file(self):
-        f = self.cleaned_data.get("file")
-        # السماح بعدم رفع ملف (اختياري)
-        return f
+        # الملف اختياري
+        return self.cleaned_data.get("file")
 
 
 # =========================
@@ -102,7 +97,7 @@ class FavoriteDeleteForm(forms.ModelForm):
 
 
 # =========================
-# المستخدمون (تعديل مبسّط)
+# المستخدمون
 # =========================
 class UserEditForm(forms.ModelForm):
     email = forms.EmailField(disabled=True, required=False, help_text="البريد لا يمكن تعديله.")
@@ -117,3 +112,10 @@ class UserEditForm(forms.ModelForm):
             "is_staff",
             "is_superuser",
         ]
+
+
+# نموذج مبسّط لتغيير الدور فقط (مطلوب في views.py)
+class UserRoleForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ["role"]
