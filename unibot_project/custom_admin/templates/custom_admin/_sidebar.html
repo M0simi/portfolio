@@ -1,0 +1,18 @@
+<aside class="sidebar" aria-label="القائمة الجانبية">
+  <div class="menu">
+    <div class="menu-title">المحتوى</div>
+    <nav>
+      <a href="{% url 'custom_admin:dashboard' %}"
+         {% if request.path == '/' or request.path|slice:':11' == '/dashboard' %}aria-current="page"{% endif %}>
+        الرئيسية
+      </a>
+      <a href="{% url 'custom_admin:events_list' %}" {% if '/events' in request.path %}aria-current="page"{% endif %}>الأحداث</a>
+      <a href="{% url 'custom_admin:categories_list' %}" {% if '/categories' in request.path %}aria-current="page"{% endif %}>الفئات</a>
+      <a href="{% url 'custom_admin:faqs_list' %}" {% if '/faqs' in request.path %}aria-current="page"{% endif %}>الأسئلة الشائعة</a>
+      <a href="{% url 'custom_admin:favorites_list' %}" {% if '/favorites' in request.path %}aria-current="page"{% endif %}>المفضلات</a>
+      <a href="{% url 'custom_admin:feedback_list' %}" {% if '/feedback' in request.path %}aria-current="page"{% endif %}>التعليقات</a>
+      <a href="{% url 'custom_admin:users_list' %}" {% if '/users' in request.path %}aria-current="page"{% endif %}>المستخدمون</a>
+      <a href="{% url 'custom_admin:kb_list' %}" {% if request.path|slice:':4' == '/kb/' or request.path == '/kb/' or request.path == '/kb' %}aria-current="page"{% endif %}>Knowledge bases</a>
+    </nav>
+  </div>
+</aside>
