@@ -1,39 +1,46 @@
 {% extends "custom_admin/base.html" %}
-{% block title %}الأسئلة الشائعة{% endblock %}
 {% block content %}
-<div class="list-head">
-  <h2>الأسئلة الشائعة</h2>
-  <div class="actions-inline">
-    <form method="get" class="search">
-      <input name="q" value="{{ q }}" placeholder="بحث في السؤال/الإجابة">
-      <button class="btn">بحث</button>
-    </form>
-    <a class="btn" href="{% url 'custom_admin:faq_add' %}">+ إضافة</a>
+  <h2>إدارة الأسئلة الشائعة</h2>
+  {% include "custom_admin/_messages.html" %}
+
+  <form method="get" class="grid grid-2" style="margin:12px 0;">
+    <input name="q" value="{{ q }}" placeholder="بحث في السؤال/الإجابة" />
+    <div style="display:flex; gap:8px; justify-content:flex-end;">
+      <select name="category">
+        <option value="">كل الفئات</option>
+        {% for c in categories %}
+          <option value="{{ c.id }}" {% if c.id|stringformat:"s" == category_id %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+      <a class="secondary" href="{% url 'custom_admin:faqs_list' %}">مسح</a>
+      <button type="submit">بحث</button>
+      <a class="contrast" href="{% url 'custom_admin:faq_add' %}">+ إضافة سؤال</a>
+    </div>
+  </form>
+
+  <p class="muted">الإجمالي: {{ count }}</p>
+
+  <div class="grid" style="gap:12px;">
+    {% for f in page_obj.object_list %}
+      <article class="card">
+        <header style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div>
+            <strong>{{ f.question|truncatechars:90 }}</strong>
+            <div class="muted" style="font-size:.9rem">
+              الفئة: {{ f.category.name }} • آخر تحديث: {{ f.updated_at }} • بواسطة: {{ f.updated_by|default:"—" }}
+            </div>
+          </div>
+          <nav style="display:flex; gap:8px;">
+            <a class="secondary" href="{% url 'custom_admin:faq_edit' f.pk %}">تعديل</a>
+            <a class="secondary outline" href="{% url 'custom_admin:faq_delete' f.pk %}">حذف</a>
+          </nav>
+        </header>
+        <p class="muted" style="margin-top:8px">{{ f.answer|truncatechars:220 }}</p>
+      </article>
+    {% empty %}
+      <div class="card"><em class="muted">لا توجد أسئلة بعد.</em></div>
+    {% endfor %}
   </div>
-</div>
 
-<table class="table">
-  <thead><tr><th>السؤال</th><th>الفئة</th><th>آخر تحديث</th><th></th></tr></thead>
-  <tbody>
-    {% for f in items %}
-    <tr>
-      <td>{{ f.question|truncatechars:60 }}</td>
-      <td>{{ f.category.name|default:"-" }}</td>
-      <td>{{ f.updated_at|date:"Y-m-d H:i" }}</td>
-      <td class="actions">
-        <a class="link" href="{% url 'custom_admin:faq_edit' f.pk %}">تعديل</a>
-        <a class="link danger" href="{% url 'custom_admin:faq_delete' f.pk %}">حذف</a>
-      </td>
-    </tr>
-    {% empty %}<tr><td colspan="4">لا توجد أسئلة</td></tr>{% endfor %}
-  </tbody>
-</table>
-
-{% if items.paginator.num_pages > 1 %}
-<div class="pager">
-  {% if items.has_previous %}<a href="?page={{ items.previous_page_number }}&q={{ q }}">السابق</a>{% endif %}
-  <span>{{ items.number }} / {{ items.paginator.num_pages }}</span>
-  {% if items.has_next %}<a href="?page={{ items.next_page_number }}&q={{ q }}">التالي</a>{% endif %}
-</div>
-{% endif %}
+  {% include "custom_admin/_pagination.html" with page_obj=page_obj q=q %}
 {% endblock %}
