@@ -1,23 +1,52 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-  <meta charset="utf-8">
-  <title>لوحة UniBot</title>
-  <style>
-    body{font-family:Arial;background:#f7f7f7;margin:0;padding:2rem}
-    .card{background:#fff;padding:1rem;margin:1rem 0;border-radius:6px;box-shadow:0 0 4px rgba(0,0,0,.1)}
-    .btn{display:inline-block;background:#007bff;color:#fff;padding:.5rem 1rem;border-radius:4px;text-decoration:none;margin:.25rem}
-  </style>
-</head>
-<body>
-  <h1>لوحة التحكم</h1>
-  <div class="card">
-    <strong>مستخدمون:</strong> {{ stats.users }}<br>
-    <strong>أسئلة:</strong> {{ stats.faqs }}<br>
-    <strong>أحداث قادمة:</strong> {{ stats.upcoming_events }}
-  </div>
-  <div>
-    <a class="btn" href="{% url 'custom_admin:dashboard' %}">تحديث</a>
-  </div>
-</body>
-</html>
+{% extends "custom_admin/base.html" %}
+{% block content %}
+  <h2>لوحة التحكّم</h2>
+  <p class="muted">نظرة سريعة على النظام.</p>
+
+  <section class="grid grid-3">
+    <div class="card">
+      <h3>الأحداث</h3>
+      <p style="font-size:2rem; margin:0">{{ stats.events_count }}</p>
+      <small class="muted">إجمالي الأحداث</small>
+    </div>
+    <div class="card">
+      <h3>الأسئلة الشائعة</h3>
+      <p style="font-size:2rem; margin:0">{{ stats.faqs_count }}</p>
+      <small class="muted">إجمالي الأسئلة</small>
+    </div>
+    <div class="card">
+      <h3>المستخدمون</h3>
+      <p style="font-size:2rem; margin:0">{{ stats.users_count }}</p>
+      <small class="muted">إجمالي المستخدمين</small>
+    </div>
+  </section>
+
+  <section class="grid grid-2" style="margin-top:20px">
+    <div class="card">
+      <h4>آخر 5 أحداث</h4>
+      <ul>
+        {% for e in latest_events %}
+          <li>
+            <strong>{{ e.title }}</strong>
+            <div class="muted">{{ e.start_date }}{% if e.end_date %} → {{ e.end_date }}{% endif %}</div>
+          </li>
+        {% empty %}
+          <li class="muted">لا توجد أحداث بعد.</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="card">
+      <h4>آخر 5 أسئلة شائعة</h4>
+      <ul>
+        {% for f in latest_faqs %}
+          <li>
+            <strong>{{ f.question }}</strong>
+            <div class="muted">{{ f.answer|truncatechars:80 }}</div>
+          </li>
+        {% empty %}
+          <li class="muted">لا توجد أسئلة بعد.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+{% endblock %}
