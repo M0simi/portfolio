@@ -4,5 +4,6 @@ from . import views
 app_name = "custom_admin"
 
 urlpatterns = [
-    path("", views.dashboard, name="dashboard"),
+    path("", views.dashboard, name="dashboard"),              # /
+    path("dashboard/", views.dashboard, name="dashboard_alt") # /dashboard/
 ]
