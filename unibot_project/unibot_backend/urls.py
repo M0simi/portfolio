@@ -2,23 +2,17 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.http import JsonResponse
 
 urlpatterns = [
     # Django admin
     path("admin/", admin.site.urls),
 
-    # API 
-    path("api/", include("core.urls")),
+    # API
+    path("api/", include("core.urls", namespace="core")),
 
-    # dashboard
-    
-    path("", include(("custom_admin.urls", "custom_admin"), namespace="custom_admin")),
-  
+    # Custom dashboard (home & /dashboard/)
+    path("", include("custom_admin.urls", namespace="custom_admin")),
 ]
 
-# media
+# Media (served by Django; fine on Render for user uploads)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-
-
