@@ -1,53 +1,82 @@
-{% extends "custom_admin/base.html" %}
-{% block title %}لوحة التحكّم | UniBot{% endblock %}
+:root{
+  --bg:#0f172a;        /* slate-900 */
+  --card:#111827;      /* gray-900 */
+  --muted:#9ca3af;     /* gray-400 */
+  --text:#e5e7eb;      /* gray-200 */
+  --primary:#2563eb;   /* blue-600 */
+  --primary-700:#1d4ed8;
+  --accent:#22c55e;    /* green-500 */
+  --danger:#ef4444;    /* red-500 */
+  --warning:#f59e0b;   /* amber-500 */
+  --outline:#374151;   /* gray-700 */
+  --panel:#0b1220;     /* deep panel */
+  --panel-2:#0f1a34;   /* header rows */
+}
 
-{% block content %}
-  <h1 class="title">لوحة التحكّم</h1>
-  <p class="subtitle">نظرة عامة سريعة.</p>
+*{box-sizing:border-box}
+html,body{
+  margin:0;padding:0;background:var(--bg);color:var(--text);
+  font-family:"Cairo",system-ui,Segoe UI,Roboto,Arial,sans-serif
+}
+a{color:var(--primary);text-decoration:none}
+a:hover{color:var(--primary-700)}
+.muted{color:var(--muted)}
 
-  <section class="grid-3">
-    <div class="stat">
-      <div class="stat-label">الأحداث</div>
-      <div class="stat-value">{{ stats.events_count }}</div>
-      <a class="stat-link" href="/admin/core/event/">إدارة الأحداث</a>
-    </div>
-    <div class="stat">
-      <div class="stat-label">الأسئلة الشائعة</div>
-      <div class="stat-value">{{ stats.faqs_count }}</div>
-      <a class="stat-link" href="/admin/core/faq/">إدارة الأسئلة</a>
-    </div>
-    <div class="stat">
-      <div class="stat-label">المستخدمون</div>
-      <div class="stat-value">{{ stats.users_count }}</div>
-      <a class="stat-link" href="/admin/core/customuser/">إدارة المستخدمين</a>
-    </div>
-  </section>
+/* Top bar */
+.topbar{position:sticky;top:0;z-index:10;background:#1f2937;border-bottom:1px solid var(--outline)}
+.topbar-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700}
+.brand img{height:28px;width:auto}
+.top-links a{margin-inline:0 12px}
 
-  <section class="grid-2">
-    <div class="card">
-      <h3 class="section-title">آخر 5 أحداث</h3>
-      {% if latest_events %}
-        <ul>
-          {% for e in latest_events %}
-            <li><strong>{{ e.title }}</strong></li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <div class="empty">لا توجد أحداث بعد.</div>
-      {% endif %}
-    </div>
+/* Layout: RTL → القائمة يمين */
+.layout{
+  display:grid;
+  grid-template-columns: 260px 1fr;     /* [يمين] سايدبار 260px | [يسار] محتوى */
+  direction: rtl;                       /* تأكيد RTL */
+  min-height: calc(100vh - 56px);
+}
+.sidebar{
+  background:var(--panel);
+  border-left:1px solid var(--outline); /* لأن السايدبار يمين */
+  padding:18px;
+}
+.content{padding:24px}
 
-    <div class="card">
-      <h3 class="section-title">آخر 5 أسئلة شائعة</h3>
-      {% if latest_faqs %}
-        <ul>
-          {% for f in latest_faqs %}
-            <li><strong>{{ f.question }}</strong></li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <div class="empty">لا توجد أسئلة بعد.</div>
-      {% endif %}
-    </div>
-  </section>
-{% endblock %}
+/* Sidebar */
+.menu-title{font-size:12px;color:var(--muted);margin:12px 0 8px}
+.menu-link{
+  display:block;padding:10px 12px;border-radius:10px;color:var(--text);margin-bottom:6px;
+  border:1px solid transparent;
+}
+.menu-link:hover{background:#0f1a34;border-color:#1e293b}
+.menu-link.active{background:rgba(37,99,235,.14);border-color:rgba(37,99,235,.35)}
+
+/* Cards / blocks */
+.card{background:var(--card);border:1px solid #1f2937;border-radius:16px;padding:18px}
+.title{margin:0 0 6px;font-size:28px}
+.subtitle{margin:0 0 18px;color:var(--muted)}
+.section-title{margin:0 0 10px}
+
+/* Grids */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media (max-width:900px){.grid-3,.grid-2{grid-template-columns:1fr}}
+
+/* Stats */
+.stat{background:var(--panel);border:1px solid var(--outline);border-radius:14px;padding:16px}
+.stat-label{color:var(--muted);font-size:12px}
+.stat-value{font-size:26px;margin:6px 0 10px}
+.stat-link{font-size:12px}
+
+/* Empty */
+.empty{
+  border:1px dashed var(--outline);border-radius:14px;padding:18px;text-align:center;
+  color:var(--muted);background:rgba(255,255,255,.02)
+}
+
+/* Footer */
+.footer{
+  padding:14px 22px;border-top:1px solid var(--outline);
+  color:var(--muted);text-align:center
+}
