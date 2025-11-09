@@ -1,32 +1,36 @@
-{% load static %}
-<!doctype html>
-<html lang="ar" dir="rtl">
-  <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <title>{% block title %}UniBot Console{% endblock %}</title>
+{% extends "custom_admin/base.html" %}
+{% block title %}لوحة التحكّم | UniBot{% endblock %}
 
-  
-    <link rel="stylesheet" href="{% static 'custom_admin/css/admin.css' %}?v=8">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    {% include "custom_admin/_nav.html" %}
+{% block content %}
+  <h2 class="title">لوحة التحكّم</h2>
+  <p class="subtitle muted">نظرة سريعة على النظام.</p>
 
-    <div class="layout">
-      {% include "custom_admin/_sidebar.html" %}
-      <main class="content">
-        {% include "custom_admin/_messages.html" %}
-        {% block content %}{% endblock %}
-      </main>
+  <div class="grid-3">
+    <div class="stat">
+      <div class="stat-label">الأحداث</div>
+      <div class="stat-value">{{ stats.events_count }}</div>
+      <a class="stat-link" href="{% url 'custom_admin:events_list' %}">إدارة الأحداث →</a>
     </div>
+    <div class="stat">
+      <div class="stat-label">الأسئلة الشائعة</div>
+      <div class="stat-value">{{ stats.faqs_count }}</div>
+      <a class="stat-link" href="{% url 'custom_admin:faqs_list' %}">إدارة الأسئلة →</a>
+    </div>
+    <div class="stat">
+      <div class="stat-label">المستخدمون</div>
+      <div class="stat-value">{{ stats.users_count }}</div>
+      <a class="stat-link" href="{% url 'custom_admin:users_list' %}">إدارة المستخدمين →</a>
+    </div>
+  </div>
 
-    <footer class="footer">
-      <small>© {% now "Y" %} UniBot</small>
-    </footer>
-
-    {% block scripts %}{% endblock %}
-  </body>
-</html>
+  <div class="grid-2" style="margin-top:16px">
+    <div class="card">
+      <h4 class="section-title">آخر 5 أحداث</h4>
+      <div class="empty">سيتم عرض أحدث الأحداث هنا لاحقًا.</div>
+    </div>
+    <div class="card">
+      <h4 class="section-title">آخر 5 أسئلة شائعة</h4>
+      <div class="empty">سيتم عرض أحدث الأسئلة هنا لاحقًا.</div>
+    </div>
+  </div>
+{% endblock %}
