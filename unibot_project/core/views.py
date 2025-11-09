@@ -17,6 +17,15 @@ from .ai_service import ask_gemini
 
 # (اختياري) فحص النماذج المتاحة من Gemini
 import google.generativeai as genai
+import re
+
+
+def _clean_text(s: str) -> str:
+    """تنظيف بسيط لنصوص الإدخال (مسافات + محارف غير مرئية)."""
+    if not s:
+        return ""
+    s = re.sub(r"[\u200c\u200d\u200e\u200f]", "", s)  # ZWJ/ZWNJ/RTL marks
+    return s.strip()
 
 
 # =========================
@@ -26,7 +35,7 @@ class CustomLoginView(ObtainAuthToken):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-        email = request.data.get('email')
+        email = _clean_text(request.data.get('email'))
         password = request.data.get('password')
 
         if not email or not password:
@@ -62,14 +71,14 @@ def get_events(request):
     qs = Event.objects.all()
     now = timezone.now()
 
-    status_param = (request.GET.get('status') or '').lower()
+    status_param = (request.GET.get('status') or '').lower().strip()
     if status_param == 'upcoming':
         qs = qs.filter(start_date__gte=now)
     elif status_param == 'past':
         qs = qs.filter(Q(end_date__lt=now) | Q(end_date__isnull=True, start_date__lt=now))
     # else: all
 
-    q = request.GET.get('q')
+    q = _clean_text(request.GET.get('q'))
     if q:
         qs = qs.filter(Q(title__icontains=q) | Q(description__icontains=q))
 
@@ -95,7 +104,7 @@ def get_event_detail(request, slug):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def search_faqs(request):
-    query = (request.data.get('query') or '').strip()
+    query = _clean_text(request.data.get('query'))
     faqs = FAQ.objects.filter(question__icontains=query)[:5] if query else []
     serializer = FAQSerializer(faqs, many=True)
     return Response({'results': serializer.data})
@@ -118,6 +127,7 @@ def api_root(request):
             'ai_general': 'POST /api/ai/general/ (محمية)',
             'profile':  'GET/PUT /api/profile/ (محمية)',
             'ai_models': 'GET /api/ai/models/ (اختياري للتشخيص)',
+            'ai_health': 'GET /api/ai/health/ (تشخيص سريع)',
         },
         'status': '✅ API جاهز للعمل'
     })
@@ -129,10 +139,10 @@ def api_root(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register_user(request):
-    name = request.data.get('name')
-    email = request.data.get('email')
+    name = _clean_text(request.data.get('name'))
+    email = _clean_text(request.data.get('email'))
     password = request.data.get('password')
-    role = request.data.get('role', 'student')
+    role = _clean_text(request.data.get('role') or 'student')
 
     if not all([email, password]):
         return Response({'error': 'الرجاء إدخال البريد وكلمة المرور.'},
@@ -172,19 +182,26 @@ def ai_general(request):
     - يرجع 200 حتى لو رد نصّياً برسالة خطأ ودّية، عشان الواجهة تعرضها.
     """
     user = request.user
-    user_prompt = (request.data.get('prompt') or '').strip()
+    user_prompt = _clean_text(request.data.get('prompt'))
 
     if not user_prompt:
         return Response({'error': 'يرجى إدخال السؤال.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # ردّ سريع للتحيات
-    greetings = ["السلام عليكم", "مرحبا", "هلا", "صباح الخير", "مساء الخير", "أهلاً", "هلا والله"]
+    # ردّ سريع للتحيات (توسيع الصيغ الشائعة)
+    greetings = [
+        "السلام عليكم", "وعليكم السلام", "مرحبا", "مرحبا!", "مرحبا،", "هلا",
+        "يا هلا", "أهلاً", "اهلا", "صباح الخير", "مساء الخير"
+    ]
     if any(g in user_prompt for g in greetings):
         name = user.name or "الطالب"
         return Response({'result': f"وعليكم السلام {name}! 👋 كيف أقدر أساعدك اليوم؟"})
 
-    # استدعاء Gemini عبر خدمة ai_service
-    answer = (ask_gemini(user_prompt) or "").strip()
+    # استدعاء Gemini عبر خدمة ai_service (مع تغليف آمن)
+    try:
+        answer = (ask_gemini(user_prompt) or "").strip()
+    except Exception as e:
+        answer = f"⚠️ حدث خطأ في خدمة الذكاء: {e}"
+
     return Response({'result': answer}, status=status.HTTP_200_OK)
 
 
@@ -206,6 +223,13 @@ def ai_models(request):
         return Response({"error": str(e)}, status=500)
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def ai_health(_request):
+    """تشخيص سريع للـ API بدون مصادقة."""
+    return Response({"ok": True, "service": "unibot-ai", "ts": timezone.now().isoformat()})
+
+
 # =========================
 # الملف الشخصي
 # =========================
@@ -220,8 +244,8 @@ def get_profile(request):
 
     # PUT
     data = request.data
-    user.name = data.get('name', user.name)
-    user.role = data.get('role', user.role)
+    user.name = _clean_text(data.get('name')) or user.name
+    user.role = _clean_text(data.get('role')) or user.role
     user.save()
     serializer = UserSerializer(user)
     return Response({
