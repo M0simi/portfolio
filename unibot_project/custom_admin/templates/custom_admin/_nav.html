@@ -1,14 +1,57 @@
-<nav class="topbar">
-  <div class="brand">UniBot Console</div>
-  <ul class="menu">
-    <li><a href="{% url 'custom_admin:dashboard' %}">الرئيسية</a></li>
-    <li><a href="{% url 'custom_admin:events_list' %}">الأحداث</a></li>
-    <li><a href="{% url 'custom_admin:faqs_list' %}">الأسئلة الشائعة</a></li>
-    <li><a href="{% url 'custom_admin:categories_list' %}">الفئات</a></li>
-    <li><a href="{% url 'custom_admin:kb_list' %}">ملفات المعرفة</a></li>
-    <li><a href="{% url 'custom_admin:feedback_list' %}">التعليقات</a></li>
-    <li><a href="{% url 'custom_admin:favorites_list' %}">المفضلات</a></li>
-    <li><a href="{% url 'custom_admin:users_list' %}">المستخدمون</a></li>
-    <!-- <li><a href="/admin/">Django Admin</a></li> -->
-  </ul>
-</nav>
+{% load static %}
+<header class="container" style="margin-bottom:18px">
+  <!-- RTL + توزيع: مجموعة يمين (الشعار + الروابط) ومجموعة يسار (API + المستخدم) -->
+  <nav dir="rtl" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+
+    <!-- يمين: الشعار + الروابط الأساسية -->
+    <ul style="display:flex;align-items:center;gap:10px;margin:0;flex-wrap:wrap;">
+      <!-- الشعار (يمين) -->
+      <li style="display:flex;align-items:center;">
+        <a href="{% url 'custom_admin:dashboard' %}" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+          <img
+            src="{% static 'custom_admin/img/unibot-logo.svg' %}"
+            alt="UniBot"
+            style="height:28px;width:auto;display:block;object-fit:contain"
+          />
+          <strong>UniBot Dashboard</strong>
+          <small class="muted" style="font-weight:400">إدارة</small>
+        </a>
+      </li>
+
+      <!-- الروابط (على يمين الشعار بسبب RTL) -->
+      <li>
+        <a href="{% url 'custom_admin:dashboard' %}"
+           {% if request.path == '/' or request.path|slice:':11' == '/dashboard' %}aria-current="page"{% endif %}>
+          اللوحة
+        </a>
+      </li>
+      <li><a href="{% url 'custom_admin:events_list' %}" {% if '/events' in request.path %}aria-current="page"{% endif %}>الأحداث</a></li>
+      <li><a href="{% url 'custom_admin:faqs_list' %}" {% if '/faqs' in request.path %}aria-current="page"{% endif %}>الأسئلة</a></li>
+      <li><a href="{% url 'custom_admin:categories_list' %}" {% if '/categories' in request.path %}aria-current="page"{% endif %}>الفئات</a></li>
+      <li><a href="{% url 'custom_admin:kb_list' %}" {% if request.path|slice:':4' == '/kb/' or request.path == '/kb/' or request.path == '/kb' %}aria-current="page"{% endif %}>المعرفة</a></li>
+      <li><a href="{% url 'custom_admin:feedback_list' %}" {% if '/feedback' in request.path %}aria-current="page"{% endif %}>التعليقات</a></li>
+      <li><a href="{% url 'custom_admin:favorites_list' %}" {% if '/favorites' in request.path %}aria-current="page"{% endif %}>المفضلات</a></li>
+      <li><a href="{% url 'custom_admin:users_list' %}" {% if '/users' in request.path %}aria-current="page"{% endif %}>المستخدمون</a></li>
+    </ul>
+
+    <!-- يسار: روابط عامة + حساب المستخدم -->
+    <ul style="display:flex;align-items:center;gap:8px;margin:0;flex-wrap:wrap;">
+      <li><a class="secondary" href="/api/">API</a></li>
+      <!-- (لا يوجد رابط Django Admin كما طلبت) -->
+      <li>
+        {% if request.user.is_authenticated %}
+          <details>
+            <summary class="secondary">👤 {{ request.user.email|default:request.user.get_username }}</summary>
+            <ul dir="rtl">
+              <li class="muted" style="padding:6px 12px;">الدور: {{ request.user.role|default:"—" }}</li>
+              <li><a href="/admin/logout/">تسجيل الخروج</a></li>
+            </ul>
+          </details>
+        {% else %}
+          <a class="secondary" href="/admin/login/">تسجيل الدخول</a>
+        {% endif %}
+      </li>
+    </ul>
+
+  </nav>
+</header>
