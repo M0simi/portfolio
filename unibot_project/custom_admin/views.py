@@ -29,13 +29,38 @@ def _search(qs, query, fields):
 # ===== Dashboard =====
 @staff_member_required
 def dashboard(request):
+    # طابق أسماء المفاتيح مع القالب: events_count / faqs_count / users_count
+    try:
+        events_count = Event.objects.count()
+    except Exception:
+        events_count = 0
+
+    try:
+        faqs_count = FAQ.objects.count()
+    except Exception:
+        faqs_count = 0
+
+    try:
+        users_count = CustomUser.objects.count()
+    except Exception:
+        users_count = 0
+
+    try:
+        latest_events = Event.objects.order_by("-start_date")[:5]
+    except Exception:
+        latest_events = []
+
+    try:
+        latest_faqs = FAQ.objects.order_by("-updated_at")[:5]
+    except Exception:
+        latest_faqs = []
+
     stats = {
-        "events": Event.objects.count(),
-        "faqs": FAQ.objects.count(),
-        "users": CustomUser.objects.count(),
+        "events_count": events_count,
+        "faqs_count": faqs_count,
+        "users_count": users_count,
     }
-    latest_events = Event.objects.order_by("-start_date")[:5]
-    latest_faqs = FAQ.objects.order_by("-updated_at")[:5]
+
     return render(request, "custom_admin/dashboard.html", {
         "stats": stats,
         "latest_events": latest_events,
@@ -221,9 +246,9 @@ def favorite_list(request):
         "page_obj": page,
         "columns": columns,
         "delete_url_name": "custom_admin:favorites_delete",
-        "search_placeholder": "ابحث بالمستخدم/السؤال…",
         "hide_create": True,
         "edit_url_name": None,
+        "search_placeholder": "ابحث بالمستخدم/السؤال…",
     })
 
 @staff_member_required
@@ -247,7 +272,7 @@ def feedback_list(request):
         "title": "التعليقات",
         "page_obj": page,
         "columns": columns,
-        "delete_url_name": "custom_admin:feedback_delete",
+        "delete_url_name": "custom_admin:feedbacks_delete",
         "hide_create": True,
         "edit_url_name": None,
         "search_placeholder": "ابحث بالسؤال/المستخدم/التعليق…",
