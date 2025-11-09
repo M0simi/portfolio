@@ -1,0 +1,78 @@
+{% extends "custom_admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | UniBot{% endblock %}
+
+{% block content %}
+<h2 class="title">{{ title }}</h2>
+
+<div class="toolbar">
+  <form method="get">
+    <input class="input" type="text" name="q" value="{{ request.GET.q }}" placeholder="{{ search_placeholder|default:'ابحث…' }}">
+    <button class="btn">بحث</button>
+    {% if request.GET.q %}
+      <a class="btn ghost" href=".">مسح</a>
+    {% endif %}
+  </form>
+
+  {% if not hide_create %}
+    <a class="btn primary" href="{% url create_url %}">➕ إضافة</a>
+  {% endif %}
+</div>
+
+<div class="table-wrap" style="margin-top:12px">
+  <table class="table" dir="rtl">
+    <thead>
+      <tr>
+        {% for label, attr in columns %}
+          <th>{{ label }}</th>
+        {% endfor %}
+        <th class="actions">إجراءات</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for obj in page_obj %}
+        <tr>
+          {% for label, attr in columns %}
+            <td>
+              {% with value=obj|attr:attr %}
+                {% if value is None %}—{% else %}
+                  {% if value.url %}<a href="{{ value.url }}" target="_blank">{{ value }}</a>{% else %}{{ value }}{% endif %}
+                {% endif %}
+              {% endwith %}
+            </td>
+          {% endfor %}
+          <td class="actions">
+            {% if edit_url_name %}
+              <a class="btn sm" href="{% url edit_url_name obj.pk %}">تعديل</a>
+            {% endif %}
+            {% if delete_url_name %}
+              <form method="post" action="{% url delete_url_name obj.pk %}" style="display:inline">{% csrf_token %}
+                <button class="btn sm danger" onclick="return confirm('تأكيد الحذف؟')">حذف</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="{{ columns|length|add:1 }}"><div class="empty">لا توجد بيانات.</div></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if page_obj.paginator.num_pages > 1 %}
+  <div class="toolbar" style="justify-content:center;margin-top:10px">
+    {% if page_obj.has_previous %}
+      <a class="btn sm" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">السابق</a>
+    {% endif %}
+    <span class="badge">صفحة {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+      <a class="btn sm" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">التالي</a>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}
+
+{% comment %}
+فيلتر بسيط للوصول للخاصية بالاسم: obj|attr:"field"
+{% endcomment %}
