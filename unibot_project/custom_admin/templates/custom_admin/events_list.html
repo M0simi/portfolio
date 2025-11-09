@@ -1,43 +1,48 @@
 {% extends "custom_admin/base.html" %}
-{% block title %}الأحداث{% endblock %}
 {% block content %}
-<div class="list-head">
-  <h2>الأحداث</h2>
-  <div class="actions-inline">
-    <form method="get" class="search">
-      <input name="q" value="{{ q }}" placeholder="بحث بالعنوان/المكان/الاسم اللطيف">
-      <button class="btn">بحث</button>
-    </form>
-    <a class="btn" href="{% url 'custom_admin:event_add' %}">+ إضافة</a>
+  <h2>إدارة الأحداث</h2>
+  {% include "custom_admin/_messages.html" %}
+
+  <form method="get" class="grid grid-2" style="margin:12px 0;">
+    <input name="q" value="{{ q }}" placeholder="بحث بالعنوان/الوصف/الموقع" />
+    <div style="display:flex; gap:8px; justify-content:flex-end;">
+      <a class="secondary" href="{% url 'custom_admin:events_list' %}">مسح</a>
+      <button type="submit">بحث</button>
+      <a class="contrast" href="{% url 'custom_admin:event_add' %}">+ إضافة حدث</a>
+    </div>
+  </form>
+
+  <p class="muted">الإجمالي: {{ count }}</p>
+
+  <div class="grid" style="gap:12px;">
+    {% for e in page_obj.object_list %}
+      <article class="card">
+        <header style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div>
+            <strong>{{ e.title }}</strong>
+            <div class="muted" style="font-size:.9rem">
+              {{ e.start_date }}{% if e.end_date %} → {{ e.end_date }}{% endif %} • {{ e.location|default:"—" }}
+            </div>
+            <small class="muted">slug: {{ e.slug }}</small>
+          </div>
+          <nav style="display:flex; gap:8px;">
+            <a class="secondary" href="{% url 'custom_admin:event_edit' e.pk %}">تعديل</a>
+            <a class="secondary outline" href="{% url 'custom_admin:event_delete' e.pk %}">حذف</a>
+          </nav>
+        </header>
+
+        {% if e.image %}
+          <img src="{{ e.image.url }}" alt="" style="max-height:200px;border-radius:10px;margin-top:8px;object-fit:cover;">
+        {% endif %}
+
+        {% if e.description %}
+          <p class="muted" style="margin-top:8px">{{ e.description|truncatechars:220 }}</p>
+        {% endif %}
+      </article>
+    {% empty %}
+      <div class="card"><em class="muted">لا توجد أحداث بعد.</em></div>
+    {% endfor %}
   </div>
-</div>
 
-<div class="table-wrap">
-  <table class="table">
-    <thead><tr><th>العنوان</th><th>البدء</th><th>النهاية</th><th>المكان</th><th>Slug</th><th></th></tr></thead>
-    <tbody>
-      {% for e in events %}
-      <tr>
-        <td>{{ e.title }}</td>
-        <td>{{ e.start_date|date:"Y-m-d H:i" }}</td>
-        <td>{{ e.end_date|date:"Y-m-d H:i" }}</td>
-        <td>{{ e.location }}</td>
-        <td>{{ e.slug }}</td>
-        <td class="actions">
-          <a class="link" href="{% url 'custom_admin:event_edit' e.pk %}">تعديل</a>
-          <a class="link danger" href="{% url 'custom_admin:event_delete' e.pk %}">حذف</a>
-        </td>
-      </tr>
-      {% empty %}<tr><td colspan="6">لا توجد أحداث</td></tr>{% endfor %}
-    </tbody>
-  </table>
-</div>
-
-{% if events.paginator.num_pages > 1 %}
-<div class="pager">
-  {% if events.has_previous %}<a href="?page={{ events.previous_page_number }}&q={{ q }}">السابق</a>{% endif %}
-  <span>{{ events.number }} / {{ events.paginator.num_pages }}</span>
-  {% if events.has_next %}<a href="?page={{ events.next_page_number }}&q={{ q }}">التالي</a>{% endif %}
-</div>
-{% endif %}
+  {% include "custom_admin/_pagination.html" with page_obj=page_obj q=q %}
 {% endblock %}
