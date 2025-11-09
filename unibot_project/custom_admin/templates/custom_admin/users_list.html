@@ -1,33 +1,45 @@
 {% extends "custom_admin/base.html" %}
-{% block title %}المستخدمون{% endblock %}
 {% block content %}
-<div class="list-head">
-  <h2>المستخدمون</h2>
-  <form method="get" class="search">
-    <input name="q" value="{{ q }}" placeholder="بحث بالبريد أو الاسم">
-    <button class="btn">بحث</button>
+  <h2>إدارة المستخدمين</h2>
+  {% include "custom_admin/_messages.html" %}
+
+  <form method="get" class="grid grid-3" style="margin:12px 0;">
+    <input name="q" value="{{ q }}" placeholder="بحث بالاسم/البريد" />
+    <select name="role">
+      <option value="">كل الأدوار</option>
+      <option value="admin" {% if role == 'admin' %}selected{% endif %}>Admin</option>
+      <option value="student" {% if role == 'student' %}selected{% endif %}>Student</option>
+    </select>
+    <select name="staff">
+      <option value="">الكل</option>
+      <option value="true" {% if staff == 'true' %}selected{% endif %}>Staff فقط</option>
+      <option value="false" {% if staff == 'false' %}selected{% endif %}>غير Staff</option>
+    </select>
+    <div style="display:flex; gap:8px; justify-content:flex-end; grid-column: 1 / -1;">
+      <a class="secondary" href="{% url 'custom_admin:users_list' %}">مسح</a>
+      <button type="submit">بحث</button>
+    </div>
   </form>
-</div>
 
-<table class="table">
-  <thead><tr><th>البريد</th><th>الاسم</th><th>الدور</th><th>تاريخ الإنشاء</th></tr></thead>
-  <tbody>
-    {% for u in items %}
-    <tr>
-      <td>{{ u.email }}</td>
-      <td>{{ u.name|default:"-" }}</td>
-      <td>{{ u.role|default:"-" }}</td>
-      <td>{{ u.created_at|date:"Y-m-d H:i" }}</td>
-    </tr>
-    {% empty %}<tr><td colspan="4">لا يوجد مستخدمون</td></tr>{% endfor %}
-  </tbody>
-</table>
+  <p class="muted">الإجمالي: {{ count }}</p>
 
-{% if items.paginator.num_pages > 1 %}
-<div class="pager">
-  {% if items.has_previous %}<a href="?page={{ items.previous_page_number }}&q={{ q }}">السابق</a>{% endif %}
-  <span>{{ items.number }} / {{ items.paginator.num_pages }}</span>
-  {% if items.has_next %}<a href="?page={{ items.next_page_number }}&q={{ q }}">التالي</a>{% endif %}
-</div>
-{% endif %}
+  <div class="grid" style="gap:12px;">
+    {% for u in page_obj.object_list %}
+      <article class="card" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div>
+          <strong>{{ u.email }}</strong> • {{ u.name|default:"—" }}
+          <div class="muted" style="font-size:.9rem">
+            دور: {{ u.role }} • Staff: {{ u.is_staff }} • نشط: {{ u.is_active }} • أنشئ: {{ u.created_at }}
+          </div>
+        </div>
+        <nav style="display:flex; gap:8px;">
+          <a class="secondary" href="{% url 'custom_admin:user_edit' u.pk %}">تعديل</a>
+        </nav>
+      </article>
+    {% empty %}
+      <div class="card"><em class="muted">لا يوجد مستخدمون.</em></div>
+    {% endfor %}
+  </div>
+
+  {% include "custom_admin/_pagination.html" with page_obj=page_obj q=q %}
 {% endblock %}
