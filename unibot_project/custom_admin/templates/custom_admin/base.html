@@ -2,57 +2,21 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <title>{% block title %}UniBot Console{% endblock %}</title>
 
+  
+    <link rel="stylesheet" href="{% static 'custom_admin/css/admin.css' %}?v=8">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-
-    <!-- حمّل ستايلنا مع كسر الكاش -->
-    <link rel="stylesheet" href="{% static 'custom_admin/css/admin.css' %}?v=7">
   </head>
+  <body>
+    {% include "custom_admin/_nav.html" %}
 
-  <body class="ub-body">
-    <!-- الشريط العلوي -->
-    <header class="topbar">
-      <nav class="topbar-nav">
-        <a class="brand" href="{% url 'custom_admin:dashboard' %}">
-          <img src="{% static 'custom_admin/img/unibot-logo.svg' %}" alt="UniBot">
-          <span>UniBot Console</span>
-        </a>
-
-        <div class="right-links">
-          <!-- حذف رابط Django Admin عشان ما يرجعك للأدمن الأصلي -->
-          <a href="{% url 'custom_admin:dashboard' %}" class="toplink">اللوحة</a>
-          <a href="/api/" class="toplink">API</a>
-        </div>
-      </nav>
-    </header>
-
-    <!-- تخطيط الصفحة: قائمة يمين + محتوى يسار -->
     <div class="layout">
-      <!-- الشريط الجانبي (يمين) -->
-      <aside class="sidebar">
-        <div class="menu-title">المحتوى</div>
-
-        <!-- روابط إدارة المحتوى (كلها داخل النظام المخصص عندك أو لو تبغى مؤقتًا لصفحات الأدمن خلّها) -->
-        <a class="menu-link" href="{% url 'custom_admin:events_list' %}">الأحداث</a>
-        <a class="menu-link" href="{% url 'custom_admin:categories_list' %}">الفئات</a>
-        <a class="menu-link" href="{% url 'custom_admin:faqs_list' %}">الأسئلة الشائعة</a>
-        <a class="menu-link" href="{% url 'custom_admin:favorites_list' %}">المفضلات</a>
-        <a class="menu-link" href="{% url 'custom_admin:feedback_list' %}">التعليقات</a>
-        <a class="menu-link" href="{% url 'custom_admin:users_list' %}">المستخدمون</a>
-        <a class="menu-link" href="{% url 'custom_admin:kb_list' %}">Knowledge bases</a>
-
-        <div class="menu-title" style="margin-top:16px">روابط</div>
-        <a class="menu-link" href="{% url 'custom_admin:dashboard' %}">لوحة التحكم</a>
-        <a class="menu-link" href="/admin/password_change/">تغيير كلمة المرور</a>
-        <a class="menu-link" href="/admin/logout/">تسجيل الخروج</a>
-      </aside>
-
-      <!-- المحتوى -->
+      {% include "custom_admin/_sidebar.html" %}
       <main class="content">
         {% include "custom_admin/_messages.html" %}
         {% block content %}{% endblock %}
