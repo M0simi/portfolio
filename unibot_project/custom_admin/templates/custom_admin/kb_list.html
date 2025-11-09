@@ -1,42 +1,38 @@
 {% extends "custom_admin/base.html" %}
-{% block title %}ملفات المعرفة{% endblock %}
 {% block content %}
-<div class="list-head">
-  <h2>ملفات المعرفة (Knowledge Bases)</h2>
-  <div class="actions-inline">
-    <form method="get" class="search">
-      <input name="q" value="{{ q }}" placeholder="بحث بالعنوان">
-      <button class="btn">بحث</button>
-    </form>
-    <a class="btn" href="{% url 'custom_admin:kb_add' %}">+ إضافة</a>
+  <h2>إدارة قاعدة المعرفة</h2>
+  {% include "custom_admin/_messages.html" %}
+
+  <form method="get" class="grid grid-2" style="margin:12px 0;">
+    <input name="q" value="{{ q }}" placeholder="بحث بعنوان المصدر" />
+    <div style="display:flex; gap:8px; justify-content:flex-end;">
+      <a class="secondary" href="{% url 'custom_admin:kb_list' %}">مسح</a>
+      <button type="submit">بحث</button>
+      <a class="contrast" href="{% url 'custom_admin:kb_add' %}">+ إضافة مصدر</a>
+    </div>
+  </form>
+
+  <p class="muted">الإجمالي: {{ count }}</p>
+
+  <div class="grid" style="gap:12px;">
+    {% for k in page_obj.object_list %}
+      <article class="card" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div>
+          <strong>{{ k.title }}</strong>
+          <div class="muted"><small>آخر تحديث: {{ k.updated_at }}</small></div>
+          {% if k.file %}
+            <div><a href="{{ k.file.url }}" target="_blank">تحميل/عرض الملف</a></div>
+          {% endif %}
+        </div>
+        <nav style="display:flex; gap:8px;">
+          <a class="secondary" href="{% url 'custom_admin:kb_edit' k.pk %}">تعديل</a>
+          <a class="secondary outline" href="{% url 'custom_admin:kb_delete' k.pk %}">حذف</a>
+        </nav>
+      </article>
+    {% empty %}
+      <div class="card"><em class="muted">لا توجد مصادر بعد.</em></div>
+    {% endfor %}
   </div>
-</div>
 
-<table class="table">
-  <thead><tr><th>العنوان</th><th>الملف</th><th>آخر تحديث</th><th></th></tr></thead>
-  <tbody>
-    {% for k in items %}
-    <tr>
-      <td>{{ k.title }}</td>
-      <td>
-        {% if k.file %}
-          <a class="link" href="{{ k.file.url }}" target="_blank">فتح</a>
-        {% else %}-{% endif %}
-      </td>
-      <td>{{ k.updated_at|date:"Y-m-d H:i" }}</td>
-      <td class="actions">
-        <a class="link danger" href="{% url 'custom_admin:kb_delete' k.pk %}">حذف</a>
-      </td>
-    </tr>
-    {% empty %}<tr><td colspan="4">لا توجد ملفات</td></tr>{% endfor %}
-  </tbody>
-</table>
-
-{% if items.paginator.num_pages > 1 %}
-<div class="pager">
-  {% if items.has_previous %}<a href="?page={{ items.previous_page_number }}&q={{ q }}">السابق</a>{% endif %}
-  <span>{{ items.number }} / {{ items.paginator.num_pages }}</span>
-  {% if items.has_next %}<a href="?page={{ items.next_page_number }}&q={{ q }}">التالي</a>{% endif %}
-</div>
-{% endif %}
+  {% include "custom_admin/_pagination.html" with page_obj=page_obj q=q %}
 {% endblock %}
