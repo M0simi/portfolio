@@ -52,6 +52,7 @@ if USE_CLOUDINARY:
 # ----------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "custom_admin.middleware.RedirectAdminMiddleware"
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -210,3 +211,4 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
