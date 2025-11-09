@@ -1,37 +1,35 @@
 {% extends "custom_admin/base.html" %}
-{% block title %}الفئات{% endblock %}
 {% block content %}
-<div class="list-head">
-  <h2>الفئات</h2>
-  <div class="actions-inline">
-    <form method="get" class="search">
-      <input name="q" value="{{ q }}" placeholder="بحث بالاسم">
-      <button class="btn">بحث</button>
-    </form>
-    <a class="btn" href="{% url 'custom_admin:category_add' %}">+ إضافة</a>
+  <h2>إدارة الفئات</h2>
+  {% include "custom_admin/_messages.html" %}
+
+  <form method="get" class="grid grid-2" style="margin:12px 0;">
+    <input name="q" value="{{ q }}" placeholder="بحث باسم الفئة" />
+    <div style="display:flex; gap:8px; justify-content:flex-end;">
+      <a class="secondary" href="{% url 'custom_admin:categories_list' %}">مسح</a>
+      <button type="submit">بحث</button>
+      <a class="contrast" href="{% url 'custom_admin:category_add' %}">+ إضافة فئة</a>
+    </div>
+  </form>
+
+  <p class="muted">الإجمالي: {{ count }}</p>
+
+  <div class="grid" style="gap:12px;">
+    {% for c in page_obj.object_list %}
+      <article class="card" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div>
+          <strong>{{ c.name }}</strong>
+          <div class="muted"><small>أُنشئت: {{ c.created_at }}</small></div>
+        </div>
+        <nav style="display:flex; gap:8px;">
+          <a class="secondary" href="{% url 'custom_admin:category_edit' c.pk %}">تعديل</a>
+          <a class="secondary outline" href="{% url 'custom_admin:category_delete' c.pk %}">حذف</a>
+        </nav>
+      </article>
+    {% empty %}
+      <div class="card"><em class="muted">لا توجد فئات بعد.</em></div>
+    {% endfor %}
   </div>
-</div>
 
-<table class="table">
-  <thead><tr><th>الاسم</th><th></th></tr></thead>
-  <tbody>
-    {% for c in items %}
-    <tr>
-      <td>{{ c.name }}</td>
-      <td class="actions">
-        <a class="link" href="{% url 'custom_admin:category_edit' c.pk %}">تعديل</a>
-        <a class="link danger" href="{% url 'custom_admin:category_delete' c.pk %}">حذف</a>
-      </td>
-    </tr>
-    {% empty %}<tr><td colspan="2">لا توجد فئات</td></tr>{% endfor %}
-  </tbody>
-</table>
-
-{% if items.paginator.num_pages > 1 %}
-<div class="pager">
-  {% if items.has_previous %}<a href="?page={{ items.previous_page_number }}&q={{ q }}">السابق</a>{% endif %}
-  <span>{{ items.number }} / {{ items.paginator.num_pages }}</span>
-  {% if items.has_next %}<a href="?page={{ items.next_page_number }}&q={{ q }}">التالي</a>{% endif %}
-</div>
-{% endif %}
+  {% include "custom_admin/_pagination.html" with page_obj=page_obj q=q %}
 {% endblock %}
