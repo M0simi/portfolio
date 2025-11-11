@@ -1,0 +1,57 @@
+{% extends "custom_admin/base.html" %}
+{% load custom_admin_extras %}
+{% block title %}{{ title }} | UniBot{% endblock %}
+{% block content %}
+  <h1 class="title">{{ title }}</h1>
+
+  <form class="toolbar" method="get">
+    <input class="input" type="text" name="q" value="{{ request.GET.q }}" placeholder="{{ search_placeholder|default:'ابحث…' }}" />
+    {% if not hide_create %}
+      <a class="btn primary" href="{% if create_url %}{% url create_url %}{% else %}#{% endif %}">إضافة جديد</a>
+    {% endif %}
+  </form>
+
+  <div class="table-wrap" style="margin-top:14px">
+    <table class="table">
+      <thead>
+        <tr>
+          {% for head, field in columns %}
+            <th>{{ head }}</th>
+          {% endfor %}
+          <th class="actions">إجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for obj in page_obj.object_list %}
+          <tr>
+            {% for head, field in columns %}
+              <td>{{ obj|attr:field }}</td>
+            {% endfor %}
+            <td class="actions">
+              {% if edit_url_name %}
+                <a class="btn sm" href="{% url edit_url_name obj.pk %}">تعديل</a>
+              {% endif %}
+              {% if delete_url_name %}
+                <a class="btn sm danger" href="{% url delete_url_name obj.pk %}">حذف</a>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="{{ columns|length|add:1 }}"><div class="empty">لا توجد بيانات</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if page_obj.paginator.num_pages > 1 %}
+  <div class="toolbar" style="justify-content:center;margin-top:16px">
+    {% if page_obj.has_previous %}
+      <a class="btn" href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}">السابق</a>
+    {% endif %}
+    <span class="muted" style="padding:8px 12px">صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+      <a class="btn" href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}">التالي</a>
+    {% endif %}
+  </div>
+  {% endif %}
+{% endblock %}
