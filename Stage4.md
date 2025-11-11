@@ -1,58 +1,66 @@
-# 📌 Sprint Plan – Chatbot for University Students
-
-## 1. ✅ Break Down User Stories into Smaller Tasks
-
-**User Story:**  
-_As a student, I want to easily find university event dates._
-
-**Tasks:**
-- Design the chat interface (Chat UI)
-- Build the events information database
-- Develop the intelligent response model
-- Connect the UI with backend system (API)
-- Conduct user experience testing
+# Stage 4 – MVP Development and Execution  
+**Project:** Unibot – Chatbot for University Students  
 
 ---
 
-## 2. 🟢 Prioritize Tasks Using MoSCoW
+## 🧩 0. Plan and Define Sprints  
+*(based on project sprint plan)*  
 
-| Task                              | Priority     |
-|-----------------------------------|--------------|
-| Design chat interface             | Must Have    |
-| Build events information database | Must Have    |
-| Develop intelligent response model| Must Have    |
-| Connect UI with backend (API)     | Should Have  |
-| Conduct user experience testing   | Could Have   |
+**Sprint Duration:** **Oct 1 → Nov 11, 2025**  
+**Sprint Focus:** Event chatbot MVP (Django setup, database, backend, frontend, integration).  
 
----
-
-## 3. 🔄 Identify Dependencies and Assign Tasks
-
-| Task                              | Depends On              | Assigned To            |
-|-----------------------------------|--------------------------|-------------------------|
-| Design chat interface             | -                        | Meshari Alosimi         |
-| Build events information database | -                        | Abdulaziz Almutairi     |
-| Develop response model            | Events database          | Abdulaziz Alzahrani     |
-| Connect UI with backend (API)     | Chat UI + Response Model | Abdulaziz Almutairi     |
-| Conduct user testing              | All previous tasks       | Saleh Alharbi           |
+| Task | Assigned To | Priority | Deadline | Status |
+|:-------------------------------------------|:----------------------|:------------|:-----------|:------------|
+| Initial Django Setup & Configuration | **Saleh Alharbi** | Must | Oct 1 | ✅ Done |
+| Build Events Database | **Abdulaziz Almutairi** | Must | Oct 10 | ✅ Done |
+| Develop Response Model | **Abdulaziz Alzahrani** | Must | Oct 17 | ✅ Done |
+| Backend API Development | **Abdulaziz Almutairi** | Must | Oct 20 | ✅ Done |
+| Frontend Chat UI | **Meshari Alosimi** | Should | oct 22 | ✅ Done |
+| Integration (UI + API) | **Abdulaziz Almutairi** | Should | Nov 7 | ✅ Done |
+| User Testing | **Saleh Alharbi** | Could | Nov 10 | ✅ Completed |
 
 ---
 
-## 4. 🗓 Sprint Duration
-
-- **Length:** 2 weeks  
-- **Start Date:** October 15, 2025  
-- **End Date:** October 29, 2025
+## 🧑‍💻 1. Execute Development Tasks
+- **Django Setup:** Saleh Alharbi initialized the Django project, configured environment variables, and structured the backend files.  
+- **Database:** Abdulaziz Almutairi created the events and user tables with testing data for validation.  
+- **Backend:** REST API endpoints built and connected with the events database.  
+- **Frontend:** Meshari Alosimi developed the React chat interface after backend completion and connected it to the API.  
+- **Integration:** All components combined and verified through local environment tests.  
+- **SCM:** Feature branches managed and merged through reviewed pull requests.  
+- **QA:** Manual and Postman testing executed for main features and chat flow.  
 
 ---
 
-## 5. 📋 Summary Table
+## 📊 2. Monitor Progress and Adjust
+- Progress tracked via Trello (Backlog → In Progress → Done).  
+- Daily short syncs held on Discord.  
+- Adjustments made: postponed advanced chatbot responses to the next sprint.  
 
-| Task                              | Responsible             | Priority     | Deadline         |
-|-----------------------------------|--------------------------|--------------|------------------|
-| Design chat interface             | Meshari Alosimi          | Must Have    | Oct 18, 2025     |
-| Build events information database | Abdulaziz Almutairi      | Must Have    | Oct 18, 2025     |
-| Develop response model            | Abdulaziz Alzahrani      | Must Have    | Oct 21, 2025     |
-| Connect UI with backend (API)     | Abdulaziz Almutairi      | Should Have  | Oct 25, 2025     |
-| Conduct user testing              | Saleh Alharbi            | Could Have   | Oct 28, 2025     |
+---
 
+## 🔁 3. Sprint Review & Retrospective
+- **Review (Nov 10):** Fully functional chatbot demo showing event search and responses.  
+- **Feedback:** Improve UI speed and enhance chat layout for mobile.  
+- **Retrospective:**  
+  - ✅ Good collaboration between frontend and backend teams.  
+  - ⚠️ Integration phase required extra time for API refinements.  
+
+---
+
+## 🧪 4. Final Integration & QA Testing
+- Full system integration (Django backend + React frontend + Database) verified.  
+- Postman tests: all endpoints returned correct data and status codes.  
+- Manual browser testing across desktop and mobile passed.  
+- All major bugs resolved before final submission.  
+
+---
+
+## 📦 5. Deliverables
+| Item | Link / Note |
+|:--|:--|
+| Sprint Plan | [`Stage4.md`](https://github.com/M0simi/portfolio/blob/main/Stage4.md) |
+| Source Repository | [Unibot Repo (Main Branch)](https://github.com/M0simi/portfolio) |
+| Task / Bug Tracking | Trello Board (internal use) |
+| Testing Evidence | Postman screenshots and notes included in repo |
+| MVP Demo | Local / Render preview use
