@@ -1,0 +1,22 @@
+{% extends "custom_admin/base.html" %}
+{% block title %}{{ title }} | UniBot{% endblock %}
+{% block content %}
+  <h1 class="title">{{ title }}</h1>
+
+  <form class="form card" method="post" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:14px">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+      <div class="form-field">
+        <label>{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+        {{ field }}
+        {% if field.help_text %}<small class="muted">{{ field.help_text }}</small>{% endif %}
+        {% for e in field.errors %}<div class="alert danger">{{ e }}</div>{% endfor %}
+      </div>
+    {% endfor %}
+    <div style="display:flex;gap:10px">
+      <button class="btn primary" type="submit">حفظ</button>
+      {% if back_url %}<a class="btn ghost" href="{% url back_url %}">رجوع</a>{% endif %}
+    </div>
+  </form>
+{% endblock %}
