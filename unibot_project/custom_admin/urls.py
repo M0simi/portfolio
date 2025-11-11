@@ -4,8 +4,10 @@ from . import views
 app_name = "custom_admin"
 
 urlpatterns = [
+    
     path("", views.dashboard, name="dashboard"),
-    path("dashboard/", views.dashboard, name="dashboard_alt"),
+    path("dashboard/", views.dashboard, name="dashboard"),
+    
     # Events
     path("events/", views.event_list, name="events_list"),
     path("events/add/", views.event_create, name="events_create"),
