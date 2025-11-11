@@ -5,35 +5,41 @@ app_name = "custom_admin"
 
 urlpatterns = [
     path("", views.dashboard, name="dashboard"),
-    path("dashboard/", views.dashboard, name="dashboard"),
 
-    path("events/", views.events_list, name="events_list"),
-    path("events/add/", views.events_create, name="events_create"),
-    path("events/<int:pk>/edit/", views.events_edit, name="events_edit"),
-    path("events/<int:pk>/delete/", views.events_delete, name="events_delete"),
+    # Events
+    path("events/", views.event_list, name="events_list"),
+    path("events/add/", views.event_create, name="events_create"),
+    path("events/<str:pk>/edit/", views.event_edit, name="events_edit"),
+    path("events/<str:pk>/delete/", views.event_delete, name="events_delete"),
 
-    path("categories/", views.categories_list, name="categories_list"),
-    path("categories/add/", views.categories_create, name="categories_create"),
-    path("categories/<int:pk>/edit/", views.categories_edit, name="categories_edit"),
-    path("categories/<int:pk>/delete/", views.categories_delete, name="categories_delete"),
+    # Categories
+    path("categories/", views.category_list, name="categories_list"),
+    path("categories/add/", views.category_create, name="categories_create"),
+    path("categories/<str:pk>/edit/", views.category_edit, name="categories_edit"),
+    path("categories/<str:pk>/delete/", views.category_delete, name="categories_delete"),
 
-    path("faqs/", views.faqs_list, name="faqs_list"),
-    path("faqs/add/", views.faqs_create, name="faqs_create"),
-    path("faqs/<int:pk>/edit/", views.faqs_edit, name="faqs_edit"),
-    path("faqs/<int:pk>/delete/", views.faqs_delete, name="faqs_delete"),
+    # FAQs
+    path("faqs/", views.faq_list, name="faqs_list"),
+    path("faqs/add/", views.faq_create, name="faqs_create"),
+    path("faqs/<str:pk>/edit/", views.faq_edit, name="faqs_edit"),
+    path("faqs/<str:pk>/delete/", views.faq_delete, name="faqs_delete"),
 
-    path("favorites/", views.favorites_list, name="favorites_list"),
-    path("favorites/<int:pk>/delete/", views.favorites_delete, name="favorites_delete"),
+    # Favorites (عرض + حذف)
+    path("favorites/", views.favorite_list, name="favorites_list"),
+    path("favorites/<str:pk>/delete/", views.favorite_delete, name="favorites_delete"),
 
-    path("feedback/", views.feedback_list, name="feedback_list"),
-    path("feedback/<int:pk>/delete/", views.feedback_delete, name="feedback_delete"),
+    # Feedback (عرض + حذف)
+    path("feedback/", views.feedback_list, name="feedbacks_list"),
+    path("feedback/<str:pk>/delete/", views.feedback_delete, name="feedback_delete"),
 
-    path("users/", views.users_list, name="users_list"),
-    path("users/add/", views.users_create, name="users_create"),
-    path("users/<int:pk>/edit/", views.users_edit, name="users_edit"),
-    path("users/<int:pk>/delete/", views.users_delete, name="users_delete"),
+    # Users
+    path("users/", views.user_list, name="users_list"),
+    path("users/add/", views.user_create, name="users_create"),
+    path("users/<str:pk>/edit/", views.user_edit, name="users_edit"),
+    path("users/<str:pk>/delete/", views.user_delete, name="users_delete"),
 
+    # Knowledge Base
     path("kb/", views.kb_list, name="kb_list"),
     path("kb/upload/", views.kb_upload, name="kb_upload"),
-    path("kb/<int:pk>/delete/", views.kb_delete, name="kb_delete"),
+    path("kb/<str:pk>/delete/", views.kb_delete, name="kb_delete"),
 ]
