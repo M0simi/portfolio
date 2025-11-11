@@ -1,0 +1,13 @@
+{% extends "custom_admin/base.html" %}
+{% block title %}{{ title }} | UniBot{% endblock %}
+{% block content %}
+  <h1 class="title">{{ title }}</h1>
+  <div class="card">
+    <p>هل أنت متأكد من حذف: <b>{{ object }}</b>؟ هذا الإجراء لا يمكن التراجع عنه.</p>
+    <form method="post" style="margin-top:12px;display:flex;gap:10px">
+      {% csrf_token %}
+      <button class="btn danger" type="submit">تأكيد الحذف</button>
+      {% if back_url %}<a class="btn ghost" href="{% url back_url %}">إلغاء</a>{% endif %}
+    </form>
+  </div>
+{% endblock %}
