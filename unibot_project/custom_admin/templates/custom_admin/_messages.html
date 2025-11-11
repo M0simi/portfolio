@@ -1,9 +1,9 @@
 {% if messages %}
-  <ul style="list-style:none;padding:0;margin:0 0 12px 0;">
+  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
     {% for message in messages %}
-      <li class="card" style="border-left:4px solid {% if message.tags == 'success' %}#10b981{% elif message.tags == 'error' %}#ef4444{% else %}#60a5fa{% endif %};">
+      <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">
         {{ message }}
-      </li>
+      </div>
     {% endfor %}
-  </ul>
+  </div>
 {% endif %}
