@@ -1,96 +1,70 @@
 {% extends "custom_admin/base.html" %}
-{% load static %}
-
 {% block title %}لوحة التحكم | UniBot{% endblock %}
-
 {% block content %}
+  <h1 class="title">لوحة التحكم</h1>
+  <p class="subtitle">نظرة عامة سريعة</p>
 
-<div class="card">
-  <h2 class="title">لوحة التحكّم</h2>
-  <p class="subtitle">نظرة عامة سريعة.</p>
-</div>
-
-<div class="grid-3">
-  <!-- المستخدمون -->
-  <div class="stat">
-    <div class="stat-label">المستخدمون</div>
-    <div class="stat-value">{{ stats.users|default:0 }}</div>
-    <a class="stat-link" href="{% url 'custom_admin:users_list' %}">إدارة المستخدمين</a>
+  <div class="grid-3">
+    <div class="stat">
+      <div class="stat-label">الأحداث</div>
+      <div class="stat-value">{{ stats.events }}</div>
+      <a class="stat-link" href="{% url 'custom_admin:events_list' %}">عرض الكل</a>
+    </div>
+    <div class="stat">
+      <div class="stat-label">الأسئلة الشائعة</div>
+      <div class="stat-value">{{ stats.faqs }}</div>
+      <a class="stat-link" href="{% url 'custom_admin:faqs_list' %}">عرض الكل</a>
+    </div>
+    <div class="stat">
+      <div class="stat-label">المستخدمون</div>
+      <div class="stat-value">{{ stats.users }}</div>
+      <a class="stat-link" href="{% url 'custom_admin:users_list' %}">عرض الكل</a>
+    </div>
   </div>
 
-  <!-- الأسئلة الشائعة -->
-  <div class="stat">
-    <div class="stat-label">الأسئلة الشائعة</div>
-    <div class="stat-value">{{ stats.faqs|default:0 }}</div>
-    <a class="stat-link" href="{% url 'custom_admin:faqs_list' %}">إدارة الأسئلة</a>
-  </div>
-
-  <!-- الأحداث -->
-  <div class="stat">
-    <div class="stat-label">الأحداث</div>
-    <div class="stat-value">{{ stats.events|default:0 }}</div>
-    <a class="stat-link" href="{% url 'custom_admin:events_list' %}">إدارة الأحداث</a>
-  </div>
-</div>
-
-<div class="grid-2">
-  <!-- آخر 5 أسئلة -->
-  <section class="card">
-    <h3 class="section-title">آخر 5 أسئلة شائعة</h3>
-    {% if latest_faqs %}
+  <div class="grid-2">
+    <div class="card">
+      <h3 class="section-title">أحدث الأحداث</h3>
+      {% if latest_events %}
       <div class="table-wrap">
         <table class="table">
-          <thead>
-            <tr>
-              <th>السؤال</th>
-              <th>الفئة</th>
-              <th>آخر تحديث</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for f in latest_faqs %}
-            <tr>
-              <td>{{ f.question }}</td>
-              <td>{{ f.category }}</td>
-              <td>{{ f.updated_at }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% else %}
-      <div class="empty">لا توجد أسئلة بعد.</div>
-    {% endif %}
-  </section>
-
-  <!-- آخر 5 أحداث -->
-  <section class="card">
-    <h3 class="section-title">آخر 5 أحداث</h3>
-    {% if latest_events %}
-      <div class="table-wrap">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>العنوان</th>
-              <th>البدء</th>
-              <th>المكان</th>
-            </tr>
-          </thead>
+          <thead><tr><th>العنوان</th><th>البدء</th><th>المكان</th></tr></thead>
           <tbody>
             {% for e in latest_events %}
-            <tr>
-              <td>{{ e.title }}</td>
-              <td>{{ e.start_date }}</td>
-              <td>{{ e.location }}</td>
-            </tr>
+              <tr>
+                <td>{{ e.title }}</td>
+                <td>{{ e.start_date }}</td>
+                <td>{{ e.location }}</td>
+              </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
-    {% else %}
-      <div class="empty">لا توجد أحداث بعد.</div>
-    {% endif %}
-  </section>
-</div>
+      {% else %}
+        <div class="empty">لا توجد أحداث</div>
+      {% endif %}
+    </div>
 
+    <div class="card">
+      <h3 class="section-title">أحدث الأسئلة</h3>
+      {% if latest_faqs %}
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>السؤال</th><th>الفئة</th><th>آخر تحديث</th></tr></thead>
+          <tbody>
+            {% for f in latest_faqs %}
+              <tr>
+                <td>{{ f.question }}</td>
+                <td>{{ f.category }}</td>
+                <td>{{ f.updated_at }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="empty">لا توجد أسئلة</div>
+      {% endif %}
+    </div>
+  </div>
 {% endblock %}
