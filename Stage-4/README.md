@@ -2,7 +2,7 @@
 
 This folder contains all documentation related to Stage 4 of the Unibot project, covering the MVP development phase.
 
-## 📂 Contents
+## 📂 Contents:
 | File | Description |
 |:--|:--|
 | [Stage4.md](./Stage4.md) | Full stage overview and deliverables |
