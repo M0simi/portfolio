@@ -21,7 +21,8 @@ const SA_UNIVERSITIES = [
   "جامعة بيشة",
 ];
 
-export default function SignUp() {
+export default function SignUp()
+{
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -34,29 +35,43 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
+  {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e) =>
+  {
     e.preventDefault();
     setLoading(true);
     setErrorMsg("");
 
-    try {
-      const response = await axios.post("https://api.unibot.foo/api/register", form);
+    try
+    {
+      // ✅ أهم تعديل: إضافة السلاش الأخيرة في الرابط
+      const response = await axios.post(
+        "https://api.unibot.foo/api/register/",
+        form
+      );
 
-      if (response.status === 201 || response.status === 200) {
+      if (response.status === 201 || response.status === 200)
+      {
         alert("تم إنشاء الحساب بنجاح ✅");
         navigate("/profile"); // تحويل تلقائي لصفحة الملف الشخصي
-      } else {
+      }
+      else
+      {
         setErrorMsg("حدث خطأ أثناء إنشاء الحساب. حاول مرة أخرى.");
       }
-    } catch (error) {
+    }
+    catch (error)
+    {
       console.error("Registration error:", error);
       setErrorMsg("البريد مستخدم من قبل أو هناك خطأ في الخادم.");
-    } finally {
+    }
+    finally
+    {
       setLoading(false);
     }
   };
@@ -157,4 +172,3 @@ export default function SignUp() {
     </section>
   );
 }
-
